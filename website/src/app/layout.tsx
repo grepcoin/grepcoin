@@ -10,10 +10,10 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://grepcoin.io'),
-  title: 'GrepCoin - Fund Games, Play Together, Own the Future',
-  description: 'The decentralized ecosystem for indie games and hobby projects. Fund creators, earn rewards, and own a piece of the gaming revolution.',
-  keywords: ['crypto', 'gaming', 'indie games', 'blockchain', 'defi', 'staking', 'dao'],
-  authors: [{ name: 'GrepCoin Team' }],
+  title: 'GrepCoin - Crypto Arcade for Indie Game Lovers',
+  description: 'The decentralized arcade gaming platform by GrepLabs LLC. Play developer-themed games, earn GREP tokens, and stake for multiplied rewards.',
+  keywords: ['crypto', 'gaming', 'indie games', 'blockchain', 'arcade', 'staking', 'GREP token', 'Base'],
+  authors: [{ name: 'GrepLabs LLC' }],
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
@@ -24,11 +24,11 @@ export const metadata: Metadata = {
   },
   manifest: '/manifest.json',
   openGraph: {
-    title: 'GrepCoin - The Indie Gaming Economy',
-    description: 'Fund games, play together, own the future. Join the decentralized ecosystem for indie games.',
+    title: 'GrepCoin - Crypto Arcade for Indie Game Lovers',
+    description: 'Play developer-themed arcade games, earn GREP tokens, and stake for multiplied rewards. Built by GrepLabs LLC.',
     type: 'website',
     locale: 'en_US',
-    siteName: 'GrepCoin',
+    siteName: 'GrepCoin by GrepLabs',
     images: [
       {
         url: '/og-image.png',

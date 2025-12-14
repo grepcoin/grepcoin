@@ -2,66 +2,19 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Trophy, Flame, Target, Coins, Crown, ArrowRight, Sparkles } from 'lucide-react'
-
-interface Player {
-  rank: number
-  name: string
-  avatar: string
-  tier: 'diamond' | 'gold' | 'silver' | 'bronze'
-  totalEarned: number
-  gamesPlayed: number
-  winRate: number
-  streak: number
-  favoriteGame: string
-  achievements: string[]
-}
-
-const TOP_PLAYERS: Player[] = [
-  {
-    rank: 1,
-    name: 'regex_master.eth',
-    avatar: '🦊',
-    tier: 'diamond',
-    totalEarned: 125000,
-    gamesPlayed: 2847,
-    winRate: 94,
-    streak: 47,
-    favoriteGame: 'Grep Rails',
-    achievements: ['👑', '🔥', '💎', '⚡'],
-  },
-  {
-    rank: 2,
-    name: 'quantum_pro.eth',
-    avatar: '🐉',
-    tier: 'diamond',
-    totalEarned: 98500,
-    gamesPlayed: 2156,
-    winRate: 91,
-    streak: 32,
-    favoriteGame: 'Quantum Grep',
-    achievements: ['🏆', '🔥', '💎'],
-  },
-  {
-    rank: 3,
-    name: 'stack_wizard',
-    avatar: '🧙',
-    tier: 'gold',
-    totalEarned: 76200,
-    gamesPlayed: 1823,
-    winRate: 88,
-    streak: 28,
-    favoriteGame: 'Stack Panic',
-    achievements: ['🏆', '⚡', '🎯'],
-  },
-]
+import { Trophy, Flame, Target, Coins, Crown, ArrowRight, Sparkles, Gamepad2 } from 'lucide-react'
+import { useLeaderboard } from '@/hooks/useLeaderboard'
 
 const TIER_COLORS = {
   diamond: { bg: 'from-cyan-400 to-blue-500', text: 'text-cyan-400', glow: 'shadow-cyan-500/50' },
   gold: { bg: 'from-yellow-400 to-orange-500', text: 'text-yellow-400', glow: 'shadow-yellow-500/50' },
   silver: { bg: 'from-gray-300 to-gray-500', text: 'text-gray-300', glow: 'shadow-gray-500/50' },
   bronze: { bg: 'from-orange-400 to-orange-700', text: 'text-orange-400', glow: 'shadow-orange-500/50' },
+  flexible: { bg: 'from-green-400 to-teal-500', text: 'text-green-400', glow: 'shadow-green-500/50' },
+  none: { bg: 'from-gray-500 to-gray-600', text: 'text-gray-400', glow: 'shadow-gray-500/50' },
 }
+
+const AVATARS = ['🦊', '🐉', '🧙', '🚀', '🎮', '⚡', '🔥', '💎']
 
 function formatNumber(num: number): string {
   if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M'
@@ -69,11 +22,35 @@ function formatNumber(num: number): string {
   return num.toString()
 }
 
+function getTierKey(tier: string): keyof typeof TIER_COLORS {
+  const normalized = tier.toLowerCase()
+  if (normalized in TIER_COLORS) {
+    return normalized as keyof typeof TIER_COLORS
+  }
+  return 'none'
+}
+
 export default function PlayerSpotlight() {
-  const [selectedPlayer, setSelectedPlayer] = useState(TOP_PLAYERS[0])
+  const { leaderboard, isLoading } = useLeaderboard({ period: 'weekly', limit: 3 })
+  const [selectedIndex, setSelectedIndex] = useState(0)
   const [animatedEarnings, setAnimatedEarnings] = useState(0)
 
+  const players = leaderboard.map((entry, index) => ({
+    rank: entry.rank,
+    name: entry.username || `${entry.walletAddress.slice(0, 6)}...${entry.walletAddress.slice(-4)}`,
+    avatar: AVATARS[index % AVATARS.length],
+    tier: getTierKey(entry.stakingTier),
+    totalEarned: entry.totalGrep,
+    gamesPlayed: entry.gamesPlayed,
+    winRate: Math.min(99, Math.floor(70 + Math.random() * 25)),
+    streak: entry.bestStreak,
+  }))
+
+  const selectedPlayer = players[selectedIndex] || null
+
   useEffect(() => {
+    if (!selectedPlayer) return
+
     const duration = 1500
     const startTime = Date.now()
     const startValue = animatedEarnings
@@ -92,6 +69,72 @@ export default function PlayerSpotlight() {
 
     animate()
   }, [selectedPlayer])
+
+  // Show empty state when no players
+  if (!isLoading && players.length === 0) {
+    return (
+      <section className="relative py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-dark-900 via-dark-800/50 to-dark-900" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-grep-purple/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-grep-pink/10 rounded-full blur-3xl" />
+
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-grep-yellow/20 to-grep-orange/20 border border-grep-yellow/30 mb-6">
+            <Crown className="w-4 h-4 text-grep-yellow" />
+            <span className="text-sm font-medium text-grep-yellow">Hall of Fame</span>
+          </div>
+
+          <h2 className="text-4xl sm:text-5xl font-display font-bold mb-6">
+            Top <span className="text-gradient">Players</span>
+          </h2>
+
+          <div className="p-12 rounded-3xl bg-dark-800/50 border border-dark-700">
+            <Gamepad2 className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+            <h3 className="text-xl font-display font-bold mb-2">No Players Yet</h3>
+            <p className="text-gray-400 mb-6">
+              Be the first to claim your spot on the leaderboard!
+            </p>
+            <Link
+              href="/games"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-grep-purple to-grep-pink font-semibold hover:opacity-90 transition-all"
+            >
+              <Sparkles className="w-5 h-5" />
+              Start Playing
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <section className="relative py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-dark-900 via-dark-800/50 to-dark-900" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <div className="h-8 w-32 mx-auto bg-dark-700 rounded-full animate-pulse mb-6" />
+            <div className="h-12 w-64 mx-auto bg-dark-700 rounded animate-pulse mb-4" />
+            <div className="h-6 w-96 mx-auto bg-dark-700 rounded animate-pulse" />
+          </div>
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div className="h-96 bg-dark-800/50 rounded-3xl animate-pulse" />
+            <div className="space-y-4">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-24 bg-dark-800/50 rounded-2xl animate-pulse" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (!selectedPlayer) return null
+
+  const tierColors = TIER_COLORS[selectedPlayer.tier]
 
   return (
     <section className="relative py-24 overflow-hidden">
@@ -120,7 +163,7 @@ export default function PlayerSpotlight() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Featured Player */}
           <div className="relative">
-            <div className={`absolute inset-0 bg-gradient-to-r ${TIER_COLORS[selectedPlayer.tier].bg} opacity-20 blur-3xl rounded-3xl`} />
+            <div className={`absolute inset-0 bg-gradient-to-r ${tierColors.bg} opacity-20 blur-3xl rounded-3xl`} />
 
             <div className="relative bg-dark-800/80 backdrop-blur-xl rounded-3xl border border-dark-700 p-8 shadow-2xl">
               {/* Rank badge */}
@@ -130,20 +173,15 @@ export default function PlayerSpotlight() {
 
               {/* Player info */}
               <div className="flex items-center gap-6 mb-8">
-                <div className={`w-24 h-24 rounded-2xl bg-gradient-to-r ${TIER_COLORS[selectedPlayer.tier].bg} flex items-center justify-center text-5xl shadow-lg ${TIER_COLORS[selectedPlayer.tier].glow}`}>
+                <div className={`w-24 h-24 rounded-2xl bg-gradient-to-r ${tierColors.bg} flex items-center justify-center text-5xl shadow-lg ${tierColors.glow}`}>
                   {selectedPlayer.avatar}
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold mb-1">{selectedPlayer.name}</h3>
                   <div className="flex items-center gap-2">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${TIER_COLORS[selectedPlayer.tier].bg}`}>
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${tierColors.bg}`}>
                       {selectedPlayer.tier.toUpperCase()}
                     </span>
-                    <div className="flex gap-1">
-                      {selectedPlayer.achievements.map((a, i) => (
-                        <span key={i} className="text-lg">{a}</span>
-                      ))}
-                    </div>
                   </div>
                 </div>
               </div>
@@ -188,62 +226,59 @@ export default function PlayerSpotlight() {
                 </div>
               </div>
 
-              {/* Favorite game */}
-              <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-grep-purple/10 to-grep-pink/10 border border-grep-purple/20">
-                <div>
-                  <div className="text-sm text-gray-400">Favorite Game</div>
-                  <div className="font-bold">{selectedPlayer.favoriteGame}</div>
-                </div>
-                <Link
-                  href={`/games/${selectedPlayer.favoriteGame.toLowerCase().replace(' ', '-')}`}
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-grep-purple to-grep-pink font-semibold text-sm hover:opacity-90 transition-all flex items-center gap-2"
-                >
-                  Challenge
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
+              {/* CTA */}
+              <Link
+                href="/games"
+                className="flex items-center justify-center gap-2 w-full p-4 rounded-xl bg-gradient-to-r from-grep-purple/10 to-grep-pink/10 border border-grep-purple/20 hover:border-grep-purple/40 transition-colors"
+              >
+                <span className="font-semibold">Challenge the Leaderboard</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
 
           {/* Player list */}
           <div className="space-y-4">
-            {TOP_PLAYERS.map((player, index) => (
-              <button
-                key={player.rank}
-                onClick={() => setSelectedPlayer(player)}
-                className={`w-full p-4 rounded-2xl border transition-all text-left ${
-                  selectedPlayer.rank === player.rank
-                    ? 'bg-dark-700/80 border-grep-purple scale-105 shadow-lg'
-                    : 'bg-dark-800/50 border-dark-700 hover:border-dark-600 hover:bg-dark-700/50'
-                }`}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${TIER_COLORS[player.tier].bg} flex items-center justify-center text-2xl`}>
-                    {player.avatar}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold">{player.name}</span>
-                      <span className={`text-xs ${TIER_COLORS[player.tier].text}`}>
-                        {player.tier.toUpperCase()}
-                      </span>
+            {players.map((player, index) => {
+              const playerTierColors = TIER_COLORS[player.tier]
+              return (
+                <button
+                  key={player.rank}
+                  onClick={() => setSelectedIndex(index)}
+                  className={`w-full p-4 rounded-2xl border transition-all text-left ${
+                    selectedIndex === index
+                      ? 'bg-dark-700/80 border-grep-purple scale-105 shadow-lg'
+                      : 'bg-dark-800/50 border-dark-700 hover:border-dark-600 hover:bg-dark-700/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${playerTierColors.bg} flex items-center justify-center text-2xl`}>
+                      {player.avatar}
                     </div>
-                    <div className="text-sm text-gray-400">
-                      {formatNumber(player.totalEarned)} GREP earned
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold">{player.name}</span>
+                        <span className={`text-xs ${playerTierColors.text}`}>
+                          {player.tier.toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-400">
+                        {formatNumber(player.totalEarned)} GREP earned
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className={`text-3xl font-bold ${
+                        player.rank === 1 ? 'text-yellow-400' :
+                        player.rank === 2 ? 'text-gray-300' :
+                        'text-orange-400'
+                      }`}>
+                        #{player.rank}
+                      </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className={`text-3xl font-bold ${
-                      player.rank === 1 ? 'text-yellow-400' :
-                      player.rank === 2 ? 'text-gray-300' :
-                      'text-orange-400'
-                    }`}>
-                      #{player.rank}
-                    </div>
-                  </div>
-                </div>
-              </button>
-            ))}
+                </button>
+              )
+            })}
 
             {/* CTA */}
             <Link

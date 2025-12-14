@@ -47,6 +47,46 @@ const games = [
     rewards: '10-60 GREP',
     status: 'live',
   },
+  {
+    id: 'bug-hunter',
+    name: 'Bug Hunter',
+    description: 'Find and squash bugs in scrolling code snippets before they escape!',
+    difficulty: 'Medium',
+    color: 'from-red-500 to-orange-500',
+    icon: '🐛',
+    rewards: '10-60 GREP',
+    status: 'live',
+  },
+  {
+    id: 'crypto-snake',
+    name: 'Crypto Snake',
+    description: 'Classic snake game with blockchain vibes. Collect GREP coins and grow your chain!',
+    difficulty: 'Easy',
+    color: 'from-green-500 to-cyan-500',
+    icon: '🐍',
+    rewards: '5-40 GREP',
+    status: 'live',
+  },
+  {
+    id: 'syntax-sprint',
+    name: 'Syntax Sprint',
+    description: 'Build valid JavaScript from falling code tokens. Tetris meets programming!',
+    difficulty: 'Hard',
+    color: 'from-purple-500 to-pink-500',
+    icon: '💻',
+    rewards: '15-70 GREP',
+    status: 'live',
+  },
+  {
+    id: 'regex-crossword',
+    name: 'RegEx Crossword',
+    description: 'Solve crossword puzzles where clues are regex patterns. Match rows and columns!',
+    difficulty: 'Medium',
+    color: 'from-orange-500 to-yellow-500',
+    icon: '🧩',
+    rewards: '10-80 GREP',
+    status: 'live',
+  },
 ]
 
 export default function GamesPage() {
@@ -112,7 +152,7 @@ export default function GamesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h2 className="text-2xl font-display font-bold mb-8">Choose Your Game</h2>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {games.map((game) => (
             <div
               key={game.id}
@@ -123,13 +163,13 @@ export default function GamesPage() {
               {/* Background gradient */}
               <div className={`absolute inset-0 bg-gradient-to-br ${game.color} opacity-5 group-hover:opacity-10 transition-opacity`} />
 
-              <div className="relative p-8">
-                <div className="flex items-start justify-between mb-6">
-                  <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${game.color} flex items-center justify-center text-4xl shadow-lg`}>
+              <div className="relative p-5">
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${game.color} flex items-center justify-center text-2xl shadow-lg`}>
                     {game.icon}
                   </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  <div className="flex flex-col items-end gap-1">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                       game.difficulty === 'Hard'
                         ? 'bg-red-500/20 text-red-400'
                         : game.difficulty === 'Medium'
@@ -139,39 +179,37 @@ export default function GamesPage() {
                       {game.difficulty}
                     </span>
                     {game.status === 'coming-soon' && (
-                      <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-500/20 text-gray-400">
+                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-500/20 text-gray-400">
                         Coming Soon
                       </span>
                     )}
                   </div>
                 </div>
 
-                <h3 className="text-2xl font-display font-bold mb-2">{game.name}</h3>
-                <p className="text-gray-400 mb-6">{game.description}</p>
+                <h3 className="text-lg font-display font-bold mb-1">{game.name}</h3>
+                <p className="text-gray-400 text-sm mb-4 line-clamp-2">{game.description}</p>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Coins className="w-4 h-4 text-grep-yellow" />
-                    <span className="text-sm text-gray-400">Rewards:</span>
-                    <span className="text-sm font-bold text-grep-green">{game.rewards}</span>
-                  </div>
-
-                  {game.status === 'live' ? (
-                    <Link
-                      href={`/games/${game.id}`}
-                      className={`px-6 py-3 rounded-xl bg-gradient-to-r ${game.color} font-semibold hover:opacity-90 transition-opacity`}
-                    >
-                      Play Now
-                    </Link>
-                  ) : (
-                    <button
-                      disabled
-                      className="px-6 py-3 rounded-xl bg-dark-700 text-gray-500 font-semibold cursor-not-allowed"
-                    >
-                      Coming Soon
-                    </button>
-                  )}
+                <div className="flex items-center gap-2 mb-4">
+                  <Coins className="w-3.5 h-3.5 text-grep-yellow" />
+                  <span className="text-xs text-gray-400">Rewards:</span>
+                  <span className="text-xs font-bold text-grep-green">{game.rewards}</span>
                 </div>
+
+                {game.status === 'live' ? (
+                  <Link
+                    href={`/games/${game.id}`}
+                    className={`block w-full text-center px-4 py-2.5 rounded-xl bg-gradient-to-r ${game.color} font-semibold text-sm hover:opacity-90 transition-opacity`}
+                  >
+                    Play Now
+                  </Link>
+                ) : (
+                  <button
+                    disabled
+                    className="w-full px-4 py-2.5 rounded-xl bg-dark-700 text-gray-500 font-semibold text-sm cursor-not-allowed"
+                  >
+                    Coming Soon
+                  </button>
+                )}
               </div>
             </div>
           ))}

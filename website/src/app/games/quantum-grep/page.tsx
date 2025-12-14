@@ -6,6 +6,8 @@ import { ArrowLeft, Play, Pause, RotateCcw, Eye, Zap, Target, Sparkles } from 'l
 import { playSound, createExplosion, createTextParticle, updateParticle, drawParticle, Particle, GREP_COLORS } from '@/lib/gameUtils'
 import { useStaking } from '@/context/StakingContext'
 import { MultiplierIndicator } from '@/components/StakingBadge'
+import { useGameScore } from '@/hooks/useGameScore'
+import { useAuth } from '@/context/AuthContext'
 
 interface QuantumParticle {
   id: number
@@ -63,7 +65,18 @@ export default function QuantumGrepGame() {
 
   const { isConnected, multiplier, addEarnings } = useStaking()
 
+  // Score submission hooks
+  const { submitScore, isSubmitting, lastResult } = useGameScore('quantum-grep')
+  const { isAuthenticated } = useAuth()
+
   const currentLevel = LEVELS[level] || LEVELS[LEVELS.length - 1]
+
+  // Submit score when game ends (either gameOver or levelComplete)
+  useEffect(() => {
+    if ((gameState === 'gameOver' || gameState === 'levelComplete') && isAuthenticated && score > 0) {
+      submitScore(score, combo, level + 1)
+    }
+  }, [gameState, isAuthenticated, score, combo, level, submitScore])
 
   // Initialize particles for a level
   const initializeParticles = useCallback((lvl: Level) => {
@@ -626,9 +639,20 @@ export default function QuantumGrepGame() {
                   <div className="text-gray-400">
                     Level Reached: {level + 1} - {currentLevel.name}
                   </div>
-                  {isConnected && (
+                  {isSubmitting ? (
+                    <div className="text-grep-green animate-pulse">Submitting score...</div>
+                  ) : lastResult?.success ? (
+                    <div className="text-grep-green">
+                      +{lastResult.grepEarned} GREP earned!
+                      {lastResult.multiplier && lastResult.multiplier > 1 && ` (${lastResult.multiplier}x)`}
+                    </div>
+                  ) : isAuthenticated ? (
                     <div className="text-grep-green">
                       +{Math.floor(score / 20 * multiplier)} GREP earned!
+                    </div>
+                  ) : (
+                    <div className="text-yellow-400 text-sm">
+                      Connect wallet to save scores and earn GREP!
                     </div>
                   )}
                   <div className="flex gap-4 justify-center">
@@ -660,9 +684,20 @@ export default function QuantumGrepGame() {
                   <div className="text-3xl font-bold">
                     Final Score: <span className="text-gradient">{score}</span>
                   </div>
-                  {isConnected && (
+                  {isSubmitting ? (
+                    <div className="text-xl text-grep-green animate-pulse">Submitting score...</div>
+                  ) : lastResult?.success ? (
+                    <div className="text-xl text-grep-green">
+                      +{lastResult.grepEarned} GREP earned!
+                      {lastResult.multiplier && lastResult.multiplier > 1 && ` (${lastResult.multiplier}x)`}
+                    </div>
+                  ) : isAuthenticated ? (
                     <div className="text-xl text-grep-green">
                       +{Math.floor(score / 10 * multiplier)} GREP earned!
+                    </div>
+                  ) : (
+                    <div className="text-yellow-400 text-sm">
+                      Connect wallet to save scores and earn GREP!
                     </div>
                   )}
                   <div className="flex gap-4 justify-center">

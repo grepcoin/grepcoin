@@ -59,6 +59,59 @@ async function main() {
         maxReward: 75,
       },
     }),
+    // New games
+    prisma.game.upsert({
+      where: { slug: 'bug-hunter' },
+      update: {},
+      create: {
+        slug: 'bug-hunter',
+        name: 'Bug Hunter',
+        description: 'Find and squash bugs in scrolling code snippets before they escape!',
+        icon: 'Bug',
+        color: 'from-red-500 to-orange-500',
+        minReward: 10,
+        maxReward: 60,
+      },
+    }),
+    prisma.game.upsert({
+      where: { slug: 'crypto-snake' },
+      update: {},
+      create: {
+        slug: 'crypto-snake',
+        name: 'Crypto Snake',
+        description: 'Classic snake game with blockchain vibes. Collect GREP coins and grow your chain!',
+        icon: 'Sparkles',
+        color: 'from-green-500 to-cyan-500',
+        minReward: 5,
+        maxReward: 40,
+      },
+    }),
+    prisma.game.upsert({
+      where: { slug: 'syntax-sprint' },
+      update: {},
+      create: {
+        slug: 'syntax-sprint',
+        name: 'Syntax Sprint',
+        description: 'Build valid JavaScript from falling code tokens. Tetris meets programming!',
+        icon: 'Code',
+        color: 'from-purple-500 to-pink-500',
+        minReward: 15,
+        maxReward: 70,
+      },
+    }),
+    prisma.game.upsert({
+      where: { slug: 'regex-crossword' },
+      update: {},
+      create: {
+        slug: 'regex-crossword',
+        name: 'RegEx Crossword',
+        description: 'Solve crossword puzzles where clues are regex patterns. Match rows and columns!',
+        icon: 'Grid3X3',
+        color: 'from-orange-500 to-yellow-500',
+        minReward: 10,
+        maxReward: 80,
+      },
+    }),
   ])
 
   console.log(`Seeded ${games.length} games`)

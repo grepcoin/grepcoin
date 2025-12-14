@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useActivity } from '@/hooks/useActivity'
+import { Gamepad2 } from 'lucide-react'
 
 interface DisplayActivity {
   id: string
@@ -10,50 +11,15 @@ interface DisplayActivity {
   icon: string
 }
 
-// Mock data generators for when API has no real data
-const GAMES = ['Grep Rails', 'Stack Panic', 'Merge Miners', 'Quantum Grep']
-const PLAYERS = [
-  'regex_master.eth', 'stack_wizard', '0xGamer', 'quantum_pro.eth',
-  'git_ninja', 'code_runner', 'pixel_hero.eth', 'chain_player',
-]
-
-function generateMockActivity(id: number): DisplayActivity {
-  const types = [
-    () => {
-      const score = Math.floor(Math.random() * 5000) + 500
-      const game = GAMES[Math.floor(Math.random() * GAMES.length)]
-      return { message: `scored ${score.toLocaleString()} in ${game}`, icon: '🎯' }
-    },
-    () => {
-      const achievements = ['Speed Demon', 'Perfect Run', 'Combo Master', 'Pattern Pro']
-      return { message: `unlocked ${achievements[Math.floor(Math.random() * achievements.length)]}`, icon: '🏆' }
-    },
-    () => {
-      const reward = Math.floor(Math.random() * 100) + 10
-      return { message: `earned ${reward} GREP`, icon: '💰' }
-    },
-    () => {
-      const streak = Math.floor(Math.random() * 15) + 3
-      const game = GAMES[Math.floor(Math.random() * GAMES.length)]
-      return { message: `hit ${streak}x combo in ${game}`, icon: '🔥' }
-    },
-  ]
-
-  const player = PLAYERS[Math.floor(Math.random() * PLAYERS.length)]
-  const { message, icon } = types[Math.floor(Math.random() * types.length)]()
-
-  return { id: String(id), player, message, icon }
-}
-
 export default function LiveActivityTicker() {
-  const { activities: apiActivities } = useActivity(20)
+  const { activities: apiActivities, isLoading } = useActivity(20)
   const [displayActivities, setDisplayActivities] = useState<DisplayActivity[]>([])
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
 
-    // Use API data if available, otherwise generate mock
+    // Only use real API data - no mock generation
     if (apiActivities.length > 0) {
       setDisplayActivities(
         apiActivities.map((a) => ({
@@ -64,23 +30,27 @@ export default function LiveActivityTicker() {
         }))
       )
     } else {
-      // Generate mock activities for demo
-      const initial = Array.from({ length: 20 }, (_, i) => generateMockActivity(i))
-      setDisplayActivities(initial)
-
-      // Add new mock activity every 3 seconds
-      const interval = setInterval(() => {
-        setDisplayActivities((prev) => {
-          const newActivity = generateMockActivity(Date.now())
-          return [newActivity, ...prev.slice(0, 19)]
-        })
-      }, 3000)
-
-      return () => clearInterval(interval)
+      setDisplayActivities([])
     }
   }, [apiActivities])
 
   if (!isClient) return null
+
+  // Show nothing or a subtle message when there's no activity
+  if (!isLoading && displayActivities.length === 0) {
+    return (
+      <div className="w-full overflow-hidden bg-dark-800/50 border-y border-dark-700 py-3">
+        <div className="flex items-center justify-center gap-2 text-gray-500">
+          <Gamepad2 className="w-4 h-4" />
+          <span className="text-sm">Be the first to play today and start the activity feed!</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (displayActivities.length === 0) {
+    return null
+  }
 
   return (
     <div className="w-full overflow-hidden bg-dark-800/50 border-y border-dark-700 py-3">

@@ -31,8 +31,8 @@ export function useActivity(limit: number = 20) {
       setActivities(data.activities)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error')
-      // Fall back to mock data
-      setActivities(getMockActivities())
+      // Return empty array when API fails - no mock data
+      setActivities([])
     } finally {
       setIsLoading(false)
     }
@@ -47,14 +47,4 @@ export function useActivity(limit: number = 20) {
   }, [fetchActivities])
 
   return { activities, isLoading, error, refetch: fetchActivities }
-}
-
-function getMockActivities(): Activity[] {
-  return [
-    { id: '1', type: 'score', wallet: '0x1234', username: 'RegexMaster', game: 'Grep Rails', value: 2500, message: 'scored 2,500 in Grep Rails', icon: '🎮', timestamp: new Date().toISOString() },
-    { id: '2', type: 'achievement', wallet: '0x5678', username: 'PatternPro', value: 50, message: 'unlocked "Speed Demon" achievement', icon: '⚡', timestamp: new Date().toISOString() },
-    { id: '3', type: 'streak', wallet: '0x9abc', username: 'GrepGuru', game: 'Stack Panic', value: 15, message: 'hit 15x streak in Stack Panic', icon: '🔥', timestamp: new Date().toISOString() },
-    { id: '4', type: 'reward', wallet: '0xdef0', username: 'StackSurfer', game: 'Merge Miners', value: 100, message: 'earned 100 GREP in daily challenge', icon: '💰', timestamp: new Date().toISOString() },
-    { id: '5', type: 'score', wallet: '0x1357', username: 'MergeMaster', game: 'Quantum Grep', value: 3200, message: 'scored 3,200 in Quantum Grep', icon: '⚛️', timestamp: new Date().toISOString() },
-  ]
 }

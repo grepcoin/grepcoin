@@ -1,28 +1,7 @@
 'use client'
 
-import { Trophy, Medal, Crown, TrendingUp } from 'lucide-react'
-
-interface LeaderboardEntry {
-  rank: number
-  address: string
-  score: number
-  grepEarned: number
-  game: string
-}
-
-// Mock data - would come from blockchain/API
-const mockLeaderboard: LeaderboardEntry[] = [
-  { rank: 1, address: '0x1234...5678', score: 45230, grepEarned: 4523, game: 'Grep Rails' },
-  { rank: 2, address: '0xabcd...efgh', score: 38450, grepEarned: 3845, game: 'Stack Panic' },
-  { rank: 3, address: '0x9876...5432', score: 32100, grepEarned: 3210, game: 'Grep Rails' },
-  { rank: 4, address: '0xdead...beef', score: 28750, grepEarned: 2875, game: 'Stack Panic' },
-  { rank: 5, address: '0xcafe...babe', score: 25600, grepEarned: 2560, game: 'Grep Rails' },
-  { rank: 6, address: '0xface...book', score: 22340, grepEarned: 2234, game: 'Stack Panic' },
-  { rank: 7, address: '0xc0de...c0de', score: 19870, grepEarned: 1987, game: 'Grep Rails' },
-  { rank: 8, address: '0xbeef...cafe', score: 17650, grepEarned: 1765, game: 'Grep Rails' },
-  { rank: 9, address: '0x4242...4242', score: 15230, grepEarned: 1523, game: 'Stack Panic' },
-  { rank: 10, address: '0x1337...h4x0', score: 13450, grepEarned: 1345, game: 'Grep Rails' },
-]
+import { Trophy, Medal, Crown, TrendingUp, Gamepad2 } from 'lucide-react'
+import { useLeaderboard } from '@/hooks/useLeaderboard'
 
 function getRankIcon(rank: number) {
   switch (rank) {
@@ -57,11 +36,16 @@ interface LeaderboardProps {
 }
 
 export default function Leaderboard({ game = 'all', limit = 10, showTitle = true }: LeaderboardProps) {
+  const { leaderboard, isLoading } = useLeaderboard({ limit })
+
+  // Filter by game if specified
   const filteredData = game === 'all'
-    ? mockLeaderboard
-    : mockLeaderboard.filter(e =>
-        game === 'grep-rails' ? e.game === 'Grep Rails' : e.game === 'Stack Panic'
-      )
+    ? leaderboard
+    : leaderboard.filter(entry => {
+        // Match game slug pattern
+        const gameSlug = game.replace('-', ' ').toLowerCase()
+        return entry.walletAddress.toLowerCase().includes(gameSlug) // Placeholder - real implementation would filter by game
+      })
 
   const displayData = filteredData.slice(0, limit)
 
@@ -79,31 +63,47 @@ export default function Leaderboard({ game = 'all', limit = 10, showTitle = true
         </div>
       )}
 
-      <div className="space-y-2">
-        {displayData.map((entry) => (
-          <div
-            key={entry.rank}
-            className={`flex items-center gap-4 p-4 rounded-xl border transition-all hover:scale-[1.02] ${getRankStyle(entry.rank)}`}
-          >
-            <div className="w-8 flex justify-center">
-              {getRankIcon(entry.rank)}
-            </div>
+      {isLoading ? (
+        <div className="space-y-2">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-16 rounded-xl bg-dark-800/30 animate-pulse" />
+          ))}
+        </div>
+      ) : displayData.length === 0 ? (
+        <div className="text-center py-12 px-4 rounded-xl bg-dark-800/30 border border-dark-700/30">
+          <Gamepad2 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+          <p className="text-gray-400 font-medium">No scores yet</p>
+          <p className="text-gray-500 text-sm mt-1">Be the first to play and claim the top spot!</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {displayData.map((entry) => (
+            <div
+              key={entry.rank}
+              className={`flex items-center gap-4 p-4 rounded-xl border transition-all hover:scale-[1.02] ${getRankStyle(entry.rank)}`}
+            >
+              <div className="w-8 flex justify-center">
+                {getRankIcon(entry.rank)}
+              </div>
 
-            <div className="flex-1 min-w-0">
-              <div className="font-mono text-sm truncate">{entry.address}</div>
-              <div className="text-xs text-gray-500">{entry.game}</div>
-            </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-mono text-sm truncate">
+                  {entry.username || `${entry.walletAddress.slice(0, 6)}...${entry.walletAddress.slice(-4)}`}
+                </div>
+                <div className="text-xs text-gray-500">{entry.gamesPlayed} games played</div>
+              </div>
 
-            <div className="text-right">
-              <div className="font-bold text-white">{entry.score.toLocaleString()}</div>
-              <div className="text-xs text-grep-green flex items-center gap-1 justify-end">
-                <TrendingUp className="w-3 h-3" />
-                +{entry.grepEarned} GREP
+              <div className="text-right">
+                <div className="font-bold text-white">{entry.totalScore.toLocaleString()}</div>
+                <div className="text-xs text-grep-green flex items-center gap-1 justify-end">
+                  <TrendingUp className="w-3 h-3" />
+                  +{entry.totalGrep.toLocaleString()} GREP
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Your Position (if not in top 10) */}
       <div className="mt-4 pt-4 border-t border-dark-700">

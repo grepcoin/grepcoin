@@ -38,8 +38,8 @@ export function useLeaderboard(options: UseLeaderboardOptions = {}) {
         setLeaderboard(data.leaderboard)
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Unknown error')
-        // Fall back to mock data if API fails
-        setLeaderboard(getMockLeaderboard())
+        // Return empty array when API fails - no mock data
+        setLeaderboard([])
       } finally {
         setIsLoading(false)
       }
@@ -49,15 +49,4 @@ export function useLeaderboard(options: UseLeaderboardOptions = {}) {
   }, [period, limit])
 
   return { leaderboard, isLoading, error }
-}
-
-// Mock data fallback for development/demo
-function getMockLeaderboard(): LeaderboardEntry[] {
-  return [
-    { rank: 1, walletAddress: '0x1234...abcd', username: 'RegexMaster', totalScore: 125000, totalGrep: 15000, gamesPlayed: 342, bestStreak: 23, stakingTier: 'diamond' },
-    { rank: 2, walletAddress: '0x5678...efgh', username: 'PatternPro', totalScore: 118500, totalGrep: 12500, gamesPlayed: 298, bestStreak: 21, stakingTier: 'gold' },
-    { rank: 3, walletAddress: '0x9abc...ijkl', username: 'GrepGuru', totalScore: 98000, totalGrep: 11200, gamesPlayed: 256, bestStreak: 18, stakingTier: 'gold' },
-    { rank: 4, walletAddress: '0xdef0...mnop', username: 'StackSurfer', totalScore: 87500, totalGrep: 9800, gamesPlayed: 223, bestStreak: 16, stakingTier: 'silver' },
-    { rank: 5, walletAddress: '0x1357...qrst', username: 'MergeMaster', totalScore: 76000, totalGrep: 8500, gamesPlayed: 189, bestStreak: 15, stakingTier: 'silver' },
-  ]
 }

@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Play, RotateCcw, Volume2, VolumeX, Trophy, Zap, Heart, Shield, Clock } from 'lucide-react'
+import { useGameScore } from '@/hooks/useGameScore'
+import { useAuth } from '@/context/AuthContext'
 import {
   playSound,
   createShake,
@@ -102,6 +104,10 @@ interface ActivePowerUp {
 export default function GrepRailsGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [gameStatus, setGameStatus] = useState<'idle' | 'playing' | 'paused' | 'gameover'>('idle')
+
+  // Score submission hooks
+  const { submitScore, isSubmitting, lastResult } = useGameScore('grep-rails')
+  const { isAuthenticated } = useAuth()
   const [gameState, setGameState] = useState<GameState>({
     score: 0,
     speed: 2.5,
@@ -147,6 +153,13 @@ export default function GrepRailsGame() {
       speed: Math.random() * 0.5 + 0.1,
     }))
   }, [])
+
+  // Submit score when game ends
+  useEffect(() => {
+    if (gameStatus === 'gameover' && isAuthenticated && gameState.score > 0) {
+      submitScore(gameState.score, gameState.maxStreak, gameState.distance)
+    }
+  }, [gameStatus, isAuthenticated, gameState.score, gameState.maxStreak, gameState.distance, submitScore])
 
   // Initialize tracks
   const initTracks = useCallback(() => {
@@ -1016,10 +1029,34 @@ export default function GrepRailsGame() {
                   <div className="text-sm text-gray-400 mt-1">Best Streak</div>
                 </div>
                 <div className="p-5 rounded-xl bg-dark-800 border border-green-500/30 text-center">
-                  <div className="text-4xl font-bold text-green-400">+{Math.floor(gameState.score / 10)}</div>
-                  <div className="text-sm text-gray-400 mt-1">GREP Earned</div>
+                  {isSubmitting ? (
+                    <>
+                      <div className="text-4xl font-bold text-green-400 animate-pulse">...</div>
+                      <div className="text-sm text-gray-400 mt-1">Submitting...</div>
+                    </>
+                  ) : lastResult?.success ? (
+                    <>
+                      <div className="text-4xl font-bold text-green-400">+{lastResult.grepEarned}</div>
+                      <div className="text-sm text-gray-400 mt-1">
+                        GREP Earned {lastResult.multiplier && lastResult.multiplier > 1 ? `(${lastResult.multiplier}x)` : ''}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-4xl font-bold text-green-400">+{Math.floor(gameState.score / 10)}</div>
+                      <div className="text-sm text-gray-400 mt-1">
+                        {isAuthenticated ? 'GREP Earned' : 'Connect wallet to earn'}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
+
+              {!isAuthenticated && (
+                <p className="text-sm text-yellow-400 mb-4">
+                  Connect your wallet to save scores and earn GREP!
+                </p>
+              )}
 
               <div className="flex gap-4">
                 <button

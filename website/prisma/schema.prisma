@@ -17,14 +17,18 @@ model User {
   walletAddress String    @unique
   username      String?   @unique
   avatar        String?
+  referralCode  String?   @unique  // User's unique referral code
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   // Relations
-  gameScores   GameScore[]
-  achievements UserAchievement[]
-  stakes       Stake[]
-  dailyStats   DailyStats[]
+  gameScores     GameScore[]
+  achievements   UserAchievement[]
+  stakes         Stake[]
+  dailyStats     DailyStats[]
+  dailyRewards   DailyReward[]
+  referralsMade  Referral[] @relation("Referrer")
+  referredBy     Referral?  @relation("Referee")
 }
 
 // Game definitions
@@ -193,4 +197,49 @@ model Session {
 
   @@index([walletAddress])
   @@index([expiresAt])
+}
+
+// Daily login rewards
+model DailyReward {
+  id        String   @id @default(cuid())
+  userId    String
+  day       Int      // 1-7 streak day
+  reward    Int
+  claimedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, claimedAt])
+}
+
+// Referral tracking
+model Referral {
+  id         String   @id @default(cuid())
+  referrerId String
+  refereeId  String   @unique
+  code       String   @unique
+  rewardPaid Int      @default(0)
+  maxReward  Int      @default(5000) // Max GREP earnable from this referral
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime // 30 days from creation
+
+  referrer User @relation("Referrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  referee  User @relation("Referee", fields: [refereeId], references: [id], onDelete: Cascade)
+
+  @@index([referrerId])
+  @@index([code])
+}
+
+// Airdrop campaigns and claims
+model AirdropClaim {
+  id            String    @id @default(cuid())
+  walletAddress String
+  amount        BigInt
+  campaignId    String
+  claimedAt     DateTime?
+  txHash        String?
+  merkleProof   String?   // JSON array of proof elements
+
+  @@unique([walletAddress, campaignId])
+  @@index([campaignId])
 }

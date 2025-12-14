@@ -1,19 +1,20 @@
 'use client'
 
 import { Heart } from 'lucide-react'
+import Link from 'next/link'
 import Logo from './Logo'
 
 const footerLinks = {
   Product: [
     { name: 'Features', href: '#features' },
+    { name: 'Games', href: '/games' },
     { name: 'Tokenomics', href: '#tokenomics' },
     { name: 'Roadmap', href: '#roadmap' },
-    { name: 'Whitepaper', href: '#' },
   ],
   Resources: [
     { name: 'Documentation', href: '#' },
-    { name: 'GitHub', href: '#' },
-    { name: 'Brand Kit', href: '#' },
+    { name: 'GitHub', href: 'https://github.com/grepcoin' },
+    { name: 'Risk Disclaimer', href: '/disclaimer' },
     { name: 'API', href: '#' },
   ],
   Community: [
@@ -23,9 +24,9 @@ const footerLinks = {
     { name: 'Blog', href: '#' },
   ],
   Legal: [
-    { name: 'Privacy Policy', href: '#' },
-    { name: 'Terms of Service', href: '#' },
-    { name: 'Cookie Policy', href: '#' },
+    { name: 'Privacy Policy', href: '/privacy' },
+    { name: 'Terms of Service', href: '/terms' },
+    { name: 'Cookie Policy', href: '/cookies' },
   ],
 }
 
@@ -100,7 +101,9 @@ export default function Footer() {
         {/* Bottom Section */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-gray-400 text-sm">
-            © 2024 GrepCoin. All rights reserved.
+            <span className="block md:inline">© 2024 GrepLabs LLC. All rights reserved.</span>
+            <span className="hidden md:inline mx-2">|</span>
+            <span className="block md:inline text-gray-500">Delaware, USA</span>
           </div>
 
           <div className="flex items-center gap-1 text-gray-400 text-sm">
@@ -108,15 +111,15 @@ export default function Footer() {
           </div>
 
           <div className="flex items-center gap-6 text-sm">
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
               Privacy
-            </a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">
+            </Link>
+            <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
               Terms
-            </a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">
+            </Link>
+            <Link href="/cookies" className="text-gray-400 hover:text-white transition-colors">
               Cookies
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -30,15 +30,15 @@ export function useStats() {
         setStats(data.stats)
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Unknown error')
-        // Fall back to mock data
+        // Return zeros when API fails - no mock data
         setStats({
-          totalPlayers: 7300,
-          totalGrepEarned: '1200000',
-          totalGamesPlayed: '45000',
-          activeGames: 4,
-          todayGamesPlayed: 1250,
-          todayGrepEarned: 28000,
-          achievementsUnlocked: 15000,
+          totalPlayers: 0,
+          totalGrepEarned: '0',
+          totalGamesPlayed: '0',
+          activeGames: 8,
+          todayGamesPlayed: 0,
+          todayGrepEarned: 0,
+          achievementsUnlocked: 0,
         })
       } finally {
         setIsLoading(false)

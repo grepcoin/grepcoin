@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Play, RotateCcw, Volume2, VolumeX, Trophy, GitBranch, GitMerge, GitCommit } from 'lucide-react'
+import { useGameScore } from '@/hooks/useGameScore'
+import { useAuth } from '@/context/AuthContext'
 import {
   playSound,
   createShake,
@@ -68,6 +70,11 @@ const conflictScenarios = [
 export default function MergeMinersGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [gameStatus, setGameStatus] = useState<'idle' | 'playing' | 'paused' | 'gameover' | 'conflict'>('idle')
+
+  // Score submission hooks
+  const { submitScore, isSubmitting, lastResult } = useGameScore('merge-miners')
+  const { isAuthenticated } = useAuth()
+
   const [gameState, setGameState] = useState<GameState>({
     score: 0,
     depth: 1,
@@ -360,6 +367,13 @@ export default function MergeMinersGame() {
     setCurrentConflict(null)
     setGameStatus('playing')
   }, [muted])
+
+  // Submit score when game ends
+  useEffect(() => {
+    if (gameStatus === 'gameover' && isAuthenticated && gameState.score > 0) {
+      submitScore(gameState.score, gameState.depth, gameState.commits)
+    }
+  }, [gameStatus, isAuthenticated, gameState.score, gameState.depth, gameState.commits, submitScore])
 
   // Movement and input
   useEffect(() => {
@@ -769,10 +783,34 @@ export default function MergeMinersGame() {
                   <div className="text-xs text-gray-400">Gems</div>
                 </div>
                 <div className="p-4 rounded-xl bg-dark-800 border border-yellow-500/30">
-                  <div className="text-2xl font-bold text-yellow-400">+{Math.floor(gameState.score / 15)}</div>
-                  <div className="text-xs text-gray-400">GREP</div>
+                  {isSubmitting ? (
+                    <>
+                      <div className="text-2xl font-bold text-yellow-400 animate-pulse">...</div>
+                      <div className="text-xs text-gray-400">Submitting...</div>
+                    </>
+                  ) : lastResult?.success ? (
+                    <>
+                      <div className="text-2xl font-bold text-yellow-400">+{lastResult.grepEarned}</div>
+                      <div className="text-xs text-gray-400">
+                        GREP {lastResult.multiplier && lastResult.multiplier > 1 ? `(${lastResult.multiplier}x)` : ''}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-2xl font-bold text-yellow-400">+{Math.floor(gameState.score / 15)}</div>
+                      <div className="text-xs text-gray-400">
+                        {isAuthenticated ? 'GREP' : 'Connect wallet'}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
+
+              {!isAuthenticated && (
+                <p className="text-xs text-yellow-400 mb-3">
+                  Connect wallet to save scores!
+                </p>
+              )}
 
               <div className="flex gap-3">
                 <button
