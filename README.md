@@ -6,6 +6,25 @@ GrepCoin is an open-source, decentralized arcade gaming platform where players c
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 [![Built on Base](https://img.shields.io/badge/Built%20on-Base-blue.svg)](https://base.org)
+[![AI Powered](https://img.shields.io/badge/AI%20Powered-Claude-orange.svg)](https://anthropic.com)
+
+## The Story
+
+GrepCoin isn't just another crypto project - it's a testament to what's possible when human creativity meets AI capability.
+
+**Built entirely with AI collaboration**, GrepCoin was developed through an intensive partnership between a solo founder and Claude (Anthropic's AI). Every line of code - from the Solidity smart contracts to the React components to the Prisma database schema - was crafted through this human-AI collaboration.
+
+What would traditionally take a team of developers months to build was accomplished in days:
+
+- **8 fully playable arcade games** with unique mechanics and developer-themed narratives
+- **Production-grade smart contracts** with 47 passing tests covering staking, rewards, and tokenomics
+- **Complete web application** with authentication, leaderboards, achievements, and daily challenges
+- **Legal framework** with Terms of Service, Privacy Policy, and risk disclaimers
+- **Open-source infrastructure** ready for community contribution
+
+This project proves that the future of software development isn't about replacing developers - it's about amplifying what a single person with a vision can accomplish. GrepCoin was built not by a well-funded startup with a large team, but by one developer who said "let's build something real" and an AI that helped make it happen.
+
+**GrepCoin is for the indie devs, the hobbyists, the dreamers who code after hours.** It's a crypto arcade built by the community, for the community - and it started as a conversation with an AI.
 
 ## Features
 
@@ -161,6 +180,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with love by [GrepLabs LLC](https://greplabs.io)**
+**Built with love by [GrepLabs LLC](https://greplabs.io)** | **Powered by [Claude](https://anthropic.com)**
 
-*Registered in Delaware, USA | Built in California, USA*
+*Registered in Delaware, USA | Built in California, USA | Crafted with AI*
