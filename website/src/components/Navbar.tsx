@@ -7,6 +7,7 @@ import Logo from './Logo'
 import WalletButton from './WalletButton'
 
 const navLinks = [
+  { name: 'Story', href: '#story' },
   { name: 'Features', href: '#features' },
   { name: 'Tokenomics', href: '#tokenomics' },
   { name: 'Roadmap', href: '#roadmap' },
