@@ -1,0 +1,196 @@
+// GrepCoin Arcade Database Schema
+// PostgreSQL on NeonDB
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Core user model - wallet-based authentication
+model User {
+  id            String    @id @default(cuid())
+  walletAddress String    @unique
+  username      String?   @unique
+  avatar        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  gameScores   GameScore[]
+  achievements UserAchievement[]
+  stakes       Stake[]
+  dailyStats   DailyStats[]
+}
+
+// Game definitions
+model Game {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  icon        String
+  color       String
+  minReward   Int
+  maxReward   Int
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  scores     GameScore[]
+  challenges DailyChallenge[]
+}
+
+// Game scores and sessions
+model GameScore {
+  id         String   @id @default(cuid())
+  userId     String
+  gameId     String
+  score      Int
+  grepEarned Int
+  duration   Int      // seconds
+  streak     Int      @default(0)
+  multiplier Float    @default(1)
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([gameId])
+  @@index([createdAt(sort: Desc)])
+  @@index([score(sort: Desc)])
+}
+
+// Achievement definitions
+model Achievement {
+  id          String @id @default(cuid())
+  slug        String @unique
+  name        String
+  description String
+  icon        String
+  rarity      String // common, uncommon, rare, epic, legendary
+  reward      Int
+  type        String // score, streak, games, perfect, challenge
+  target      Int?
+  gameSlug    String? // null means global achievement
+
+  users UserAchievement[]
+}
+
+// User's achievement progress and unlocks
+model UserAchievement {
+  id            String    @id @default(cuid())
+  userId        String
+  achievementId String
+  progress      Int       @default(0)
+  unlockedAt    DateTime?
+  createdAt     DateTime  @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+}
+
+// Staking records (synced from blockchain)
+model Stake {
+  id          String    @id @default(cuid())
+  userId      String
+  amount      BigInt
+  tier        String    // flexible, bronze, silver, gold, diamond
+  multiplier  Float     @default(1)
+  lockedUntil DateTime?
+  txHash      String?   @unique
+  chainId     Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Daily challenges
+model DailyChallenge {
+  id         String   @id @default(cuid())
+  gameId     String
+  type       String   // score, streak, speed, perfect
+  target     Int
+  reward     Int
+  multiplier Float    @default(1)
+  date       DateTime @db.Date
+
+  game        Game                  @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  completions ChallengeCompletion[]
+
+  @@unique([gameId, date])
+  @@index([date])
+}
+
+// Challenge completions
+model ChallengeCompletion {
+  id            String   @id @default(cuid())
+  challengeId   String
+  walletAddress String
+  completedAt   DateTime @default(now())
+
+  challenge DailyChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@unique([challengeId, walletAddress])
+}
+
+// Daily stats per user (for rate limiting and tracking)
+model DailyStats {
+  id         String   @id @default(cuid())
+  userId     String
+  date       DateTime @db.Date
+  grepEarned Int      @default(0)
+  gamesPlayed Int     @default(0)
+  bestStreak Int      @default(0)
+  playsUsed  Int      @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([date])
+}
+
+// Global platform stats (cached for performance)
+model GlobalStats {
+  id               String   @id @default("global")
+  totalPlayers     Int      @default(0)
+  totalGrepEarned  BigInt   @default(0)
+  totalGamesPlayed BigInt   @default(0)
+  updatedAt        DateTime @updatedAt
+}
+
+// Live activity feed
+model Activity {
+  id        String   @id @default(cuid())
+  type      String   // score, achievement, reward, streak, levelup
+  wallet    String
+  username  String?
+  game      String?
+  value     Int?
+  message   String
+  icon      String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt(sort: Desc)])
+}
+
+// Auth sessions (for SIWE)
+model Session {
+  id           String   @id @default(cuid())
+  walletAddress String
+  nonce        String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([walletAddress])
+  @@index([expiresAt])
+}

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X, Gamepad2 } from 'lucide-react'
 import Logo from './Logo'
+import WalletButton from './WalletButton'
 
 const navLinks = [
   { name: 'Features', href: '#features' },
@@ -46,18 +47,7 @@ export default function Navbar() {
               <Gamepad2 className="w-4 h-4" />
               Play & Earn
             </Link>
-            <a
-              href="#"
-              className="text-gray-300 hover:text-white transition-colors font-medium"
-            >
-              Whitepaper
-            </a>
-            <a
-              href="#"
-              className="px-5 py-2.5 rounded-xl bg-gradient-playful font-semibold hover:opacity-90 transition-opacity"
-            >
-              Launch App
-            </a>
+            <WalletButton />
           </div>
 
           {/* Mobile Menu Button */}
@@ -93,18 +83,9 @@ export default function Navbar() {
                 <Gamepad2 className="w-4 h-4" />
                 Play & Earn
               </Link>
-              <a
-                href="#"
-                className="block text-gray-300 hover:text-white transition-colors font-medium py-2"
-              >
-                Whitepaper
-              </a>
-              <a
-                href="#"
-                className="block w-full text-center px-5 py-2.5 rounded-xl bg-gradient-playful font-semibold"
-              >
-                Launch App
-              </a>
+              <div className="pt-2">
+                <WalletButton />
+              </div>
             </div>
           </div>
         </div>

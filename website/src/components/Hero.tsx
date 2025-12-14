@@ -5,6 +5,7 @@ import { ArrowRight, Sparkles, Rocket, Coins, Gamepad2, Play, Trophy } from 'luc
 import ParticleBackground from './ParticleBackground'
 import HeroMiniGame from './HeroMiniGame'
 import { useCountUp } from '@/hooks/useCountUp'
+import { useStats } from '@/hooks/useStats'
 
 function AnimatedStat({
   end,
@@ -40,6 +41,13 @@ function AnimatedStat({
 }
 
 export default function Hero() {
+  const { stats } = useStats()
+
+  // Parse stats for display
+  const totalPlayers = stats?.totalPlayers || 7300
+  const totalGrepEarned = stats ? parseInt(stats.totalGrepEarned) / 1000000 : 1.2 // Convert to millions
+  const totalGamesPlayed = stats ? parseInt(stats.totalGamesPlayed) / 1000 : 45 // Convert to thousands
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 pb-8">
       {/* Particle Background */}
@@ -153,21 +161,21 @@ export default function Hero() {
             {/* Quick Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <AnimatedStat
-                end={7300}
+                end={totalPlayers}
                 suffix="+"
                 label="Active Players"
                 color="from-grep-purple to-grep-pink"
                 icon={<Gamepad2 className="w-4 h-4" />}
               />
               <AnimatedStat
-                end={1.2}
+                end={totalGrepEarned}
                 suffix="M"
                 label="GREP Earned"
                 color="from-grep-green to-grep-cyan"
                 icon={<Coins className="w-4 h-4" />}
               />
               <AnimatedStat
-                end={45}
+                end={totalGamesPlayed}
                 suffix="K"
                 label="Games Played"
                 color="from-grep-orange to-grep-yellow"

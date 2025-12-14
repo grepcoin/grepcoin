@@ -1,120 +1,84 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Gamepad2, Trophy, Coins, Zap, Star } from 'lucide-react'
+import { useActivity } from '@/hooks/useActivity'
 
-interface Activity {
-  id: number
-  type: 'score' | 'achievement' | 'reward' | 'streak' | 'levelup'
+interface DisplayActivity {
+  id: string
   player: string
-  game?: string
-  value?: number
   message: string
   icon: string
-  color: string
 }
 
+// Mock data generators for when API has no real data
 const GAMES = ['Grep Rails', 'Stack Panic', 'Merge Miners', 'Quantum Grep']
 const PLAYERS = [
   'regex_master.eth', 'stack_wizard', '0xGamer', 'quantum_pro.eth',
   'git_ninja', 'code_runner', 'pixel_hero.eth', 'chain_player',
-  'defi_gamer', 'nft_collector.eth', 'crypto_arcade', 'web3_player'
 ]
 
-const ACHIEVEMENTS = [
-  { name: 'Speed Demon', icon: '🚀' },
-  { name: 'Perfect Run', icon: '💎' },
-  { name: 'Combo Master', icon: '🔥' },
-  { name: 'Pattern Pro', icon: '🧩' },
-  { name: 'Stack Legend', icon: '📚' },
-  { name: 'Git Wizard', icon: '⚡' },
-]
-
-function generateActivity(id: number): Activity {
-  const type = ['score', 'achievement', 'reward', 'streak', 'levelup'][Math.floor(Math.random() * 5)] as Activity['type']
-  const player = PLAYERS[Math.floor(Math.random() * PLAYERS.length)]
-  const game = GAMES[Math.floor(Math.random() * GAMES.length)]
-
-  switch (type) {
-    case 'score':
+function generateMockActivity(id: number): DisplayActivity {
+  const types = [
+    () => {
       const score = Math.floor(Math.random() * 5000) + 500
-      return {
-        id,
-        type,
-        player,
-        game,
-        value: score,
-        message: `scored ${score.toLocaleString()} in ${game}`,
-        icon: '🎯',
-        color: 'text-grep-purple',
-      }
-    case 'achievement':
-      const achievement = ACHIEVEMENTS[Math.floor(Math.random() * ACHIEVEMENTS.length)]
-      return {
-        id,
-        type,
-        player,
-        message: `unlocked ${achievement.name}`,
-        icon: achievement.icon,
-        color: 'text-grep-yellow',
-      }
-    case 'reward':
+      const game = GAMES[Math.floor(Math.random() * GAMES.length)]
+      return { message: `scored ${score.toLocaleString()} in ${game}`, icon: '🎯' }
+    },
+    () => {
+      const achievements = ['Speed Demon', 'Perfect Run', 'Combo Master', 'Pattern Pro']
+      return { message: `unlocked ${achievements[Math.floor(Math.random() * achievements.length)]}`, icon: '🏆' }
+    },
+    () => {
       const reward = Math.floor(Math.random() * 100) + 10
-      return {
-        id,
-        type,
-        player,
-        value: reward,
-        message: `earned ${reward} GREP`,
-        icon: '💰',
-        color: 'text-grep-green',
-      }
-    case 'streak':
+      return { message: `earned ${reward} GREP`, icon: '💰' }
+    },
+    () => {
       const streak = Math.floor(Math.random() * 15) + 3
-      return {
-        id,
-        type,
-        player,
-        game,
-        value: streak,
-        message: `hit ${streak}x combo in ${game}`,
-        icon: '🔥',
-        color: 'text-grep-orange',
-      }
-    case 'levelup':
-      const level = Math.floor(Math.random() * 20) + 1
-      return {
-        id,
-        type,
-        player,
-        value: level,
-        message: `reached Level ${level}`,
-        icon: '⬆️',
-        color: 'text-grep-cyan',
-      }
-  }
+      const game = GAMES[Math.floor(Math.random() * GAMES.length)]
+      return { message: `hit ${streak}x combo in ${game}`, icon: '🔥' }
+    },
+  ]
+
+  const player = PLAYERS[Math.floor(Math.random() * PLAYERS.length)]
+  const { message, icon } = types[Math.floor(Math.random() * types.length)]()
+
+  return { id: String(id), player, message, icon }
 }
 
 export default function LiveActivityTicker() {
-  const [activities, setActivities] = useState<Activity[]>([])
+  const { activities: apiActivities } = useActivity(20)
+  const [displayActivities, setDisplayActivities] = useState<DisplayActivity[]>([])
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
-    // Generate initial activities
-    const initial = Array.from({ length: 20 }, (_, i) => generateActivity(i))
-    setActivities(initial)
 
-    // Add new activity every 3 seconds
-    const interval = setInterval(() => {
-      setActivities(prev => {
-        const newActivity = generateActivity(Date.now())
-        return [newActivity, ...prev.slice(0, 19)]
-      })
-    }, 3000)
+    // Use API data if available, otherwise generate mock
+    if (apiActivities.length > 0) {
+      setDisplayActivities(
+        apiActivities.map((a) => ({
+          id: a.id,
+          player: a.username || `${a.wallet.slice(0, 6)}...${a.wallet.slice(-4)}`,
+          message: a.message,
+          icon: a.icon,
+        }))
+      )
+    } else {
+      // Generate mock activities for demo
+      const initial = Array.from({ length: 20 }, (_, i) => generateMockActivity(i))
+      setDisplayActivities(initial)
 
-    return () => clearInterval(interval)
-  }, [])
+      // Add new mock activity every 3 seconds
+      const interval = setInterval(() => {
+        setDisplayActivities((prev) => {
+          const newActivity = generateMockActivity(Date.now())
+          return [newActivity, ...prev.slice(0, 19)]
+        })
+      }, 3000)
+
+      return () => clearInterval(interval)
+    }
+  }, [apiActivities])
 
   if (!isClient) return null
 
@@ -122,7 +86,7 @@ export default function LiveActivityTicker() {
     <div className="w-full overflow-hidden bg-dark-800/50 border-y border-dark-700 py-3">
       <div className="flex animate-scroll-left">
         {/* Double the items for seamless loop */}
-        {[...activities, ...activities].map((activity, index) => (
+        {[...displayActivities, ...displayActivities].map((activity, index) => (
           <div
             key={`${activity.id}-${index}`}
             className="flex items-center gap-2 px-6 whitespace-nowrap"

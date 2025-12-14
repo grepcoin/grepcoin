@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  images: {
-    unoptimized: true,
-  },
+  // Removed 'export' to support API routes
+  // Vercel will handle SSR automatically
 }
 
 module.exports = nextConfig
