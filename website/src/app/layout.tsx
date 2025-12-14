@@ -1,7 +1,15 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import Providers from '@/components/Providers'
+
+export const viewport: Viewport = {
+  themeColor: '#8B5CF6',
+  width: 'device-width',
+  initialScale: 1,
+}
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://grepcoin.io'),
   title: 'GrepCoin - Fund Games, Play Together, Own the Future',
   description: 'The decentralized ecosystem for indie games and hobby projects. Fund creators, earn rewards, and own a piece of the gaming revolution.',
   keywords: ['crypto', 'gaming', 'indie games', 'blockchain', 'defi', 'staking', 'dao'],
@@ -36,7 +44,6 @@ export const metadata: Metadata = {
     description: 'The decentralized ecosystem for indie games and hobby projects.',
     images: ['/og-image.png'],
   },
-  themeColor: '#8B5CF6',
 }
 
 export default function RootLayout({
@@ -51,7 +58,9 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
       </head>
       <body className="bg-dark-900 text-white antialiased">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   )

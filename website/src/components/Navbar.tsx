@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import Link from 'next/link'
+import { Menu, X, Gamepad2 } from 'lucide-react'
 import Logo from './Logo'
 
 const navLinks = [
@@ -38,6 +39,13 @@ export default function Navbar() {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
+            <Link
+              href="/games"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-grep-orange to-grep-yellow text-dark-900 font-semibold hover:opacity-90 transition-opacity"
+            >
+              <Gamepad2 className="w-4 h-4" />
+              Play & Earn
+            </Link>
             <a
               href="#"
               className="text-gray-300 hover:text-white transition-colors font-medium"
@@ -77,6 +85,14 @@ export default function Navbar() {
               </a>
             ))}
             <div className="pt-4 space-y-3">
+              <Link
+                href="/games"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-center gap-2 w-full px-5 py-2.5 rounded-xl bg-gradient-to-r from-grep-orange to-grep-yellow text-dark-900 font-semibold"
+              >
+                <Gamepad2 className="w-4 h-4" />
+                Play & Earn
+              </Link>
               <a
                 href="#"
                 className="block text-gray-300 hover:text-white transition-colors font-medium py-2"
