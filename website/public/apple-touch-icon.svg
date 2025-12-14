@@ -1,0 +1,20 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="appleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6"/>
+      <stop offset="50%" style="stop-color:#EC4899"/>
+      <stop offset="100%" style="stop-color:#F97316"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Full background -->
+  <rect width="180" height="180" fill="url(#appleGradient)"/>
+
+  <!-- G letterform -->
+  <path d="M112 56H79C66.297 56 56 66.297 56 79V101C56 113.703 66.297 124 79 124H95V101H79C75.134 101 72 97.866 72 94V86C72 82.134 75.134 79 79 79H112V94H95V112H112C124.703 112 135 101.703 135 89V79C135 66.297 124.703 56 112 56Z" fill="white"/>
+
+  <!-- Bottom dots -->
+  <circle cx="62" cy="148" r="10" fill="white" opacity="0.9"/>
+  <circle cx="90" cy="148" r="12" fill="white"/>
+  <circle cx="118" cy="148" r="10" fill="white" opacity="0.9"/>
+</svg>

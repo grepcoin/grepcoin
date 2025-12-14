@@ -1,0 +1,33 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6"/>
+      <stop offset="50%" style="stop-color:#EC4899"/>
+      <stop offset="100%" style="stop-color:#F97316"/>
+    </linearGradient>
+    <linearGradient id="innerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#A78BFA"/>
+      <stop offset="100%" style="stop-color:#F472B6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer rounded square -->
+  <rect x="32" y="32" width="448" height="448" rx="96" fill="url(#logoGradient)"/>
+
+  <!-- Inner glow circle -->
+  <circle cx="256" cy="256" r="160" fill="url(#innerGradient)" opacity="0.3"/>
+
+  <!-- Stylized "G" with gamepad elements -->
+  <path d="M320 176H224C188.654 176 160 204.654 160 240V272C160 307.346 188.654 336 224 336H272V288H224C215.163 288 208 280.837 208 272V240C208 231.163 215.163 224 224 224H320V272H272V320H320C355.346 320 384 291.346 384 256V240C384 204.654 355.346 176 320 176Z" fill="white"/>
+
+  <!-- Gamepad button dots -->
+  <circle cx="176" cy="384" r="24" fill="white" opacity="0.9"/>
+  <circle cx="336" cy="384" r="24" fill="white" opacity="0.9"/>
+
+  <!-- Center coin symbol -->
+  <circle cx="256" cy="384" r="32" fill="white"/>
+  <circle cx="256" cy="384" r="20" fill="url(#logoGradient)"/>
+
+  <!-- Top sparkle -->
+  <path d="M400 120L408 136L424 144L408 152L400 168L392 152L376 144L392 136L400 120Z" fill="white"/>
+</svg>

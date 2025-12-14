@@ -1,0 +1,22 @@
+{
+  "name": "GrepCoin",
+  "short_name": "GrepCoin",
+  "description": "The decentralized ecosystem for indie games and hobby projects",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D0D12",
+  "theme_color": "#8B5CF6",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
