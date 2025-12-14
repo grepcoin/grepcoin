@@ -3,6 +3,7 @@ import Hero from '@/components/Hero'
 import LiveActivityTicker from '@/components/LiveActivityTicker'
 import Partners from '@/components/Partners'
 import HowItWorks from '@/components/HowItWorks'
+import Story from '@/components/Story'
 import GamesShowcase from '@/components/GamesShowcase'
 import DailyChallenge from '@/components/DailyChallenge'
 import PlayerSpotlight from '@/components/PlayerSpotlight'
@@ -30,6 +31,9 @@ export default function Home() {
       <Partners />
       <div id="how-it-works">
         <HowItWorks />
+      </div>
+      <div id="story">
+        <Story />
       </div>
       <GamesShowcase />
       <DailyChallenge />
