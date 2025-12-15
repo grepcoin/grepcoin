@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Menu, X, Gamepad2 } from 'lucide-react'
+import { Menu, X, Gamepad2, Heart } from 'lucide-react'
 import Logo from './Logo'
 import WalletButton from './WalletButton'
 
@@ -40,13 +40,20 @@ export default function Navbar() {
           </div>
 
           {/* CTA Buttons */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              href="/fundraise"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-grep-purple/20 border border-grep-purple/50 text-grep-purple font-semibold hover:bg-grep-purple/30 transition-colors"
+            >
+              <Heart className="w-4 h-4" />
+              Back Us
+            </Link>
             <Link
               href="/games"
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-grep-orange to-grep-yellow text-dark-900 font-semibold hover:opacity-90 transition-opacity"
             >
               <Gamepad2 className="w-4 h-4" />
-              Play & Earn
+              Play
             </Link>
             <WalletButton />
           </div>
@@ -76,6 +83,14 @@ export default function Navbar() {
               </a>
             ))}
             <div className="pt-4 space-y-3">
+              <Link
+                href="/fundraise"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-center gap-2 w-full px-5 py-2.5 rounded-xl bg-grep-purple/20 border border-grep-purple/50 text-grep-purple font-semibold"
+              >
+                <Heart className="w-4 h-4" />
+                Back Us
+              </Link>
               <Link
                 href="/games"
                 onClick={() => setIsOpen(false)}
