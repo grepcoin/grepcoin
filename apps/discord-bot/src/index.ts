@@ -21,12 +21,15 @@ const GUILD_ID = process.env.DISCORD_GUILD_ID // Optional: for development
 const AUTO_RESPONSE_CHANNELS = ['support', 'help', 'questions', 'ask-grepbot']
 
 // Initialize Discord client
+// Note: MessageContent and GuildMembers are privileged intents
+// Enable them in Discord Developer Portal > Bot > Privileged Gateway Intents
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMembers
+    // Uncomment after enabling in Developer Portal:
+    // GatewayIntentBits.MessageContent,
+    // GatewayIntentBits.GuildMembers
   ]
 })
 
