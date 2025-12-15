@@ -95,12 +95,16 @@ async function runInteractive(agent: any) {
 
   console.log('Interactive mode. Type your message or "quit" to exit.\n')
 
+  rl.on('close', () => {
+    console.log('\nGoodbye!')
+    process.exit(0)
+  })
+
   const prompt = () => {
     rl.question('You: ', async (input) => {
-      if (input.toLowerCase() === 'quit' || input.toLowerCase() === 'exit') {
-        console.log('Goodbye!')
+      if (!input || input.toLowerCase() === 'quit' || input.toLowerCase() === 'exit') {
         rl.close()
-        process.exit(0)
+        return
       }
 
       try {

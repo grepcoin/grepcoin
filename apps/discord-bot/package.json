@@ -9,7 +9,7 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@grepcoin/agents": "workspace:*",
+    "@grepcoin/agents": "file:../../packages/agents",
     "discord.js": "^14.14.1",
     "@discordjs/rest": "^2.2.0",
     "dotenv": "^16.3.1"
