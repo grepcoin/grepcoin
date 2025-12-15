@@ -48,8 +48,9 @@ This project proves that the future of software development isn't about replacin
 ### Prerequisites
 
 - Node.js 18+
-- pnpm (recommended) or npm
+- npm or pnpm
 - PostgreSQL database
+- Ollama (for AI agents, optional)
 
 ### Installation
 
@@ -58,22 +59,33 @@ This project proves that the future of software development isn't about replacin
 git clone https://github.com/grepcoin/grepcoin.git
 cd grepcoin
 
-# Install dependencies
-cd website
-pnpm install
+# Install all dependencies
+npm install
 
-# Set up environment variables
+# Start the web app
+npm run dev
+
+# Or run specific workspaces
+npm run dev --workspace=apps/web
+npm run test:contracts
+npm run bot:dev
+```
+
+### Web App
+
+```bash
+cd apps/web
+
+# Set up environment
 cp .env.example .env
-# Edit .env with your database URL and other config
+# Edit .env with your database URL
 
-# Run database migrations
-pnpm db:push
+# Database setup
+npm run db:push
+npm run db:seed
 
-# Seed the database
-pnpm db:seed
-
-# Start development server
-pnpm dev
+# Start dev server
+npm run dev
 ```
 
 Visit `http://localhost:3000` to see the app.
@@ -81,38 +93,66 @@ Visit `http://localhost:3000` to see the app.
 ### Smart Contracts
 
 ```bash
-# Navigate to contracts directory
-cd contracts-dev
+cd packages/contracts
 
-# Install dependencies
 npm install
+npm test                    # Run 47 tests
+npm run deploy:sepolia      # Deploy to Base Sepolia
+```
 
-# Run tests
-npx hardhat test
+### AI Agents
 
-# Deploy to Base Sepolia (testnet)
-npx hardhat run scripts/deploy.js --network baseSepolia
+```bash
+cd packages/agents
+
+# Run interactively with Ollama
+npm run agent:community -- --interactive
+npm run agent:social -- --interactive
+npm run agent:guardian -- --interactive
+npm run agent:analytics -- --interactive
+```
+
+### Discord Bot
+
+```bash
+cd apps/discord-bot
+
+cp .env.example .env
+# Add your Discord bot token
+
+npm run dev
 ```
 
 ## Project Structure
 
 ```
-grepcoin/
-├── website/                 # Next.js frontend application
-│   ├── src/
-│   │   ├── app/            # Next.js app router pages
-│   │   ├── components/     # React components
-│   │   ├── context/        # React contexts (Auth, Staking)
-│   │   ├── hooks/          # Custom React hooks
-│   │   └── lib/            # Utilities and configurations
-│   └── prisma/             # Database schema and migrations
-├── contracts-dev/          # Solidity smart contracts
-│   ├── contracts/          # Smart contract source files
-│   ├── scripts/            # Deployment scripts
-│   └── test/               # Contract tests
-├── LICENSE                 # MIT License
-├── CONTRIBUTING.md         # Contribution guidelines
-└── SECURITY.md            # Security policy
+grepcoin/                        # Monorepo root
+├── apps/
+│   ├── web/                     # Next.js web application
+│   │   ├── src/app/            # App router pages
+│   │   ├── src/components/     # React components
+│   │   ├── src/hooks/          # Custom hooks
+│   │   └── prisma/             # Database schema
+│   └── discord-bot/            # AI-powered Discord bot
+│       └── src/                # Bot source code
+├── packages/
+│   ├── contracts/              # Solidity smart contracts
+│   │   ├── contracts/          # GrepToken, GrepStakingPool
+│   │   ├── test/               # 47 passing tests
+│   │   └── scripts/            # Deployment scripts
+│   └── agents/                 # AI Agent System
+│       ├── src/agents/         # CommunityAgent, SocialAgent, etc.
+│       ├── src/providers/      # Ollama, OpenAI providers
+│       └── src/core/           # Base agent framework
+├── marketing/                  # Campaign materials
+│   ├── INDIEGOGO_CAMPAIGN.md
+│   ├── PITCH_DECK.md
+│   ├── PRESS_KIT.md
+│   └── SOCIAL_MEDIA.md
+├── FUNDRAISING.md             # Fundraising strategy
+├── LICENSE                    # MIT License
+├── CONTRIBUTING.md            # Contribution guidelines
+└── SECURITY.md               # Security policy
 ```
 
 ## Smart Contracts
