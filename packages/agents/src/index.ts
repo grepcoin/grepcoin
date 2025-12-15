@@ -6,6 +6,17 @@ export * from './core/types'
 export { OllamaProvider } from './providers/ollama'
 export { OpenAIProvider } from './providers/openai'
 
+// Services
+export {
+  BlockchainService,
+  getBlockchainService,
+  type TokenMetrics,
+  type StakingMetrics,
+  type Transfer,
+  type StakeEvent,
+  type NetworkType
+} from './services/blockchain'
+
 // Agents
 export { CommunityAgent } from './agents/community-agent'
 export { SocialAgent } from './agents/social-agent'

@@ -1,8 +1,7 @@
 import { z } from 'zod'
-import { createPublicClient, http, formatEther, parseAbi } from 'viem'
-import { base, baseSepolia } from 'viem/chains'
 import { Agent } from '../core/agent'
 import type { AgentConfig, AIProvider, Task, Tool } from '../core/types'
+import { BlockchainService, getBlockchainService, type NetworkType } from '../services/blockchain'
 
 const SYSTEM_PROMPT = `You are the Guardian Agent for GrepCoin - responsible for monitoring smart contract health and security.
 
@@ -27,21 +26,8 @@ When you detect issues, categorize severity:
 - MEDIUM: Notable pattern, monitoring needed
 - LOW: Minor anomaly, log for review`
 
-// Contract ABIs (simplified)
-const TOKEN_ABI = parseAbi([
-  'function totalSupply() view returns (uint256)',
-  'function balanceOf(address) view returns (uint256)',
-  'event Transfer(address indexed from, address indexed to, uint256 value)'
-])
-
-const STAKING_ABI = parseAbi([
-  'function totalStaked() view returns (uint256)',
-  'function stakersCount() view returns (uint256)',
-  'event Staked(address indexed user, uint256 amount, uint8 tier)',
-  'event Unstaked(address indexed user, uint256 amount)'
-])
-
-const tools: Tool[] = [
+// Create tools with blockchain service integration
+const createTools = (blockchainService: BlockchainService): Tool[] => [
   {
     name: 'get_token_metrics',
     description: 'Get current token metrics from the blockchain',
@@ -49,13 +35,25 @@ const tools: Tool[] = [
       network: z.enum(['mainnet', 'testnet']).default('testnet')
     }),
     execute: async ({ network }) => {
-      // In production, this would read from actual contracts
-      return {
-        totalSupply: '100000000',
-        circulatingSupply: '15000000',
-        holders: 1250,
-        transfers24h: 487,
-        network
+      try {
+        if (!blockchainService.isConfigured()) {
+          return {
+            error: 'Contracts not configured',
+            note: 'Using mock data - deploy contracts and configure addresses',
+            totalSupply: '100000000',
+            circulatingSupply: '15000000',
+            holders: 1250,
+            transfers24h: 487,
+            network
+          }
+        }
+        const metrics = await blockchainService.getTokenMetrics()
+        return { ...metrics, network }
+      } catch (error) {
+        return {
+          error: `Failed to fetch metrics: ${error}`,
+          network
+        }
       }
     }
   },
@@ -66,19 +64,32 @@ const tools: Tool[] = [
       network: z.enum(['mainnet', 'testnet']).default('testnet')
     }),
     execute: async ({ network }) => {
-      return {
-        totalStaked: '8500000',
-        stakersCount: 342,
-        tvl: '$85,000',
-        averageStake: '24854',
-        tierDistribution: {
-          flexible: 45,
-          bronze: 30,
-          silver: 15,
-          gold: 7,
-          diamond: 3
-        },
-        network
+      try {
+        if (!blockchainService.isConfigured()) {
+          return {
+            error: 'Contracts not configured',
+            note: 'Using mock data - deploy contracts and configure addresses',
+            totalStaked: '8500000',
+            stakersCount: 342,
+            tvl: '$85,000',
+            averageStake: '24854',
+            tierDistribution: {
+              flexible: 45,
+              bronze: 30,
+              silver: 15,
+              gold: 7,
+              diamond: 3
+            },
+            network
+          }
+        }
+        const metrics = await blockchainService.getStakingMetrics()
+        return { ...metrics, network }
+      } catch (error) {
+        return {
+          error: `Failed to fetch staking metrics: ${error}`,
+          network
+        }
       }
     }
   },
@@ -90,13 +101,52 @@ const tools: Tool[] = [
       limit: z.number().default(10)
     }),
     execute: async ({ contract, limit }) => {
-      // In production, this would fetch from blockchain/indexer
-      return {
-        contract,
-        transactions: [
-          { type: 'stake', amount: '5000', user: '0x123...', timestamp: Date.now() - 60000 },
-          { type: 'transfer', amount: '1000', from: '0x456...', to: '0x789...', timestamp: Date.now() - 120000 }
-        ].slice(0, limit)
+      try {
+        if (!blockchainService.isConfigured()) {
+          return {
+            error: 'Contracts not configured',
+            note: 'Using mock data',
+            contract,
+            transactions: [
+              { type: 'stake', amount: '5000', user: '0x123...', timestamp: Date.now() - 60000 },
+              { type: 'transfer', amount: '1000', from: '0x456...', to: '0x789...', timestamp: Date.now() - 120000 }
+            ].slice(0, limit)
+          }
+        }
+
+        if (contract === 'token') {
+          const transfers = await blockchainService.getRecentTransfers(limit)
+          return {
+            contract,
+            transactions: transfers.map(t => ({
+              type: 'transfer',
+              from: t.from,
+              to: t.to,
+              amount: t.value,
+              blockNumber: t.blockNumber.toString(),
+              txHash: t.transactionHash
+            }))
+          }
+        } else {
+          const stakes = await blockchainService.getRecentStakes(limit)
+          return {
+            contract,
+            transactions: stakes.map(s => ({
+              type: 'stake',
+              user: s.user,
+              amount: s.amount,
+              tier: s.tier,
+              lockedUntil: s.lockedUntil.toString(),
+              blockNumber: s.blockNumber.toString(),
+              txHash: s.transactionHash
+            }))
+          }
+        }
+      } catch (error) {
+        return {
+          error: `Failed to fetch transactions: ${error}`,
+          contract
+        }
       }
     }
   },
@@ -156,17 +206,34 @@ interface Alert {
 export class GuardianAgent extends Agent {
   private alerts: Alert[] = []
   private lastMetrics: any = null
+  private blockchainService: BlockchainService
 
-  constructor(provider: AIProvider) {
+  constructor(provider: AIProvider, network: NetworkType = 'testnet') {
+    const blockchainService = getBlockchainService(network)
     const config: AgentConfig = {
       name: 'GuardianAgent',
       description: 'Monitors smart contracts and security',
       systemPrompt: SYSTEM_PROMPT,
-      tools,
+      tools: createTools(blockchainService),
       temperature: 0.3, // Lower temperature for more consistent analysis
       maxTokens: 1000
     }
     super(config, provider)
+    this.blockchainService = blockchainService
+  }
+
+  /**
+   * Configure contract addresses for real blockchain monitoring
+   */
+  configureContracts(tokenAddress: `0x${string}`, stakingAddress: `0x${string}`): void {
+    this.blockchainService.setContractAddresses(tokenAddress, stakingAddress)
+  }
+
+  /**
+   * Get blockchain health status
+   */
+  async getBlockchainHealth(): Promise<any> {
+    return this.blockchainService.getHealthStatus()
   }
 
   protected async handleTask(task: Task): Promise<any> {

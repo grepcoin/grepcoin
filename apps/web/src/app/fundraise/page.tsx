@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import {
@@ -16,10 +17,29 @@ import {
   Sparkles,
   TrendingUp,
   Gift,
-  Star
+  Star,
+  Loader2
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+
+interface FundraiseData {
+  campaign: {
+    totalRaised: number
+    backerCount: number
+    goalAmount: number
+    progressPercent: number
+    daysRemaining: number
+    isActive: boolean
+  }
+  recentBackers: Array<{
+    name: string | null
+    tier: string
+    amount: number
+    message: string | null
+    confirmedAt: string
+  }>
+}
 
 const fundingGoals = [
   { name: 'Security Audit', amount: 8000, description: 'Professional smart contract audit' },
@@ -105,11 +125,35 @@ const milestones = [
 ]
 
 export default function FundraisePage() {
-  const totalGoal = 35000
-  const currentRaised = 0 // Update this dynamically
-  const progress = (currentRaised / totalGoal) * 100
-  const backers = 0 // Update this dynamically
-  const daysLeft = 30 // Update this dynamically
+  const [data, setData] = useState<FundraiseData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch('/api/fundraise')
+        if (res.ok) {
+          const json = await res.json()
+          setData(json)
+        }
+      } catch (error) {
+        console.error('Failed to fetch fundraise data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+    // Refresh data every 30 seconds
+    const interval = setInterval(fetchData, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
+  // Use dynamic data or fallback to defaults
+  const totalGoal = data?.campaign.goalAmount || 35000
+  const currentRaised = data?.campaign.totalRaised || 0
+  const progress = data?.campaign.progressPercent || 0
+  const backers = data?.campaign.backerCount || 0
+  const daysLeft = data?.campaign.daysRemaining || 30
 
   return (
     <main className="min-h-screen bg-dark-900">
@@ -175,21 +219,33 @@ export default function FundraisePage() {
           <div className="max-w-4xl mx-auto">
             <div className="grid md:grid-cols-3 gap-8 mb-8">
               <div className="text-center">
-                <div className="text-4xl font-display font-bold text-grep-green mb-2">
-                  ${currentRaised.toLocaleString()}
-                </div>
+                {loading ? (
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-grep-green mb-2" />
+                ) : (
+                  <div className="text-4xl font-display font-bold text-grep-green mb-2">
+                    ${currentRaised.toLocaleString()}
+                  </div>
+                )}
                 <div className="text-gray-400">raised of ${totalGoal.toLocaleString()} goal</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-display font-bold text-white mb-2">
-                  {backers}
-                </div>
+                {loading ? (
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-white mb-2" />
+                ) : (
+                  <div className="text-4xl font-display font-bold text-white mb-2">
+                    {backers}
+                  </div>
+                )}
                 <div className="text-gray-400">backers</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-display font-bold text-grep-orange mb-2">
-                  {daysLeft}
-                </div>
+                {loading ? (
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-grep-orange mb-2" />
+                ) : (
+                  <div className="text-4xl font-display font-bold text-grep-orange mb-2">
+                    {daysLeft}
+                  </div>
+                )}
                 <div className="text-gray-400">days left</div>
               </div>
             </div>

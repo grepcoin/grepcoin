@@ -243,3 +243,36 @@ model AirdropClaim {
   @@unique([walletAddress, campaignId])
   @@index([campaignId])
 }
+
+// Fundraising backers
+model Backer {
+  id          String    @id @default(cuid())
+  wallet      String?
+  email       String?
+  name        String?
+  tier        String    // early-bird, builder, partner, genesis
+  amount      Int       // Amount in USD
+  currency    String    @default("USD") // USD, ETH, USDC
+  txHash      String?   @unique
+  status      String    @default("pending") // pending, confirmed, refunded
+  message     String?   // Optional message from backer
+  anonymous   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  confirmedAt DateTime?
+
+  @@index([tier])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+}
+
+// Fundraising campaign stats (singleton)
+model FundraiseStats {
+  id          String   @id @default("campaign")
+  totalRaised Int      @default(0)     // Total USD raised
+  backerCount Int      @default(0)     // Number of backers
+  goalAmount  Int      @default(100000) // Target goal in USD
+  startDate   DateTime @default(now())
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+}

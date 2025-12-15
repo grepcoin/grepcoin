@@ -1,0 +1,77 @@
+name: Deploy Contracts
+
+on:
+  workflow_dispatch:
+    inputs:
+      network:
+        description: 'Network to deploy to'
+        required: true
+        default: 'baseSepolia'
+        type: choice
+        options:
+          - baseSepolia
+          - base
+      verify:
+        description: 'Verify contracts on Basescan'
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.network }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.network }}
+    defaults:
+      run:
+        working-directory: packages/contracts
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: .
+
+      - name: Compile contracts
+        run: npx hardhat compile
+
+      - name: Run tests before deployment
+        run: npx hardhat test
+
+      - name: Deploy contracts
+        run: npx hardhat run scripts/deploy.js --network ${{ inputs.network }}
+        env:
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+
+      - name: Verify GrepToken on Basescan
+        if: ${{ inputs.verify }}
+        run: npx hardhat verify --network ${{ inputs.network }} ${{ env.GREP_TOKEN_ADDRESS }}
+        env:
+          BASESCAN_API_KEY: ${{ secrets.BASESCAN_API_KEY }}
+        continue-on-error: true
+
+      - name: Verify GrepStakingPool on Basescan
+        if: ${{ inputs.verify }}
+        run: npx hardhat verify --network ${{ inputs.network }} ${{ env.STAKING_POOL_ADDRESS }} ${{ env.GREP_TOKEN_ADDRESS }}
+        env:
+          BASESCAN_API_KEY: ${{ secrets.BASESCAN_API_KEY }}
+        continue-on-error: true
+
+      - name: Output deployed addresses
+        run: |
+          echo "## Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Network:** ${{ inputs.network }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Update your environment variables with these addresses:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "NEXT_PUBLIC_GREP_TOKEN_ADDRESS=" >> $GITHUB_STEP_SUMMARY
+          echo "NEXT_PUBLIC_STAKING_POOL_ADDRESS=" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
