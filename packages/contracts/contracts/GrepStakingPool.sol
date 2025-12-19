@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 
 interface IGrepToken {
     function mintStakingRewards(address to, uint256 amount) external;
@@ -21,7 +22,7 @@ interface IGrepToken {
  * - Gold: 10,000 GREP min, 30 days lock, 1.75x multiplier, 15% APY
  * - Diamond: 50,000 GREP min, 90 days lock, 2.0x multiplier, 20% APY
  */
-contract GrepStakingPool is Ownable, ReentrancyGuard {
+contract GrepStakingPool is Ownable, ReentrancyGuard, Pausable {
     using SafeERC20 for IERC20;
 
     IERC20 public immutable grepToken;
@@ -116,7 +117,7 @@ contract GrepStakingPool is Ownable, ReentrancyGuard {
      * @param amount Amount to stake
      * @param tier Desired tier (must meet minimum requirement)
      */
-    function stake(uint256 amount, Tier tier) external nonReentrant {
+    function stake(uint256 amount, Tier tier) external nonReentrant whenNotPaused {
         require(tier != Tier.None, "Invalid tier");
         require(amount >= tierInfo[tier].minStake, "Below minimum stake for tier");
 
@@ -323,5 +324,19 @@ contract GrepStakingPool is Ownable, ReentrancyGuard {
     function emergencyWithdraw(address token, uint256 amount) external onlyOwner {
         require(token != address(grepToken), "Cannot withdraw staked tokens");
         IERC20(token).safeTransfer(owner(), amount);
+    }
+
+    /**
+     * @dev Pause staking operations (emergency stop)
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @dev Unpause staking operations
+     */
+    function unpause() external onlyOwner {
+        _unpause();
     }
 }

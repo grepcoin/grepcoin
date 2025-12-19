@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { SiweMessage } from 'siwe'
 import prisma from '@/lib/db'
 import { createSessionToken } from '@/lib/auth'
+import { rateLimiters } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit by IP
+    const headersList = await headers()
+    const ip = headersList.get('x-forwarded-for')?.split(',')[0] || 'unknown'
+    const rateCheck = rateLimiters.auth(ip)
+
+    if (!rateCheck.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((rateCheck.resetAt - Date.now()) / 1000)) } }
+      )
+    }
+
     const { message, signature } = await request.json()
 
     if (!message || !signature) {
