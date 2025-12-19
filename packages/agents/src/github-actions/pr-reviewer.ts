@@ -1,29 +1,23 @@
 #!/usr/bin/env tsx
 /**
- * GREP Agent: PR Reviewer
- * Powered by GrepCoin AI Agents
+ * GREP Agent: PR Reviewer (Claude-Powered)
  *
- * Reviews pull requests for:
- * - Code quality and best practices
- * - Security vulnerabilities
- * - Performance issues
- * - Test coverage suggestions
+ * Uses Claude to provide intelligent code reviews for GrepCoin PRs
  */
 
 import { Octokit } from '@octokit/rest'
+import { askClaude, PROMPTS } from './claude-client'
 
-interface PRReviewResult {
+interface ReviewResult {
   summary: string
-  quality: 'excellent' | 'good' | 'needs_improvement' | 'critical'
-  issues: Array<{
+  aiAnalysis: string
+  staticIssues: Array<{
     file: string
     line?: number
-    severity: 'info' | 'warning' | 'error'
+    severity: 'critical' | 'warning' | 'info'
     message: string
     suggestion?: string
   }>
-  suggestions: string[]
-  securityConcerns: string[]
   approved: boolean
 }
 
@@ -31,7 +25,7 @@ async function reviewPR(): Promise<void> {
   const token = process.env.GITHUB_TOKEN
   const prNumber = parseInt(process.env.PR_NUMBER || '0')
   const repo = process.env.GITHUB_REPOSITORY || ''
-  const aiProvider = process.env.AI_PROVIDER || 'openai'
+  const anthropicKey = process.env.ANTHROPIC_API_KEY
 
   if (!token || !prNumber || !repo) {
     console.error('Missing required environment variables: GITHUB_TOKEN, PR_NUMBER, GITHUB_REPOSITORY')
@@ -41,8 +35,8 @@ async function reviewPR(): Promise<void> {
   const [owner, repoName] = repo.split('/')
   const octokit = new Octokit({ auth: token })
 
-  console.log(`🤖 GREP Agent reviewing PR #${prNumber} in ${repo}`)
-  console.log(`📡 Using AI provider: ${aiProvider}`)
+  console.log('🤖 GREP Agent (Claude-Powered) reviewing PR...')
+  console.log(`📋 PR #${prNumber} in ${repo}`)
 
   // Get PR details
   const { data: pr } = await octokit.pulls.get({
@@ -51,22 +45,23 @@ async function reviewPR(): Promise<void> {
     pull_number: prNumber
   })
 
-  console.log(`📋 PR Title: ${pr.title}`)
+  console.log(`📝 Title: ${pr.title}`)
   console.log(`👤 Author: ${pr.user?.login}`)
-  console.log(`📝 Files changed: ${pr.changed_files}`)
 
-  // Get PR diff
+  // Get changed files
   const { data: files } = await octokit.pulls.listFiles({
     owner,
     repo: repoName,
     pull_number: prNumber
   })
 
-  // Analyze files
-  const review = await analyzeChanges(files, pr.title, pr.body || '', aiProvider)
+  console.log(`📁 Files changed: ${files.length}`)
+
+  // Perform review
+  const review = await performReview(files, pr.title, pr.body || '', !!anthropicKey)
 
   // Post review comment
-  const commentBody = formatReviewComment(review, prNumber)
+  const commentBody = formatReviewComment(review, prNumber, pr.user?.login || 'contributor')
 
   await octokit.issues.createComment({
     owner,
@@ -75,241 +70,181 @@ async function reviewPR(): Promise<void> {
     body: commentBody
   })
 
-  console.log('✅ Review posted successfully')
+  console.log('✅ Review posted')
 
-  // If critical issues, request changes
-  if (review.quality === 'critical' || review.securityConcerns.length > 0) {
+  // Request changes if critical issues
+  if (!review.approved) {
     await octokit.pulls.createReview({
       owner,
       repo: repoName,
       pull_number: prNumber,
       event: 'REQUEST_CHANGES',
-      body: '🚨 Critical issues detected. Please address the concerns mentioned in the review comment.'
+      body: '🚨 Please address the critical issues found in the review.'
     })
-    console.log('⚠️ Requested changes due to critical issues')
     process.exit(1)
   }
-
-  console.log('🎉 PR review complete')
 }
 
-async function analyzeChanges(
+async function performReview(
   files: Array<{ filename: string; status: string; additions: number; deletions: number; patch?: string }>,
   title: string,
   body: string,
-  _aiProvider: string
-): Promise<PRReviewResult> {
-  const issues: PRReviewResult['issues'] = []
-  const suggestions: string[] = []
-  const securityConcerns: string[] = []
+  useAI: boolean
+): Promise<ReviewResult> {
+  const staticIssues: ReviewResult['staticIssues'] = []
+  let aiAnalysis = ''
 
-  // Analyze each file
+  // Build context for Claude
+  const changedCode: string[] = []
+  const fileList = files.map(f => `- ${f.filename} (+${f.additions}/-${f.deletions})`).join('\n')
+
   for (const file of files) {
-    const patch = file.patch || ''
+    if (!file.patch) continue
 
-    // Security checks
-    if (patch.includes('eval(') || patch.includes('Function(')) {
-      securityConcerns.push(`Potential code injection in ${file.filename}: Use of eval() or Function()`)
-      issues.push({
-        file: file.filename,
-        severity: 'error',
-        message: 'Use of eval() or Function() detected - potential security vulnerability',
-        suggestion: 'Consider safer alternatives like JSON.parse() for data or explicit function calls'
-      })
-    }
+    // Static analysis
+    runStaticChecks(file, staticIssues)
 
-    if (patch.includes('dangerouslySetInnerHTML')) {
-      securityConcerns.push(`XSS risk in ${file.filename}: dangerouslySetInnerHTML usage`)
-      issues.push({
-        file: file.filename,
-        severity: 'warning',
-        message: 'dangerouslySetInnerHTML detected - ensure content is properly sanitized',
-        suggestion: 'Use a sanitization library like DOMPurify before rendering HTML'
-      })
-    }
-
-    if (/password|secret|api[_-]?key|private[_-]?key/i.test(patch) && !file.filename.includes('.example')) {
-      if (!/process\.env|import\.meta\.env/.test(patch)) {
-        securityConcerns.push(`Potential hardcoded secret in ${file.filename}`)
-        issues.push({
-          file: file.filename,
-          severity: 'error',
-          message: 'Potential hardcoded secret detected',
-          suggestion: 'Use environment variables for sensitive data'
-        })
-      }
-    }
-
-    // Smart contract specific checks
-    if (file.filename.endsWith('.sol')) {
-      if (patch.includes('tx.origin')) {
-        securityConcerns.push(`Unsafe tx.origin usage in ${file.filename}`)
-        issues.push({
-          file: file.filename,
-          severity: 'error',
-          message: 'tx.origin usage detected - vulnerable to phishing attacks',
-          suggestion: 'Use msg.sender instead of tx.origin for authentication'
-        })
-      }
-
-      if (!patch.includes('ReentrancyGuard') && (patch.includes('.call{value') || patch.includes('.transfer('))) {
-        issues.push({
-          file: file.filename,
-          severity: 'warning',
-          message: 'External call without visible reentrancy protection',
-          suggestion: 'Consider using OpenZeppelin ReentrancyGuard'
-        })
-      }
-    }
-
-    // Code quality checks
-    if (patch.includes('console.log') && !file.filename.includes('test')) {
-      issues.push({
-        file: file.filename,
-        severity: 'info',
-        message: 'console.log statement found - remove before production',
-        suggestion: 'Use a proper logging library or remove debug statements'
-      })
-    }
-
-    if (patch.includes('TODO') || patch.includes('FIXME')) {
-      issues.push({
-        file: file.filename,
-        severity: 'info',
-        message: 'TODO/FIXME comment found',
-        suggestion: 'Consider creating an issue to track this task'
-      })
-    }
-
-    // TypeScript checks
-    if (file.filename.endsWith('.ts') || file.filename.endsWith('.tsx')) {
-      if (patch.includes(': any') || patch.includes('as any')) {
-        issues.push({
-          file: file.filename,
-          severity: 'warning',
-          message: 'Use of "any" type reduces type safety',
-          suggestion: 'Define proper types or use "unknown" with type guards'
-        })
-      }
+    // Collect code for AI analysis (limit size)
+    if (changedCode.join('\n').length < 15000) {
+      changedCode.push(`\n--- ${file.filename} ---\n${file.patch}`)
     }
   }
 
-  // Generate suggestions based on changes
-  const hasTests = files.some(f => f.filename.includes('test') || f.filename.includes('spec'))
-  const hasSourceChanges = files.some(f =>
-    (f.filename.endsWith('.ts') || f.filename.endsWith('.tsx') || f.filename.endsWith('.sol')) &&
-    !f.filename.includes('test')
-  )
+  // Claude AI analysis
+  if (useAI && changedCode.length > 0) {
+    console.log('🧠 Running Claude analysis...')
+    try {
+      const context = `
+## Pull Request
+**Title:** ${title}
+**Description:** ${body || 'No description provided'}
 
-  if (hasSourceChanges && !hasTests) {
-    suggestions.push('Consider adding tests for the new/modified code')
+## Files Changed
+${fileList}
+
+## Code Changes (diff format)
+${changedCode.join('\n')}
+`
+      const response = await askClaude(PROMPTS.codeReview, context, { maxTokens: 2048 })
+      aiAnalysis = response.content
+      console.log(`📊 Claude used ${response.usage.inputTokens} input, ${response.usage.outputTokens} output tokens`)
+    } catch (error) {
+      console.error('Claude analysis failed:', error)
+      aiAnalysis = '*AI analysis unavailable*'
+    }
   }
 
-  if (files.length > 10) {
-    suggestions.push('This is a large PR - consider breaking it into smaller, focused PRs for easier review')
-  }
-
-  // Determine overall quality
-  let quality: PRReviewResult['quality'] = 'excellent'
-  const errorCount = issues.filter(i => i.severity === 'error').length
-  const warningCount = issues.filter(i => i.severity === 'warning').length
-
-  if (securityConcerns.length > 0 || errorCount > 0) {
-    quality = 'critical'
-  } else if (warningCount > 3) {
-    quality = 'needs_improvement'
-  } else if (warningCount > 0 || issues.length > 5) {
-    quality = 'good'
-  }
+  // Determine approval
+  const criticalCount = staticIssues.filter(i => i.severity === 'critical').length
+  const approved = criticalCount === 0
 
   // Generate summary
-  const summary = generateSummary(title, body, files, issues, quality)
+  const summary = `Reviewed ${files.length} files with ${files.reduce((s, f) => s + f.additions, 0)} additions and ${files.reduce((s, f) => s + f.deletions, 0)} deletions. Found ${staticIssues.length} static issues (${criticalCount} critical).`
 
-  return {
-    summary,
-    quality,
-    issues,
-    suggestions,
-    securityConcerns,
-    approved: quality !== 'critical' && securityConcerns.length === 0
+  return { summary, aiAnalysis, staticIssues, approved }
+}
+
+function runStaticChecks(
+  file: { filename: string; patch?: string },
+  issues: ReviewResult['staticIssues']
+): void {
+  const patch = file.patch || ''
+  const filename = file.filename
+
+  // Security checks
+  const securityPatterns = [
+    { pattern: /eval\s*\(/, message: 'eval() usage - potential code injection', severity: 'critical' as const },
+    { pattern: /dangerouslySetInnerHTML/, message: 'dangerouslySetInnerHTML - ensure content is sanitized', severity: 'warning' as const },
+    { pattern: /innerHTML\s*=/, message: 'Direct innerHTML assignment - XSS risk', severity: 'critical' as const },
+    { pattern: /\btx\.origin\b/, message: 'tx.origin usage - vulnerable to phishing', severity: 'critical' as const },
+    { pattern: /selfdestruct|suicide/, message: 'selfdestruct usage - dangerous in upgradeable contracts', severity: 'warning' as const },
+    { pattern: /password|secret|apikey|api_key|private_key/i, message: 'Potential hardcoded secret', severity: 'critical' as const },
+  ]
+
+  for (const { pattern, message, severity } of securityPatterns) {
+    if (pattern.test(patch)) {
+      // Don't flag if it's in process.env usage
+      if (message.includes('secret') && /process\.env|import\.meta\.env/.test(patch)) continue
+      issues.push({ file: filename, severity, message })
+    }
+  }
+
+  // TypeScript/JavaScript checks
+  if (filename.match(/\.(ts|tsx|js|jsx)$/)) {
+    if (/:\s*any\b|as\s+any\b/.test(patch)) {
+      issues.push({ file: filename, severity: 'warning', message: 'Usage of "any" type reduces type safety' })
+    }
+    if (/console\.(log|debug|info)\(/.test(patch) && !filename.includes('test')) {
+      issues.push({ file: filename, severity: 'info', message: 'Console statement - remove before production' })
+    }
+    if (/TODO|FIXME|HACK|XXX/.test(patch)) {
+      issues.push({ file: filename, severity: 'info', message: 'TODO/FIXME comment found' })
+    }
+  }
+
+  // Solidity checks
+  if (filename.endsWith('.sol')) {
+    if (/\.call\{value/.test(patch) && !/nonReentrant|ReentrancyGuard/.test(patch)) {
+      issues.push({ file: filename, severity: 'warning', message: 'External call without visible reentrancy protection' })
+    }
+    if (/block\.timestamp/.test(patch)) {
+      issues.push({ file: filename, severity: 'info', message: 'block.timestamp usage - can be manipulated by miners' })
+    }
   }
 }
 
-function generateSummary(
-  title: string,
-  _body: string,
-  files: Array<{ filename: string; additions: number; deletions: number }>,
-  issues: PRReviewResult['issues'],
-  quality: PRReviewResult['quality']
-): string {
-  const totalAdditions = files.reduce((sum, f) => sum + f.additions, 0)
-  const totalDeletions = files.reduce((sum, f) => sum + f.deletions, 0)
-
-  const qualityEmoji = {
-    excellent: '🌟',
-    good: '✅',
-    needs_improvement: '⚠️',
-    critical: '🚨'
-  }
-
-  return `This PR "${title}" modifies ${files.length} files (+${totalAdditions}/-${totalDeletions} lines). ` +
-    `Overall quality: ${qualityEmoji[quality]} ${quality.replace('_', ' ')}. ` +
-    `Found ${issues.filter(i => i.severity === 'error').length} errors, ` +
-    `${issues.filter(i => i.severity === 'warning').length} warnings, and ` +
-    `${issues.filter(i => i.severity === 'info').length} suggestions.`
-}
-
-function formatReviewComment(review: PRReviewResult, prNumber: number): string {
-  const qualityBadge = {
-    excellent: '![Quality: Excellent](https://img.shields.io/badge/quality-excellent-brightgreen)',
-    good: '![Quality: Good](https://img.shields.io/badge/quality-good-green)',
-    needs_improvement: '![Quality: Needs Improvement](https://img.shields.io/badge/quality-needs%20improvement-yellow)',
-    critical: '![Quality: Critical](https://img.shields.io/badge/quality-critical-red)'
-  }
+function formatReviewComment(review: ReviewResult, prNumber: number, author: string): string {
+  const statusBadge = review.approved
+    ? '![Status: Approved](https://img.shields.io/badge/status-approved-brightgreen)'
+    : '![Status: Changes Requested](https://img.shields.io/badge/status-changes%20requested-red)'
 
   let comment = `## 🤖 GREP Agent Code Review
 
-${qualityBadge[review.quality]}
+${statusBadge}
 
-### Summary
+Hey @${author}! I've reviewed your changes. Here's what I found:
+
+### 📊 Summary
 ${review.summary}
 
 `
 
-  if (review.securityConcerns.length > 0) {
-    comment += `### 🔒 Security Concerns
-${review.securityConcerns.map(c => `- 🚨 ${c}`).join('\n')}
+  // AI Analysis section
+  if (review.aiAnalysis && review.aiAnalysis !== '*AI analysis unavailable*') {
+    comment += `### 🧠 Claude Analysis
+
+${review.aiAnalysis}
 
 `
   }
 
-  if (review.issues.length > 0) {
-    comment += `### Issues Found
+  // Static issues
+  if (review.staticIssues.length > 0) {
+    comment += `### 🔍 Static Analysis
 
-| File | Severity | Issue | Suggestion |
-|------|----------|-------|------------|
-${review.issues.map(i =>
-  `| \`${i.file}\` | ${i.severity === 'error' ? '🔴' : i.severity === 'warning' ? '🟡' : '🔵'} ${i.severity} | ${i.message} | ${i.suggestion || '-'} |`
-).join('\n')}
-
+| Severity | File | Issue |
+|----------|------|-------|
 `
-  }
-
-  if (review.suggestions.length > 0) {
-    comment += `### 💡 Suggestions
-${review.suggestions.map(s => `- ${s}`).join('\n')}
+    for (const issue of review.staticIssues) {
+      const emoji = issue.severity === 'critical' ? '🔴' : issue.severity === 'warning' ? '🟡' : '🔵'
+      comment += `| ${emoji} ${issue.severity} | \`${issue.file}\` | ${issue.message} |\n`
+    }
+    comment += '\n'
+  } else {
+    comment += `### ✅ Static Analysis
+No issues detected by static analysis.
 
 `
   }
 
   comment += `---
-<sub>🤖 Powered by GREP Agents | PR #${prNumber} | [GrepCoin](https://grepcoin.io)</sub>`
+<sub>🤖 Powered by GREP Agent + Claude | PR #${prNumber} | [GrepCoin](https://grepcoin.io)</sub>`
 
   return comment
 }
 
-// Run the reviewer
+// Run
 reviewPR().catch((error) => {
-  console.error('❌ PR review failed:', error)
+  console.error('❌ Review failed:', error)
   process.exit(1)
 })

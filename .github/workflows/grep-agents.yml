@@ -1,20 +1,22 @@
-name: GREP Agents
+name: GREP Agents (Claude-Powered)
 
 on:
   # PR Review - triggers on new/updated PRs
   pull_request:
     types: [opened, synchronize, reopened]
 
-  # Issue Triage - triggers on new issues
+  # Issue events - triage new issues, debug bugs
   issues:
-    types: [opened]
+    types: [opened, labeled]
 
-  # Scheduled reports and security checks
+  # Scheduled tasks
   schedule:
     # Security check: Every 6 hours
     - cron: '0 */6 * * *'
     # Weekly analytics: Every Monday at 9 AM UTC
     - cron: '0 9 * * 1'
+    # Feature ideas: First of each month
+    - cron: '0 12 1 * *'
 
   # Manual trigger for any agent
   workflow_dispatch:
@@ -28,11 +30,13 @@ on:
           - security-guardian
           - analytics-reporter
           - issue-triage
+          - debug-helper
+          - feature-ideator
           - all
 
 jobs:
   # ===========================================
-  # PR Review Agent
+  # PR Review Agent (Claude-Powered)
   # ===========================================
   pr-review:
     name: 🤖 GREP PR Reviewer
@@ -64,15 +68,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          AI_PROVIDER: openai
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
   # ===========================================
   # Issue Triage Agent
   # ===========================================
   issue-triage:
     name: 🏷️ GREP Issue Triage
-    if: github.event_name == 'issues' || (github.event_name == 'workflow_dispatch' && (inputs.agent == 'issue-triage' || inputs.agent == 'all'))
+    if: (github.event_name == 'issues' && github.event.action == 'opened') || (github.event_name == 'workflow_dispatch' && (inputs.agent == 'issue-triage' || inputs.agent == 'all'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -97,6 +100,39 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+  # ===========================================
+  # Debug Helper Agent (Claude-Powered)
+  # ===========================================
+  debug-helper:
+    name: 🐛 GREP Debug Helper
+    if: (github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'bug') || (github.event_name == 'workflow_dispatch' && (inputs.agent == 'debug-helper' || inputs.agent == 'all'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Debug Helper Agent
+        run: npx tsx packages/agents/src/github-actions/debug-helper.ts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
   # ===========================================
   # Security Guardian Agent
@@ -128,8 +164,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           BLOCKCHAIN_NETWORK: testnet
-        continue-on-error: false
 
   # ===========================================
   # Analytics Reporter Agent
@@ -163,11 +199,43 @@ jobs:
           REPORT_TYPE: weekly
 
   # ===========================================
+  # Feature Ideator Agent (Claude-Powered)
+  # ===========================================
+  feature-ideator:
+    name: 💡 GREP Feature Ideator
+    if: github.event.schedule == '0 12 1 * *' || (github.event_name == 'workflow_dispatch' && (inputs.agent == 'feature-ideator' || inputs.agent == 'all'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Feature Ideator Agent
+        run: npx tsx packages/agents/src/github-actions/feature-ideator.ts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FOCUS_AREA: all
+
+  # ===========================================
   # Summary Job
   # ===========================================
   summary:
     name: 📋 GREP Agent Summary
-    needs: [pr-review, issue-triage, security-guardian, analytics-reporter]
+    needs: [pr-review, issue-triage, debug-helper, security-guardian, analytics-reporter, feature-ideator]
     if: always() && github.event_name == 'workflow_dispatch' && inputs.agent == 'all'
     runs-on: ubuntu-latest
 
@@ -178,10 +246,12 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Agent | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| PR Reviewer | ${{ needs.pr-review.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Issue Triage | ${{ needs.issue-triage.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Security Guardian | ${{ needs.security-guardian.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Analytics Reporter | ${{ needs.analytics-reporter.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🤖 PR Reviewer | ${{ needs.pr-review.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🏷️ Issue Triage | ${{ needs.issue-triage.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🐛 Debug Helper | ${{ needs.debug-helper.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🛡️ Security Guardian | ${{ needs.security-guardian.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📊 Analytics Reporter | ${{ needs.analytics-reporter.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 💡 Feature Ideator | ${{ needs.feature-ideator.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "*Powered by GrepCoin AI Agents*" >> $GITHUB_STEP_SUMMARY
+          echo "*Powered by GrepCoin AI Agents + Claude*" >> $GITHUB_STEP_SUMMARY
