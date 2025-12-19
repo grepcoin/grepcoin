@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
  * @title GrepToken
@@ -16,7 +17,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * - 20% (200M) reserved for gameplay rewards
  * - 10% (100M) reserved for airdrops and marketing
  */
-contract GrepToken is ERC20, ERC20Burnable, ERC20Permit, Ownable {
+contract GrepToken is ERC20, ERC20Burnable, ERC20Permit, Ownable, Pausable {
     uint256 public constant MAX_SUPPLY = 1_000_000_000 * 10**18; // 1 billion tokens
 
     // Addresses that can mint (staking pool, rewards distributor)
@@ -112,5 +113,26 @@ contract GrepToken is ERC20, ERC20Burnable, ERC20Permit, Ownable {
         stakingRemaining = STAKING_REWARDS_CAP - stakingRewardsMinted;
         gameplayRemaining = GAMEPLAY_REWARDS_CAP - gameplayRewardsMinted;
         airdropsRemaining = AIRDROPS_CAP - airdropsMinted;
+    }
+
+    /**
+     * @dev Pause all token transfers (emergency stop)
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @dev Unpause token transfers
+     */
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
+    /**
+     * @dev Override _update to add pause functionality
+     */
+    function _update(address from, address to, uint256 value) internal virtual override whenNotPaused {
+        super._update(from, to, value);
     }
 }

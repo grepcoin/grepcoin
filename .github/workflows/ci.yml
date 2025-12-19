@@ -41,7 +41,7 @@ jobs:
         run: npm ci
 
       - name: Generate Prisma client
-        run: npx prisma generate --schema=apps/web/prisma/schema.prisma
+        run: npm run prisma:generate --workspace=apps/web
 
       - name: Build web app
         run: npm run build --workspace=apps/web

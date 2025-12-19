@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import prisma from '@/lib/db'
 import { parseSessionToken } from '@/lib/auth'
+import { rateLimiters } from '@/lib/rate-limit'
 
 export async function POST(
   request: NextRequest,
@@ -26,6 +27,15 @@ export async function POST(
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }
+      )
+    }
+
+    // Rate limit by wallet
+    const rateCheck = rateLimiters.gameSubmit(session.address)
+    if (!rateCheck.success) {
+      return NextResponse.json(
+        { error: 'Too many game submissions. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((rateCheck.resetAt - Date.now()) / 1000)) } }
       )
     }
 
