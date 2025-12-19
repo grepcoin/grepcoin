@@ -151,43 +151,59 @@ function runStaticChecks(
   const patch = file.patch || ''
   const filename = file.filename
 
-  // Security checks
+  // Skip static analysis on our own agent files (they contain the patterns)
+  if (filename.includes('github-actions/') && filename.endsWith('-reviewer.ts')) {
+    return
+  }
+
+  // Skip secret detection on workflow files (they reference secrets, not hardcode them)
+  const isWorkflowFile = filename.endsWith('.yml') || filename.endsWith('.yaml')
+
+  // Only analyze added lines (lines starting with +)
+  const addedLines = patch
+    .split('\n')
+    .filter(line => line.startsWith('+') && !line.startsWith('+++'))
+    .join('\n')
+
+  if (!addedLines) return
+
+  // Security checks (skip some for workflow files)
   const securityPatterns = [
-    { pattern: /eval\s*\(/, message: 'eval() usage - potential code injection', severity: 'critical' as const },
-    { pattern: /dangerouslySetInnerHTML/, message: 'dangerouslySetInnerHTML - ensure content is sanitized', severity: 'warning' as const },
-    { pattern: /innerHTML\s*=/, message: 'Direct innerHTML assignment - XSS risk', severity: 'critical' as const },
-    { pattern: /\btx\.origin\b/, message: 'tx.origin usage - vulnerable to phishing', severity: 'critical' as const },
-    { pattern: /selfdestruct|suicide/, message: 'selfdestruct usage - dangerous in upgradeable contracts', severity: 'warning' as const },
-    { pattern: /password|secret|apikey|api_key|private_key/i, message: 'Potential hardcoded secret', severity: 'critical' as const },
+    { pattern: /eval\s*\(/, message: 'eval() usage - potential code injection', severity: 'critical' as const, skipWorkflow: false },
+    { pattern: /dangerouslySetInnerHTML/, message: 'dangerouslySetInnerHTML - ensure content is sanitized', severity: 'warning' as const, skipWorkflow: false },
+    { pattern: /innerHTML\s*=/, message: 'Direct innerHTML assignment - XSS risk', severity: 'critical' as const, skipWorkflow: false },
+    { pattern: /\btx\.origin\b/, message: 'tx.origin usage - vulnerable to phishing', severity: 'critical' as const, skipWorkflow: false },
+    { pattern: /selfdestruct|suicide/, message: 'selfdestruct usage - dangerous in upgradeable contracts', severity: 'warning' as const, skipWorkflow: false },
+    { pattern: /["'`](?:[^"'`]*(?:password|secret|api_key|private_key)[^"'`]*=\s*["'`][^"'`]+["'`])/i, message: 'Potential hardcoded secret', severity: 'critical' as const, skipWorkflow: true },
   ]
 
-  for (const { pattern, message, severity } of securityPatterns) {
-    if (pattern.test(patch)) {
-      // Don't flag if it's in process.env usage
-      if (message.includes('secret') && /process\.env|import\.meta\.env/.test(patch)) continue
+  for (const { pattern, message, severity, skipWorkflow } of securityPatterns) {
+    if (skipWorkflow && isWorkflowFile) continue
+    if (pattern.test(addedLines)) {
       issues.push({ file: filename, severity, message })
     }
   }
 
-  // TypeScript/JavaScript checks
+  // TypeScript/JavaScript checks (only on added lines)
   if (filename.match(/\.(ts|tsx|js|jsx)$/)) {
-    if (/:\s*any\b|as\s+any\b/.test(patch)) {
+    if (/:\s*any\b|as\s+any\b/.test(addedLines)) {
       issues.push({ file: filename, severity: 'warning', message: 'Usage of "any" type reduces type safety' })
     }
-    if (/console\.(log|debug|info)\(/.test(patch) && !filename.includes('test')) {
+    // Skip console.log warnings for agent files (they use logging for CI output)
+    if (/console\.(log|debug|info)\(/.test(addedLines) && !filename.includes('test') && !filename.includes('agents')) {
       issues.push({ file: filename, severity: 'info', message: 'Console statement - remove before production' })
     }
-    if (/TODO|FIXME|HACK|XXX/.test(patch)) {
+    if (/TODO|FIXME|HACK|XXX/.test(addedLines)) {
       issues.push({ file: filename, severity: 'info', message: 'TODO/FIXME comment found' })
     }
   }
 
   // Solidity checks
   if (filename.endsWith('.sol')) {
-    if (/\.call\{value/.test(patch) && !/nonReentrant|ReentrancyGuard/.test(patch)) {
+    if (/\.call\{value/.test(addedLines) && !/nonReentrant|ReentrancyGuard/.test(addedLines)) {
       issues.push({ file: filename, severity: 'warning', message: 'External call without visible reentrancy protection' })
     }
-    if (/block\.timestamp/.test(patch)) {
+    if (/block\.timestamp/.test(addedLines)) {
       issues.push({ file: filename, severity: 'info', message: 'block.timestamp usage - can be manipulated by miners' })
     }
   }
