@@ -1,0 +1,187 @@
+name: GREP Agents
+
+on:
+  # PR Review - triggers on new/updated PRs
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+  # Issue Triage - triggers on new issues
+  issues:
+    types: [opened]
+
+  # Scheduled reports and security checks
+  schedule:
+    # Security check: Every 6 hours
+    - cron: '0 */6 * * *'
+    # Weekly analytics: Every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+
+  # Manual trigger for any agent
+  workflow_dispatch:
+    inputs:
+      agent:
+        description: 'Which agent to run'
+        required: true
+        type: choice
+        options:
+          - pr-reviewer
+          - security-guardian
+          - analytics-reporter
+          - issue-triage
+          - all
+
+jobs:
+  # ===========================================
+  # PR Review Agent
+  # ===========================================
+  pr-review:
+    name: 🤖 GREP PR Reviewer
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && (inputs.agent == 'pr-reviewer' || inputs.agent == 'all'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run PR Review Agent
+        run: npx tsx packages/agents/src/github-actions/pr-reviewer.ts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          AI_PROVIDER: openai
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+  # ===========================================
+  # Issue Triage Agent
+  # ===========================================
+  issue-triage:
+    name: 🏷️ GREP Issue Triage
+    if: github.event_name == 'issues' || (github.event_name == 'workflow_dispatch' && (inputs.agent == 'issue-triage' || inputs.agent == 'all'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Issue Triage Agent
+        run: npx tsx packages/agents/src/github-actions/issue-triage.ts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+
+  # ===========================================
+  # Security Guardian Agent
+  # ===========================================
+  security-guardian:
+    name: 🛡️ GREP Security Guardian
+    if: github.event.schedule == '0 */6 * * *' || (github.event_name == 'workflow_dispatch' && (inputs.agent == 'security-guardian' || inputs.agent == 'all'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Security Guardian Agent
+        run: npx tsx packages/agents/src/github-actions/security-guardian.ts
+        timeout-minutes: 10
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          BLOCKCHAIN_NETWORK: testnet
+        continue-on-error: false
+
+  # ===========================================
+  # Analytics Reporter Agent
+  # ===========================================
+  analytics-reporter:
+    name: 📊 GREP Analytics Reporter
+    if: github.event.schedule == '0 9 * * 1' || (github.event_name == 'workflow_dispatch' && (inputs.agent == 'analytics-reporter' || inputs.agent == 'all'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Analytics Reporter Agent
+        run: npx tsx packages/agents/src/github-actions/analytics-reporter.ts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          REPORT_TYPE: weekly
+
+  # ===========================================
+  # Summary Job
+  # ===========================================
+  summary:
+    name: 📋 GREP Agent Summary
+    needs: [pr-review, issue-triage, security-guardian, analytics-reporter]
+    if: always() && github.event_name == 'workflow_dispatch' && inputs.agent == 'all'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate Summary
+        run: |
+          echo "## 🤖 GREP Agent Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Agent | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| PR Reviewer | ${{ needs.pr-review.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Issue Triage | ${{ needs.issue-triage.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Guardian | ${{ needs.security-guardian.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Analytics Reporter | ${{ needs.analytics-reporter.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "*Powered by GrepCoin AI Agents*" >> $GITHUB_STEP_SUMMARY
