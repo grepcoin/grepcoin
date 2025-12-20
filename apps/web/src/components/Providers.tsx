@@ -6,6 +6,7 @@ import { WagmiProvider } from 'wagmi'
 import { config } from '@/lib/wagmi'
 import { AuthProvider } from '@/context/AuthContext'
 import { StakingProvider } from '@/context/StakingContext'
+import { NotificationProvider } from '@/components/NotificationProvider'
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient())
@@ -15,7 +16,9 @@ export default function Providers({ children }: { children: ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <StakingProvider>
-            {children}
+            <NotificationProvider>
+              {children}
+            </NotificationProvider>
           </StakingProvider>
         </AuthProvider>
       </QueryClientProvider>
