@@ -45,6 +45,64 @@ Track all changes, decisions, and context for parallel agent development.
 
 ---
 
+## Wave 5 - Completed (PRs #16-21 merged)
+
+| Stream | Task | Deliverables |
+|--------|------|--------------|
+| Stream A | Anti-cheat integration | Validation in `/api/games/[slug]/submit`, `lib/anticheat.ts` |
+| Stream B | Achievement NFT minting | `/api/achievements/mint`, `useAchievementMint.ts`, `MintAchievementButton.tsx` |
+| Stream C | Battle Pass page | `/battle-pass` page, `BattlePassReward.tsx`, `BattlePassProgress.tsx` |
+| Stream D | Notification system | `NotificationProvider.tsx`, `NotificationToast.tsx`, `useNotifications.ts` |
+| Stream E | Settings page | `/settings` page, `/api/users/settings` |
+| Stream F | Stats dashboard | `/stats` page, `StatsChart.tsx`, `GameStatsCard.tsx`, `/api/stats/detailed` |
+
+**Anti-cheat Integration:**
+- Validators called before saving game scores
+- Confidence threshold (0.5) for rejection
+- Suspicious activity logging
+- Client-side session tracking helpers
+
+**Achievement NFT Minting:**
+- API validates unlock status before mint
+- wagmi hook for transaction handling
+- Mint button with loading/success states
+
+**Notification System:**
+- Global context provider for toasts
+- Types: success, error, achievement, reward
+- Auto-dismiss with progress bar
+- Slide-in animations
+
+---
+
+## Wave 4 - Completed (PRs #12-15 merged)
+
+| Stream | Task | Deliverables |
+|--------|------|--------------|
+| Stream 1 | Auto-fix agent | `.github/workflows/auto-fix.yml`, error parsers |
+| Stream 2 | Multiplayer server | `server/multiplayer.ts`, `useMultiplayer.ts`, `MultiplayerLobby.tsx` |
+| Stream 3 | OG images | `/api/og/*` routes for dynamic Open Graph images |
+| Stream 4 | The Graph subgraph | `packages/subgraph/` with schema and handlers |
+
+**Auto-fix Agent:**
+- Triggers on CI failure
+- Parses ESLint, TypeScript, Jest errors
+- Uses Claude to suggest fixes
+- Creates fix PRs automatically
+
+**Multiplayer:**
+- Socket.io server with room management
+- Player state synchronization
+- Countdown and game state handling
+- Lobby UI component
+
+**OG Images:**
+- Dynamic generation for profiles, games, achievements
+- Edge runtime for performance
+- Utility functions for formatting
+
+---
+
 ## Wave 3 - Completed (PRs #8-11 merged)
 
 | Stream | Task | Deliverables |
