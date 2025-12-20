@@ -33,6 +33,7 @@ model User {
   friendsReceived  Friendship[] @relation("FriendOf")
   eventParticipations EventParticipant[]
   battlePassProgress BattlePassProgress[]
+  tournamentParticipations TournamentParticipant[]
 }
 
 // Game definitions
@@ -412,4 +413,48 @@ enum RewardType {
   BADGE
   MULTIPLIER
   NFT
+}
+
+// Tournament System
+model Tournament {
+  id          String           @id @default(cuid())
+  name        String
+  gameSlug    String
+  entryFee    Int              @default(0)
+  prizePool   Int
+  maxPlayers  Int
+  startTime   DateTime
+  endTime     DateTime
+  status      TournamentStatus @default(REGISTRATION)
+  createdAt   DateTime         @default(now())
+
+  participants TournamentParticipant[]
+
+  @@index([status])
+  @@index([startTime])
+  @@index([gameSlug])
+}
+
+model TournamentParticipant {
+  id           String     @id @default(cuid())
+  tournamentId String
+  userId       String
+  score        Int        @default(0)
+  rank         Int?
+  joinedAt     DateTime   @default(now())
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tournamentId, userId])
+  @@index([tournamentId])
+  @@index([userId])
+  @@index([score])
+}
+
+enum TournamentStatus {
+  REGISTRATION
+  ACTIVE
+  COMPLETED
+  CANCELLED
 }
