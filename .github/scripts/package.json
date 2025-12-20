@@ -1,0 +1,11 @@
+{
+  "name": "grepcoin-github-scripts",
+  "version": "1.0.0",
+  "description": "GitHub Actions automation scripts",
+  "private": true,
+  "type": "commonjs",
+  "dependencies": {
+    "@octokit/rest": "^20.1.2",
+    "@anthropic-ai/sdk": "^0.14.1"
+  }
+}
