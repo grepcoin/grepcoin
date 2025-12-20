@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import prisma from '@/lib/db'
 import { parseSessionToken } from '@/lib/auth'
 import { rateLimiters } from '@/lib/rate-limit'
+import { validateGameSubmission, GameSubmissionData } from '@grepcoin/anti-cheat'
 
 export async function POST(
   request: NextRequest,
@@ -70,11 +71,98 @@ export async function POST(
     }
 
     // Parse score data
-    const { score, streak, duration } = await request.json()
+    const { score, streak, duration, sessionStartTime } = await request.json()
 
     if (typeof score !== 'number' || score < 0) {
       return NextResponse.json(
         { error: 'Invalid score' },
+        { status: 400 }
+      )
+    }
+
+    // Get previous score and submission history for anti-cheat validation
+    const previousScoreRecord = await prisma.gameScore.findFirst({
+      where: {
+        userId: user.id,
+        gameId: game.id,
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+
+    const recentSubmissions = await prisma.gameScore.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+      include: { game: true },
+    })
+
+    // Prepare anti-cheat validation data
+    const validationData: GameSubmissionData = {
+      gameSlug: slug,
+      userId: user.id,
+      score,
+      streak,
+      duration: duration || 0,
+      sessionStartTime,
+      previousScore: previousScoreRecord?.score,
+      submissionHistory: recentSubmissions.map(s => ({
+        timestamp: s.createdAt.getTime(),
+        gameSlug: s.game.slug,
+        score: s.score,
+      })),
+    }
+
+    // Run anti-cheat validation
+    const validationResult = validateGameSubmission(validationData)
+
+    // Reject if confidence is too low
+    if (validationResult.confidence !== undefined && validationResult.confidence < 0.5) {
+      console.warn('Suspicious game submission detected:', {
+        userId: user.id,
+        walletAddress: user.walletAddress,
+        gameSlug: slug,
+        score,
+        confidence: validationResult.confidence,
+        errors: validationResult.errors,
+        warnings: validationResult.warnings,
+      })
+
+      return NextResponse.json(
+        {
+          error: 'Submission rejected: suspicious activity detected',
+          details: validationResult.errors,
+        },
+        { status: 403 }
+      )
+    }
+
+    // Log warnings for review even if submission is accepted
+    if (validationResult.warnings && validationResult.warnings.length > 0) {
+      console.warn('Game submission warnings:', {
+        userId: user.id,
+        walletAddress: user.walletAddress,
+        gameSlug: slug,
+        score,
+        confidence: validationResult.confidence,
+        warnings: validationResult.warnings,
+      })
+    }
+
+    // Reject if validation failed
+    if (!validationResult.valid) {
+      console.error('Game submission validation failed:', {
+        userId: user.id,
+        walletAddress: user.walletAddress,
+        gameSlug: slug,
+        score,
+        errors: validationResult.errors,
+      })
+
+      return NextResponse.json(
+        {
+          error: 'Invalid submission',
+          details: validationResult.errors,
+        },
         { status: 400 }
       )
     }
