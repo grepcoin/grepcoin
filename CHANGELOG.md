@@ -45,14 +45,37 @@ Track all changes, decisions, and context for parallel agent development.
 
 ---
 
-## Wave 3 - In Progress
+## Wave 3 - Completed (PRs #8-11 merged)
 
-| Stream | Task | Status |
-|--------|------|--------|
-| Stream 1 | Discord AI commands | Pending |
-| Stream 2 | Socket.io multiplayer | Pending |
-| Stream 3 | Deploy contracts testnet | Pending |
-| Stream 4 | Leaderboards & rankings | Pending |
+| Stream | Task | Deliverables |
+|--------|------|--------------|
+| Stream 1 | Discord AI commands | 4 slash commands: /analyze, /explain, /debug, /optimize |
+| Stream 3 | Contract deployment | deploy-all.js, deploy-testnet.js, verify.js, setup-roles.js |
+| Stream 4 | Leaderboards | `/api/leaderboards`, `/api/leaderboards/[game]`, `/api/leaderboards/rankings` |
+| Stream 4 | Tournament system | Tournament/TournamentParticipant models, 4 API routes, hooks |
+
+**Discord AI Commands:**
+- `/analyze <code>` - Analyze code for bugs, security issues, performance
+- `/explain <concept>` - Explain programming/crypto concepts
+- `/debug <error>` - Help debug error messages
+- `/optimize <code>` - Suggest code optimizations
+
+**Leaderboard Features:**
+- Global leaderboard with period filtering (all/weekly/daily)
+- Game-specific leaderboards
+- Player ranking with nearby players
+- useLeaderboards, usePlayerRanking hooks
+
+**Tournament Features:**
+- Tournament model with REGISTRATION/ACTIVE/COMPLETED/CANCELLED status
+- Join tournaments, submit scores, automatic rank calculation
+- useTournaments, useTournament hooks with join/submit
+
+**Contract Deployment:**
+- Full deployment script: Token → Staking → Vesting → Achievements
+- Quick testnet deployment without verification
+- Basescan verification script
+- Role setup script (minter/signer)
 
 ---
 
@@ -159,18 +182,19 @@ Set up parallel development infrastructure with comprehensive documentation for 
 - [x] Create Claude provider in `packages/agents/src/providers/claude.ts`
 - [x] AI Chat endpoint with streaming
 - [x] Enhanced GitHub Actions claude-client
+- [x] Discord AI commands (/analyze, /explain, /debug, /optimize)
 - [ ] Add `ANTHROPIC_API_KEY` to GitHub secrets
-- [ ] Discord AI commands
 - [ ] Build auto-fix agent
 
 #### Stream 2: Game Backend
 - [x] Build anti-cheat validators
+- [x] Tournament system with scoring
 - [ ] Set up Redis
 - [ ] Socket.io multiplayer server
-- [ ] Tournament system
 
 #### Stream 3: Crypto/Blockchain
 - [x] Build GrepAchievements NFT contract
+- [x] Contract deployment scripts (all, testnet, verify, roles)
 - [ ] Fund deployer wallet with Base Sepolia ETH
 - [ ] Deploy contracts to testnet
 - [ ] Set up The Graph subgraph
@@ -179,7 +203,7 @@ Set up parallel development infrastructure with comprehensive documentation for 
 - [x] Friend system API routes & hooks
 - [x] Events system with participation
 - [x] Battle pass progression & rewards
-- [ ] Leaderboards & rankings
+- [x] Leaderboards & rankings (global, game-specific, player rank)
 - [ ] OG image generation
 
 ### Environment Required
