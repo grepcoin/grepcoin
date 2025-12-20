@@ -1,6 +1,6 @@
 /**
  * Claude API Client for GREP Agents
- * Configured for optimal code analysis
+ * Configured for optimal code analysis with retry logic, streaming, and token tracking
  */
 
 import Anthropic from '@anthropic-ai/sdk'
@@ -20,36 +20,216 @@ export interface ClaudeResponse {
     inputTokens: number
     outputTokens: number
   }
+  stopReason?: string
+}
+
+export interface ClaudeOptions {
+  maxTokens?: number
+  temperature?: number
+  retries?: number
+  retryDelayMs?: number
+  stream?: boolean
+}
+
+export interface TokenUsageTracker {
+  totalInputTokens: number
+  totalOutputTokens: number
+  totalCost: number
+  requestCount: number
+}
+
+// Token usage tracker for the session
+export const tokenUsage: TokenUsageTracker = {
+  totalInputTokens: 0,
+  totalOutputTokens: 0,
+  totalCost: 0,
+  requestCount: 0
+}
+
+// Pricing per 1M tokens (as of Dec 2024)
+const PRICING = {
+  'claude-sonnet-4-20250514': {
+    input: 3.0,  // $3 per 1M input tokens
+    output: 15.0 // $15 per 1M output tokens
+  }
+}
+
+function calculateCost(inputTokens: number, outputTokens: number, model: string): number {
+  const pricing = PRICING[model as keyof typeof PRICING] || PRICING['claude-sonnet-4-20250514']
+  return (inputTokens / 1_000_000) * pricing.input + (outputTokens / 1_000_000) * pricing.output
+}
+
+function trackUsage(inputTokens: number, outputTokens: number, model: string): void {
+  tokenUsage.totalInputTokens += inputTokens
+  tokenUsage.totalOutputTokens += outputTokens
+  tokenUsage.totalCost += calculateCost(inputTokens, outputTokens, model)
+  tokenUsage.requestCount += 1
+}
+
+export function getTokenUsageSummary(): string {
+  return `Token Usage Summary:
+- Requests: ${tokenUsage.requestCount}
+- Input tokens: ${tokenUsage.totalInputTokens.toLocaleString()}
+- Output tokens: ${tokenUsage.totalOutputTokens.toLocaleString()}
+- Estimated cost: $${tokenUsage.totalCost.toFixed(4)}`
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  retries: number,
+  delayMs: number
+): Promise<T> {
+  let lastError: Error | undefined
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn()
+    } catch (error) {
+      lastError = error as Error
+
+      if (error instanceof Anthropic.APIError) {
+        if (error.status && [400, 401, 403].includes(error.status)) {
+          throw error
+        }
+      }
+
+      if (attempt < retries) {
+        const backoffDelay = delayMs * Math.pow(2, attempt)
+        console.log(`Attempt ${attempt + 1} failed: ${lastError.message}. Retrying in ${backoffDelay}ms...`)
+        await sleep(backoffDelay)
+      }
+    }
+  }
+
+  throw new Error(`Failed after ${retries + 1} attempts: ${lastError?.message}`)
 }
 
 export async function askClaude(
   systemPrompt: string,
   userMessage: string,
-  options: {
-    maxTokens?: number
-    temperature?: number
-  } = {}
+  options: ClaudeOptions = {}
 ): Promise<ClaudeResponse> {
-  const { maxTokens = 4096, temperature = 0.3 } = options
+  const {
+    maxTokens = 4096,
+    temperature = 0.3,
+    retries = 3,
+    retryDelayMs = 1000,
+    stream = false
+  } = options
 
-  const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: maxTokens,
-    temperature,
-    system: systemPrompt,
-    messages: [
-      { role: 'user', content: userMessage }
-    ]
-  })
+  const model = 'claude-sonnet-4-20250514'
 
-  const textContent = response.content.find(c => c.type === 'text')
+  if (stream) {
+    return askClaudeStreaming(systemPrompt, userMessage, { maxTokens, temperature, retries, retryDelayMs })
+  }
 
-  return {
-    content: textContent?.text || '',
-    usage: {
-      inputTokens: response.usage.input_tokens,
-      outputTokens: response.usage.output_tokens
+  const callAPI = async (): Promise<ClaudeResponse> => {
+    const response = await anthropic.messages.create({
+      model,
+      max_tokens: maxTokens,
+      temperature,
+      system: systemPrompt,
+      messages: [
+        { role: 'user', content: userMessage }
+      ]
+    })
+
+    const textContent = response.content.find(c => c.type === 'text')
+    const content = textContent?.type === 'text' ? textContent.text : ''
+
+    trackUsage(response.usage.input_tokens, response.usage.output_tokens, model)
+
+    return {
+      content,
+      usage: {
+        inputTokens: response.usage.input_tokens,
+        outputTokens: response.usage.output_tokens
+      },
+      stopReason: response.stop_reason
     }
+  }
+
+  try {
+    return await retryWithBackoff(callAPI, retries, retryDelayMs)
+  } catch (error) {
+    if (error instanceof Anthropic.APIError) {
+      throw new Error(
+        `Claude API Error (${error.status}): ${error.message}\n` +
+        `Type: ${error.type || 'unknown'}\n` +
+        `This may be due to: rate limits, invalid API key, or service issues.`
+      )
+    }
+    throw new Error(`Failed to get response from Claude: ${error instanceof Error ? error.message : String(error)}`)
+  }
+}
+
+async function askClaudeStreaming(
+  systemPrompt: string,
+  userMessage: string,
+  options: ClaudeOptions = {}
+): Promise<ClaudeResponse> {
+  const {
+    maxTokens = 4096,
+    temperature = 0.3,
+    retries = 3,
+    retryDelayMs = 1000
+  } = options
+
+  const model = 'claude-sonnet-4-20250514'
+
+  const callAPI = async (): Promise<ClaudeResponse> => {
+    const stream = await anthropic.messages.create({
+      model,
+      max_tokens: maxTokens,
+      temperature,
+      system: systemPrompt,
+      messages: [
+        { role: 'user', content: userMessage }
+      ],
+      stream: true
+    })
+
+    let content = ''
+    let inputTokens = 0
+    let outputTokens = 0
+    let stopReason: string | undefined
+
+    for await (const event of stream) {
+      if (event.type === 'message_start') {
+        inputTokens = event.message.usage.input_tokens
+      } else if (event.type === 'content_block_delta') {
+        if (event.delta.type === 'text_delta') {
+          content += event.delta.text
+        }
+      } else if (event.type === 'message_delta') {
+        outputTokens = event.usage.output_tokens
+        stopReason = event.delta.stop_reason || undefined
+      }
+    }
+
+    trackUsage(inputTokens, outputTokens, model)
+
+    return {
+      content,
+      usage: { inputTokens, outputTokens },
+      stopReason
+    }
+  }
+
+  try {
+    return await retryWithBackoff(callAPI, retries, retryDelayMs)
+  } catch (error) {
+    if (error instanceof Anthropic.APIError) {
+      throw new Error(
+        `Claude API Error (${error.status}): ${error.message}\n` +
+        `Type: ${error.type || 'unknown'}`
+      )
+    }
+    throw new Error(`Failed to stream response from Claude: ${error instanceof Error ? error.message : String(error)}`)
   }
 }
 
@@ -71,9 +251,6 @@ export async function analyzeCode(
   )
 }
 
-/**
- * Carefully crafted prompts for Claude to analyze GrepCoin code
- */
 export const PROMPTS = {
   codeReview: `You are an expert code reviewer for GrepCoin, a Web3 gaming platform built with:
 - Frontend: Next.js 15, React 18, TypeScript, Tailwind CSS
@@ -84,7 +261,7 @@ export const PROMPTS = {
 Your review style:
 1. Be concise and actionable - developers should know exactly what to fix
 2. Prioritize: Security > Correctness > Performance > Style
-3. For each issue, provide: severity (🔴 critical, 🟡 warning, 🔵 info), file:line, and fix suggestion
+3. For each issue, provide: severity (critical, warning, info), file:line, and fix suggestion
 4. Praise good patterns briefly, focus on improvements
 5. Consider the Web3 context - wallet interactions, blockchain state, gas optimization
 
@@ -117,22 +294,20 @@ For GrepCoin specifically, watch for:
 - Private key exposure
 
 Severity levels:
-- 🔴 CRITICAL: Immediate exploitation possible, funds at risk
-- 🟠 HIGH: Significant vulnerability, exploitation likely
-- 🟡 MEDIUM: Security weakness, exploitation requires conditions
-- 🔵 LOW: Best practice violation, minimal risk
-- ⚪ INFO: Observation, no direct security impact
+- CRITICAL: Immediate exploitation possible, funds at risk
+- HIGH: Significant vulnerability, exploitation likely
+- MEDIUM: Security weakness, exploitation requires conditions
+- LOW: Best practice violation, minimal risk
+- INFO: Observation, no direct security impact
 
 Output format:
 ## Security Assessment: [PASS/WARN/FAIL]
 
 ## Vulnerabilities Found
-[For each vulnerability:]
-### [🔴/🟠/🟡/🔵] [Title]
+### [SEVERITY] [Title]
 - **Location**: file:line
 - **Description**: What's wrong
 - **Impact**: What could happen
-- **Proof of Concept**: How to exploit (if applicable)
 - **Remediation**: How to fix
 
 ## Security Checklist
@@ -172,7 +347,7 @@ Also draft a helpful first response that:
 - Links to relevant docs if applicable
 - Sets expectations on timeline
 
-Be friendly but professional. Use emojis sparingly.`,
+Be friendly but professional.`,
 
   prSummary: `Summarize this pull request for the GrepCoin project.
 

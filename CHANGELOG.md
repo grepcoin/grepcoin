@@ -40,6 +40,46 @@ Track all changes, decisions, and context for parallel agent development.
 - APIs: friends, requests, accept/reject
 - Hook: useFriends
 
+### Wave 1 Completed - Commit f8b0800
+All 4 streams delivered:
+- Claude API provider with streaming
+- Anti-cheat validation package
+- GrepAchievements NFT contract
+- Friend system with API & hooks
+
+---
+
+## Wave 2 - Completed
+
+| Stream | Agent | Task | Status |
+|--------|-------|------|--------|
+| Stream 1 | a52425d | AI Chat endpoint | Completed |
+| Stream 4 | ae13b3c | Events system | Completed |
+| Stream 4 | a97f25a | Battle Pass | Completed |
+| Stream 1 | ac12567 | GitHub Actions AI improvements | Completed |
+
+### Wave 2 Deliverables
+
+#### AI Chat (Stream 1)
+- API: `/api/ai/chat` with streaming responses
+- Hook: `useAIChat.ts` with message management
+- Features: Rate limiting, GrepCoin context-aware prompts
+
+#### Events System (Stream 4)
+- Schema: Event, EventParticipant models with EventType/EventStatus enums
+- APIs: `/api/events`, `/api/events/[id]`, `/api/events/[id]/join`
+- Hook: `useEvents.ts`, `useEvent.ts` with join functionality
+
+#### Battle Pass (Stream 4)
+- Schema: BattlePass, BattlePassReward, BattlePassProgress models
+- APIs: `/api/battle-pass`, `/api/battle-pass/claim`, `/api/battle-pass/xp`
+- Hook: `useBattlePass.ts` with XP tracking and reward claiming
+
+#### GitHub Actions AI (Stream 1)
+- Enhanced claude-client.ts with retry logic, streaming, token tracking
+- Added analyzeCode() helper and PROMPTS object
+- Cost estimation for API usage
+
 ---
 
 ## Session: December 20, 2024 (Part 1)

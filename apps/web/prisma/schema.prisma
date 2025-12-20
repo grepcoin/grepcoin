@@ -31,6 +31,8 @@ model User {
   referredBy     Referral?  @relation("Referee")
   friendsInitiated Friendship[] @relation("UserFriends")
   friendsReceived  Friendship[] @relation("FriendOf")
+  eventParticipations EventParticipant[]
+  battlePassProgress BattlePassProgress[]
 }
 
 // Game definitions
@@ -301,4 +303,113 @@ enum FriendStatus {
   PENDING
   ACCEPTED
   BLOCKED
+}
+
+// Events system
+model Event {
+  id          String      @id @default(cuid())
+  name        String
+  description String
+  type        EventType
+  gameSlug    String?
+  startTime   DateTime
+  endTime     DateTime
+  rewards     Json
+  rules       Json
+  status      EventStatus @default(SCHEDULED)
+  createdAt   DateTime    @default(now())
+
+  participants EventParticipant[]
+
+  @@index([status])
+  @@index([startTime])
+  @@index([endTime])
+}
+
+model EventParticipant {
+  id       String   @id @default(cuid())
+  eventId  String
+  userId   String
+  score    Int      @default(0)
+  joinedAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+}
+
+enum EventType {
+  DAILY
+  WEEKEND
+  SEASONAL
+  FLASH
+}
+
+enum EventStatus {
+  SCHEDULED
+  ACTIVE
+  ENDED
+}
+
+// Battle Pass System
+model BattlePass {
+  id         String   @id @default(cuid())
+  season     Int      @unique
+  name       String
+  startDate  DateTime
+  endDate    DateTime
+  levels     Int      @default(50)
+  xpPerLevel Int      @default(1000)
+  createdAt  DateTime @default(now())
+
+  rewards  BattlePassReward[]
+  progress BattlePassProgress[]
+}
+
+model BattlePassReward {
+  id           String     @id @default(cuid())
+  battlePassId String
+  level        Int
+  tier         RewardTier
+  type         RewardType
+  value        Json
+
+  battlePass BattlePass @relation(fields: [battlePassId], references: [id], onDelete: Cascade)
+
+  @@unique([battlePassId, level, tier])
+  @@index([battlePassId])
+}
+
+model BattlePassProgress {
+  id            String   @id @default(cuid())
+  battlePassId  String
+  userId        String
+  level         Int      @default(1)
+  xp            Int      @default(0)
+  isPremium     Boolean  @default(false)
+  claimedLevels Int[]    @default([])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  battlePass BattlePass @relation(fields: [battlePassId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([battlePassId, userId])
+  @@index([userId])
+  @@index([battlePassId])
+}
+
+enum RewardTier {
+  FREE
+  PREMIUM
+}
+
+enum RewardType {
+  GREP
+  BADGE
+  MULTIPLIER
+  NFT
 }
