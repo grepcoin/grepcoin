@@ -1,0 +1,43 @@
+type TokenHolder @entity {
+  id: ID!
+  address: Bytes!
+  balance: BigInt!
+  transferCount: Int!
+  firstTransferAt: BigInt!
+  lastTransferAt: BigInt!
+}
+
+type Transfer @entity {
+  id: ID!
+  from: Bytes!
+  to: Bytes!
+  amount: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}
+
+type StakePosition @entity {
+  id: ID!
+  user: Bytes!
+  amount: BigInt!
+  tier: Int!
+  stakedAt: BigInt!
+  lastClaimAt: BigInt!
+}
+
+type AchievementMint @entity {
+  id: ID!
+  user: Bytes!
+  achievementId: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type GlobalStats @entity {
+  id: ID!
+  totalHolders: Int!
+  totalTransfers: Int!
+  totalStaked: BigInt!
+  totalAchievementsMinted: Int!
+}
