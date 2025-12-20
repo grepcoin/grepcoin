@@ -45,6 +45,49 @@ Track all changes, decisions, and context for parallel agent development.
 
 ---
 
+## Wave 7 - Completed (PRs #28-33 merged)
+
+| Stream | Task | Deliverables |
+|--------|------|--------------|
+| Stream A | PWA support | `manifest.json`, `InstallPWA.tsx`, `/offline` page |
+| Stream B | Game tutorials | `GameTutorial.tsx`, `tutorials.ts`, `useTutorial.ts` |
+| Stream C | Keyboard shortcuts | `useKeyboardShortcuts.ts`, `KeyboardShortcutsModal.tsx` |
+| Stream D | Sound manager | `sounds.ts`, `useSound.ts`, `SoundToggle.tsx` |
+| Stream E | Search feature | `SearchModal.tsx`, `/api/search` |
+| Stream F | Analytics events | `analytics.ts`, `AnalyticsProvider.tsx` |
+
+**PWA Support:**
+- Progressive Web App manifest with icons
+- Install prompt component for mobile/desktop
+- Offline fallback page
+
+**Game Tutorials:**
+- Step-by-step tutorial modal component
+- Tutorial content config for each game
+- Hook for tutorial state management
+
+**Keyboard Shortcuts:**
+- Global keyboard navigation (?, Escape, Cmd+K)
+- Shortcuts help modal
+- Game controls documentation
+
+**Sound Manager:**
+- Singleton audio manager with preloading
+- Volume control with mute toggle
+- localStorage persistence for preferences
+
+**Search Feature:**
+- Cmd+K global search modal
+- Search API for games, users, achievements
+- Keyboard navigation for results
+
+**Analytics Events:**
+- Event tracking with batched API calls
+- AnalyticsProvider context component
+- Page views and game event tracking
+
+---
+
 ## Wave 6 - Completed (PRs #22-27 merged)
 
 | Stream | Task | Deliverables |
