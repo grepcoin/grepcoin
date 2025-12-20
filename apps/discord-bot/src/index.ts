@@ -131,6 +131,43 @@ const commands = [
   new SlashCommandBuilder()
     .setName('stats')
     .setDescription('Get GrepCoin platform statistics'),
+
+  // AI-powered developer commands
+  new SlashCommandBuilder()
+    .setName('analyze')
+    .setDescription('Analyze code for issues')
+    .addStringOption(option =>
+      option.setName('code')
+        .setDescription('Code to analyze')
+        .setRequired(true)
+    ),
+
+  new SlashCommandBuilder()
+    .setName('explain')
+    .setDescription('Explain a programming/crypto concept')
+    .addStringOption(option =>
+      option.setName('concept')
+        .setDescription('Concept to explain')
+        .setRequired(true)
+    ),
+
+  new SlashCommandBuilder()
+    .setName('debug')
+    .setDescription('Help debug an error message')
+    .addStringOption(option =>
+      option.setName('error')
+        .setDescription('Error message to debug')
+        .setRequired(true)
+    ),
+
+  new SlashCommandBuilder()
+    .setName('optimize')
+    .setDescription('Suggest optimizations for code')
+    .addStringOption(option =>
+      option.setName('code')
+        .setDescription('Code to optimize')
+        .setRequired(true)
+    ),
 ].map(command => command.toJSON())
 
 // Register slash commands
@@ -202,7 +239,7 @@ async function handleCommand(interaction: ChatInputCommandInteraction) {
 
 I'm GrepBot, your AI assistant for GrepCoin! Here's what I can help with:
 
-**Commands:**
+**GrepCoin Commands:**
 • \`/ask <question>\` - Ask me anything about GrepCoin
 • \`/games [game]\` - Get info about our arcade games
 • \`/staking [tier]\` - Learn about staking and rewards
@@ -210,6 +247,12 @@ I'm GrepBot, your AI assistant for GrepCoin! Here's what I can help with:
 • \`/alerts [severity]\` - View security alerts
 • \`/stats\` - Get platform statistics
 • \`/links\` - Get useful links
+
+**AI Developer Commands:**
+• \`/analyze <code>\` - Analyze code for issues and vulnerabilities
+• \`/explain <concept>\` - Explain programming/crypto concepts
+• \`/debug <error>\` - Help debug error messages
+• \`/optimize <code>\` - Get optimization suggestions
 
 **Quick Topics:**
 • How to play and earn GREP
@@ -289,6 +332,39 @@ Just ask in the support channels and I'll help!`
           console.error('Stats fetch error:', error)
           await interaction.editReply('Unable to fetch platform statistics. Please try again later.')
         }
+        break
+      }
+
+      // AI-powered developer commands
+      case 'analyze': {
+        const code = interaction.options.getString('code', true)
+        const prompt = `Analyze this code for potential issues, bugs, security vulnerabilities, and best practice violations:\n\n${code}`
+        const response = await agent.chat(prompt)
+        await interaction.editReply(response.slice(0, 2000))
+        break
+      }
+
+      case 'explain': {
+        const concept = interaction.options.getString('concept', true)
+        const prompt = `Explain the following programming or cryptocurrency concept in a clear and concise way, suitable for developers: ${concept}`
+        const response = await agent.chat(prompt)
+        await interaction.editReply(response.slice(0, 2000))
+        break
+      }
+
+      case 'debug': {
+        const error = interaction.options.getString('error', true)
+        const prompt = `Help debug this error message. Explain what it means, common causes, and suggest solutions:\n\n${error}`
+        const response = await agent.chat(prompt)
+        await interaction.editReply(response.slice(0, 2000))
+        break
+      }
+
+      case 'optimize': {
+        const code = interaction.options.getString('code', true)
+        const prompt = `Suggest optimizations for this code. Focus on performance, readability, and best practices:\n\n${code}`
+        const response = await agent.chat(prompt)
+        await interaction.editReply(response.slice(0, 2000))
         break
       }
 
