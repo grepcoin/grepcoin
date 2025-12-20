@@ -29,6 +29,8 @@ model User {
   dailyRewards   DailyReward[]
   referralsMade  Referral[] @relation("Referrer")
   referredBy     Referral?  @relation("Referee")
+  friendsInitiated Friendship[] @relation("UserFriends")
+  friendsReceived  Friendship[] @relation("FriendOf")
 }
 
 // Game definitions
@@ -275,4 +277,28 @@ model FundraiseStats {
   endDate     DateTime
   isActive    Boolean  @default(true)
   updatedAt   DateTime @updatedAt
+}
+
+// Friendship system
+model Friendship {
+  id         String       @id @default(cuid())
+  userId     String
+  friendId   String
+  status     FriendStatus @default(PENDING)
+  createdAt  DateTime     @default(now())
+  acceptedAt DateTime?
+
+  user   User @relation("UserFriends", fields: [userId], references: [id], onDelete: Cascade)
+  friend User @relation("FriendOf", fields: [friendId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, friendId])
+  @@index([userId])
+  @@index([friendId])
+  @@index([status])
+}
+
+enum FriendStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
 }
