@@ -16,7 +16,6 @@ export function ShareButton({ title, text, url, hashtags = ['GrepCoin', 'Web3Gam
   const shareData = {
     twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}&hashtags=${hashtags.join(',')}`,
     telegram: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(text)}`,
-    discord: shareUrl // Copy to clipboard for Discord
   }
 
   const copyToClipboard = async () => {
