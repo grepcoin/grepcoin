@@ -1,0 +1,72 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: GrepToken
+    network: base-sepolia
+    source:
+      address: "0x0000000000000000000000000000000000000000"
+      abi: GrepToken
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Transfer
+        - TokenHolder
+        - GlobalStats
+      abis:
+        - name: GrepToken
+          file: ../contracts/artifacts/contracts/GrepToken.sol/GrepToken.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/grep-token.ts
+  - kind: ethereum
+    name: GrepStakingPool
+    network: base-sepolia
+    source:
+      address: "0x0000000000000000000000000000000000000000"
+      abi: GrepStakingPool
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - StakePosition
+        - GlobalStats
+      abis:
+        - name: GrepStakingPool
+          file: ../contracts/artifacts/contracts/GrepStakingPool.sol/GrepStakingPool.json
+      eventHandlers:
+        - event: Staked(indexed address,uint256,uint8)
+          handler: handleStaked
+        - event: Unstaked(indexed address,uint256)
+          handler: handleUnstaked
+        - event: RewardsClaimed(indexed address,uint256)
+          handler: handleRewardsClaimed
+      file: ./src/staking-pool.ts
+  - kind: ethereum
+    name: GrepAchievements
+    network: base-sepolia
+    source:
+      address: "0x0000000000000000000000000000000000000000"
+      abi: GrepAchievements
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AchievementMint
+        - GlobalStats
+      abis:
+        - name: GrepAchievements
+          file: ../contracts/artifacts/contracts/GrepAchievements.sol/GrepAchievements.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleAchievementMint
+      file: ./src/achievements.ts
