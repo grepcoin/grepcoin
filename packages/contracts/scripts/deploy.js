@@ -28,6 +28,14 @@ async function main() {
   await addMinterTx.wait();
   console.log("StakingPool added as minter");
 
+  // Deploy GrepVesting
+  console.log("\n4. Deploying GrepVesting...");
+  const GrepVesting = await hre.ethers.getContractFactory("GrepVesting");
+  const grepVesting = await GrepVesting.deploy(grepTokenAddress);
+  await grepVesting.waitForDeployment();
+  const vestingAddress = await grepVesting.getAddress();
+  console.log("GrepVesting deployed to:", vestingAddress);
+
   // Summary
   console.log("\n========================================");
   console.log("DEPLOYMENT COMPLETE");
@@ -35,6 +43,7 @@ async function main() {
   console.log("Network:", hre.network.name);
   console.log("GrepToken:", grepTokenAddress);
   console.log("GrepStakingPool:", stakingPoolAddress);
+  console.log("GrepVesting:", vestingAddress);
   console.log("========================================");
 
   // Output for contracts.ts update
@@ -44,6 +53,7 @@ async function main() {
   84532: {
     GREP_TOKEN: '${grepTokenAddress}',
     STAKING_POOL: '${stakingPoolAddress}',
+    VESTING: '${vestingAddress}',
   },
 `);
 
@@ -69,6 +79,16 @@ async function main() {
       console.log("GrepStakingPool verified!");
     } catch (e) {
       console.log("GrepStakingPool verification failed:", e.message);
+    }
+
+    try {
+      await hre.run("verify:verify", {
+        address: vestingAddress,
+        constructorArguments: [grepTokenAddress],
+      });
+      console.log("GrepVesting verified!");
+    } catch (e) {
+      console.log("GrepVesting verification failed:", e.message);
     }
   }
 }
