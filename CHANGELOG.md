@@ -4,81 +4,55 @@ Track all changes, decisions, and context for parallel agent development.
 
 ## Session: December 20, 2024 (Part 2) - Parallel Development
 
-### Active Work Streams
+### Wave 1 - Completed (Commit f8b0800)
 
-| Stream | Agent | Task | Status |
-|--------|-------|------|--------|
-| Stream 1 | ad0a921 | Claude API provider | In Progress |
-| Stream 2 | a20b83a | Anti-cheat validators | In Progress |
-| Stream 3 | a9a1b87 | GrepAchievements NFT | In Progress |
-| Stream 4 | ab17558 | Friend system API | In Progress |
+| Stream | Task | Deliverables |
+|--------|------|--------------|
+| Stream 1 | Claude API provider | `packages/agents/src/providers/claude.ts` |
+| Stream 2 | Anti-cheat validators | `packages/anti-cheat/` package |
+| Stream 3 | GrepAchievements NFT | `packages/contracts/contracts/GrepAchievements.sol` |
+| Stream 4 | Friend system | Friendship model, APIs, hooks |
 
-### Stream 1: AI Agents
-**Task**: Create Claude API provider
-- File: `packages/agents/src/providers/claude.ts`
-- Uses @anthropic-ai/sdk
-- Streaming support
-- Same interface as ollama.ts
+### Wave 2 - Completed (Commit 4ac3441)
 
-### Stream 2: Game Backend
-**Task**: Create anti-cheat package
-- New package: `packages/anti-cheat/`
-- Score validators (range, progression)
-- Timing validators (session duration)
-- Rate validators (submission limits)
+| Stream | Task | Deliverables |
+|--------|------|--------------|
+| Stream 1 | AI Chat endpoint | `/api/ai/chat`, `useAIChat.ts` |
+| Stream 1 | GitHub Actions AI | Enhanced claude-client.ts |
+| Stream 4 | Events system | Event models, APIs, `useEvents.ts` |
+| Stream 4 | Battle Pass | BattlePass models, APIs, `useBattlePass.ts` |
 
-### Stream 3: Crypto/Blockchain
-**Task**: Create GrepAchievements NFT contract
-- File: `packages/contracts/contracts/GrepAchievements.sol`
-- ERC-1155 for achievement badges
-- EIP-712 signed claims
-- Replay attack prevention
+**AI Chat Features:**
+- Streaming responses with Claude integration
+- Rate limiting (10 req/min)
+- GrepCoin context-aware prompts
 
-### Stream 4: Social Features
-**Task**: Implement friend system
-- Schema: Add Friendship model
-- APIs: friends, requests, accept/reject
-- Hook: useFriends
+**Events System Features:**
+- Event, EventParticipant models with EventType/EventStatus enums
+- `/api/events`, `/api/events/[id]`, `/api/events/[id]/join`
+- useEvents, useEvent hooks with join functionality
 
-### Wave 1 Completed - Commit f8b0800
-All 4 streams delivered:
-- Claude API provider with streaming
-- Anti-cheat validation package
-- GrepAchievements NFT contract
-- Friend system with API & hooks
+**Battle Pass Features:**
+- BattlePass, BattlePassReward, BattlePassProgress models
+- `/api/battle-pass`, `/api/battle-pass/claim`, `/api/battle-pass/xp`
+- useBattlePass hook with XP tracking and reward claiming
+
+**GitHub Actions AI Features:**
+- Retry logic with exponential backoff
+- Streaming support for real-time responses
+- Token usage tracking with cost estimation
+- PROMPTS object for code analysis
 
 ---
 
-## Wave 2 - Completed
+## Wave 3 - In Progress
 
-| Stream | Agent | Task | Status |
-|--------|-------|------|--------|
-| Stream 1 | a52425d | AI Chat endpoint | Completed |
-| Stream 4 | ae13b3c | Events system | Completed |
-| Stream 4 | a97f25a | Battle Pass | Completed |
-| Stream 1 | ac12567 | GitHub Actions AI improvements | Completed |
-
-### Wave 2 Deliverables
-
-#### AI Chat (Stream 1)
-- API: `/api/ai/chat` with streaming responses
-- Hook: `useAIChat.ts` with message management
-- Features: Rate limiting, GrepCoin context-aware prompts
-
-#### Events System (Stream 4)
-- Schema: Event, EventParticipant models with EventType/EventStatus enums
-- APIs: `/api/events`, `/api/events/[id]`, `/api/events/[id]/join`
-- Hook: `useEvents.ts`, `useEvent.ts` with join functionality
-
-#### Battle Pass (Stream 4)
-- Schema: BattlePass, BattlePassReward, BattlePassProgress models
-- APIs: `/api/battle-pass`, `/api/battle-pass/claim`, `/api/battle-pass/xp`
-- Hook: `useBattlePass.ts` with XP tracking and reward claiming
-
-#### GitHub Actions AI (Stream 1)
-- Enhanced claude-client.ts with retry logic, streaming, token tracking
-- Added analyzeCode() helper and PROMPTS object
-- Cost estimation for API usage
+| Stream | Task | Status |
+|--------|------|--------|
+| Stream 1 | Discord AI commands | Pending |
+| Stream 2 | Socket.io multiplayer | Pending |
+| Stream 3 | Deploy contracts testnet | Pending |
+| Stream 4 | Leaderboards & rankings | Pending |
 
 ---
 
@@ -179,30 +153,33 @@ Set up parallel development infrastructure with comprehensive documentation for 
 4. Return array of newly unlocked achievements
 ```
 
-### Pending Work
+### Completed Work
 
 #### Stream 1: AI Agents
+- [x] Create Claude provider in `packages/agents/src/providers/claude.ts`
+- [x] AI Chat endpoint with streaming
+- [x] Enhanced GitHub Actions claude-client
 - [ ] Add `ANTHROPIC_API_KEY` to GitHub secrets
-- [ ] Create Claude provider in `packages/agents/src/providers/claude.ts`
-- [ ] Build auto-fix agent
 - [ ] Discord AI commands
+- [ ] Build auto-fix agent
 
 #### Stream 2: Game Backend
+- [x] Build anti-cheat validators
 - [ ] Set up Redis
-- [ ] Build anti-cheat validators
 - [ ] Socket.io multiplayer server
 - [ ] Tournament system
 
 #### Stream 3: Crypto/Blockchain
+- [x] Build GrepAchievements NFT contract
 - [ ] Fund deployer wallet with Base Sepolia ETH
 - [ ] Deploy contracts to testnet
-- [ ] Build GrepAchievements NFT contract
 - [ ] Set up The Graph subgraph
 
 #### Stream 4: Social
-- [ ] Friend system API routes
-- [ ] Events system
-- [ ] Battle pass progression
+- [x] Friend system API routes & hooks
+- [x] Events system with participation
+- [x] Battle pass progression & rewards
+- [ ] Leaderboards & rankings
 - [ ] OG image generation
 
 ### Environment Required
