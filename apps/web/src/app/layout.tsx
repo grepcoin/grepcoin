@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     siteName: 'GrepCoin by GrepLabs',
     images: [
       {
-        url: '/og-image.png',
+        url: '/api/og?title=GrepCoin&description=Play games, earn crypto',
         width: 1200,
         height: 630,
         alt: 'GrepCoin - The Indie Gaming Economy',
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'GrepCoin - Fund Games, Play Together',
     description: 'The decentralized ecosystem for indie games and hobby projects.',
-    images: ['/og-image.png'],
+    images: ['/api/og?title=GrepCoin&description=Play games, earn crypto'],
   },
 }
 
