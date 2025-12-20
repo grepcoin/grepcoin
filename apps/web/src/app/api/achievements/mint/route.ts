@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { parseSessionToken } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import prisma from '@/lib/db'
 import { createPublicClient, createWalletClient, http } from 'viem'
 import { baseSepolia } from 'viem/chains'
 
