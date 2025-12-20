@@ -155,6 +155,28 @@ grepcoin/                        # Monorepo root
 └── SECURITY.md               # Security policy
 ```
 
+## Development Documentation
+
+For Claude agents and developers working on GrepCoin:
+
+| Document | Purpose |
+|----------|---------|
+| [PLANS-OVERVIEW.md](./PLANS-OVERVIEW.md) | Overview of 4 parallel development streams |
+| [CONTEXT.md](./CONTEXT.md) | Full codebase structure, patterns, conventions |
+| [AGENTS-GUIDE.md](./AGENTS-GUIDE.md) | Development instructions and code style |
+| [KEY-FILES.md](./KEY-FILES.md) | Reference of important files by stream |
+| [CHANGELOG.md](./CHANGELOG.md) | Track all changes and decisions |
+| [THINKING.md](./THINKING.md) | Architectural reasoning and decisions |
+
+### Parallel Development Streams
+
+| Stream | Focus | Plan |
+|--------|-------|------|
+| Stream 1 | AI Agents | [PLAN-STREAM1-AI-AGENTS.md](./PLAN-STREAM1-AI-AGENTS.md) |
+| Stream 2 | Game Backend | [PLAN-STREAM2-GAME-BACKEND.md](./PLAN-STREAM2-GAME-BACKEND.md) |
+| Stream 3 | Crypto/Blockchain | [PLAN-STREAM3-CRYPTO.md](./PLAN-STREAM3-CRYPTO.md) |
+| Stream 4 | Social Features | [PLAN-STREAM4-SOCIAL.md](./PLAN-STREAM4-SOCIAL.md) |
+
 ## Smart Contracts
 
 | Contract | Description |
