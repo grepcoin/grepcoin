@@ -16,7 +16,9 @@
     "gha:pr-review": "tsx src/github-actions/pr-reviewer.ts",
     "gha:security": "tsx src/github-actions/security-guardian.ts",
     "gha:analytics": "tsx src/github-actions/analytics-reporter.ts",
-    "gha:triage": "tsx src/github-actions/issue-triage.ts"
+    "gha:triage": "tsx src/github-actions/issue-triage.ts",
+    "gha:debug": "tsx src/github-actions/debug-helper.ts",
+    "gha:feature-ideas": "tsx src/github-actions/feature-ideator.ts"
   },
   "dependencies": {
     "@octokit/rest": "^20.0.0",
