@@ -165,14 +165,15 @@ export async function POST(
       },
     })
 
-    // Check for achievements
-    await checkAchievements(user.id, score, streak || 0, game.slug)
+    // Check for achievements and get newly unlocked ones
+    const unlockedAchievements = await checkAchievements(user.id, score, streak || 0, game.slug)
 
     return NextResponse.json({
       success: true,
       score: gameScore,
       grepEarned,
       multiplier: stakingMultiplier,
+      unlockedAchievements,
     })
   } catch (error) {
     console.error('Score submission error:', error)
@@ -183,7 +184,18 @@ export async function POST(
   }
 }
 
-async function checkAchievements(userId: string, score: number, streak: number, gameSlug: string) {
+interface UnlockedAchievement {
+  id: string
+  name: string
+  description: string
+  icon: string
+  rarity: string
+  reward: number
+}
+
+async function checkAchievements(userId: string, score: number, streak: number, gameSlug: string): Promise<UnlockedAchievement[]> {
+  const unlockedAchievements: UnlockedAchievement[] = []
+
   // Get user's achievement progress
   const achievements = await prisma.achievement.findMany()
 
@@ -248,6 +260,15 @@ async function checkAchievements(userId: string, score: number, streak: number, 
 
     // Create activity for unlocked achievement
     if (shouldUnlock) {
+      unlockedAchievements.push({
+        id: achievement.id,
+        name: achievement.name,
+        description: achievement.description,
+        icon: achievement.icon,
+        rarity: achievement.rarity,
+        reward: achievement.reward,
+      })
+
       const user = await prisma.user.findUnique({ where: { id: userId } })
       if (user) {
         await prisma.activity.create({
@@ -263,4 +284,6 @@ async function checkAchievements(userId: string, score: number, streak: number, 
       }
     }
   }
+
+  return unlockedAchievements
 }

@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Menu, X, Gamepad2, Heart } from 'lucide-react'
+import { Menu, X, Gamepad2, Heart, User } from 'lucide-react'
+import { useAccount } from 'wagmi'
 import Logo from './Logo'
 import WalletButton from './WalletButton'
 
@@ -16,6 +17,7 @@ const navLinks = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const { isConnected } = useAccount()
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-dark-900/80 backdrop-blur-lg border-b border-dark-600/50">
@@ -55,6 +57,15 @@ export default function Navbar() {
               <Gamepad2 className="w-4 h-4" />
               Play
             </Link>
+            {isConnected && (
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-dark-700 hover:bg-dark-600 text-white font-semibold transition-colors"
+              >
+                <User className="w-4 h-4" />
+                Profile
+              </Link>
+            )}
             <WalletButton />
           </div>
 
@@ -99,6 +110,16 @@ export default function Navbar() {
                 <Gamepad2 className="w-4 h-4" />
                 Play & Earn
               </Link>
+              {isConnected && (
+                <Link
+                  href="/profile"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-center gap-2 w-full px-5 py-2.5 rounded-xl bg-dark-700 text-white font-semibold"
+                >
+                  <User className="w-4 h-4" />
+                  My Profile
+                </Link>
+              )}
               <div className="pt-2">
                 <WalletButton />
               </div>

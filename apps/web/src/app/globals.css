@@ -86,3 +86,50 @@ html {
   background: rgba(139, 92, 246, 0.3);
   color: white;
 }
+
+/* Achievement notification animations */
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slide-out-right {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes shrink-width {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+@keyframes bounce-once {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+@keyframes float {
+  0% { transform: translateY(100%); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-200%); opacity: 0; }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out forwards;
+}
+
+.animate-slide-out-right {
+  animation: slide-out-right 0.3s ease-in forwards;
+}
+
+.animate-shrink-width {
+  animation: shrink-width linear forwards;
+}
+
+.animate-bounce-once {
+  animation: bounce-once 0.5s ease-out;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
