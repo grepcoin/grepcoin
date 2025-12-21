@@ -1,0 +1,47 @@
+const zh = {
+  common: {
+    play: '玩',
+    earn: '赚取',
+    stake: '质押',
+    connect: '连接钱包',
+    disconnect: '断开连接',
+    loading: '加载中...',
+    error: '错误',
+    success: '成功',
+    cancel: '取消',
+    save: '保存',
+    close: '关闭',
+  },
+  nav: {
+    home: '首页',
+    games: '游戏',
+    leaderboard: '排行榜',
+    profile: '个人资料',
+    settings: '设置',
+    admin: '管理员',
+  },
+  games: {
+    yourScore: '你的分数',
+    highScore: '最高分',
+    grepEarned: '赚取的GREP',
+    playAgain: '再玩一次',
+    startGame: '开始游戏',
+    gameOver: '游戏结束',
+  },
+  achievements: {
+    title: '成就',
+    unlocked: '已解锁',
+    locked: '已锁定',
+    progress: '进度',
+    mint: '铸造NFT',
+  },
+  staking: {
+    title: '质押',
+    staked: '已质押',
+    rewards: '奖励',
+    stake: '质押GREP',
+    unstake: '取消质押',
+    claim: '领取奖励',
+  },
+}
+export default zh
