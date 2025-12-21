@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // This will be replaced with actual server instance in the server setup
-let multiplayerServer: any = null;
-
-export function setMultiplayerServer(server: any) {
-  multiplayerServer = server;
-}
+// In production, use a proper server-side store or environment variable
+const multiplayerServer: any = null;
 
 export async function GET(request: NextRequest) {
   try {

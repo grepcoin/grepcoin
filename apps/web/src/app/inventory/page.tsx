@@ -12,7 +12,7 @@ type ViewMode = 'in-game' | 'on-chain'
 export default function InventoryPage() {
   const { address } = useAccount()
   const [viewMode, setViewMode] = useState<ViewMode>('in-game')
-  const { items, isLoading: isLoadingInventory, useItem, equipItem } = useInventory()
+  const { items, isLoading: isLoadingInventory, consumeItem, equipItem } = useInventory()
   const { nfts, isLoading: isLoadingNFTs, refetch: refetchNFTs } = useOwnedNFTs()
   const { mintAsNFT, isMinting } = useMintAsNFT()
   const { importNFT, isImporting } = useImportNFT()
@@ -46,8 +46,8 @@ export default function InventoryPage() {
     }
   }
 
-  const handleUseItem = async (itemId: string) => {
-    const result = await useItem(itemId)
+  const handleConsumeItem = async (itemId: string) => {
+    const result = await consumeItem(itemId)
     if (result.success) {
       alert(`Used ${result.item?.name}!`)
     }
@@ -154,7 +154,7 @@ export default function InventoryPage() {
                       isMinted={false} // Would come from database
                       onUse={
                         inv.item.type === 'booster' || inv.item.type === 'consumable'
-                          ? () => handleUseItem(inv.itemId)
+                          ? () => handleConsumeItem(inv.itemId)
                           : undefined
                       }
                       onEquip={

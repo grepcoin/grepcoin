@@ -105,9 +105,10 @@ export function usePushNotifications(userId?: string) {
       }
 
       // Subscribe to push notifications
+      const vapidKey = urlBase64ToUint8Array(getPublicVapidKey())
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(getPublicVapidKey()),
+        applicationServerKey: vapidKey.buffer as ArrayBuffer,
       })
 
       // Save subscription to server

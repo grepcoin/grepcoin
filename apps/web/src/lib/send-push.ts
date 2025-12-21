@@ -23,14 +23,34 @@ function initializeWebPush() {
 // Initialize on module load
 const isInitialized = initializeWebPush()
 
+// Web-push subscription format
+interface WebPushSubscription {
+  endpoint: string
+  keys: {
+    p256dh: string
+    auth: string
+  }
+}
+
 // Send push notification to a single subscription
 export async function sendPushNotification(
-  subscription: PushSubscription | { endpoint: string; keys: { p256dh: string; auth: string } },
+  subscription: WebPushSubscription | { endpoint: string; p256dh: string; auth: string },
   notification: NotificationPayload
 ): Promise<void> {
   if (!isInitialized) {
     throw new Error('Web push is not initialized. Check VAPID keys.')
   }
+
+  // Normalize subscription format for web-push
+  const normalizedSubscription: WebPushSubscription = 'keys' in subscription
+    ? subscription
+    : {
+        endpoint: subscription.endpoint,
+        keys: {
+          p256dh: subscription.p256dh,
+          auth: subscription.auth,
+        },
+      }
 
   const payload = JSON.stringify({
     title: notification.title,
@@ -49,8 +69,8 @@ export async function sendPushNotification(
   }
 
   try {
-    await webpush.sendNotification(subscription, payload, options)
-  } catch (error: any) {
+    await webpush.sendNotification(normalizedSubscription, payload, options)
+  } catch (error: unknown) {
     // Re-throw with status code for cleanup logic
     throw error
   }

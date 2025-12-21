@@ -2,8 +2,28 @@
 import { Resend } from 'resend'
 import { EmailType } from '@prisma/client'
 
-// Initialize Resend client
-export const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazy initialization of Resend client
+let resendClient: Resend | null = null
+
+export function getResendClient(): Resend {
+  if (!resendClient) {
+    const apiKey = process.env.RESEND_API_KEY
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY is not configured')
+    }
+    resendClient = new Resend(apiKey)
+  }
+  return resendClient
+}
+
+// For backwards compatibility
+export const resend = {
+  emails: {
+    send: async (options: Parameters<Resend['emails']['send']>[0]) => {
+      return getResendClient().emails.send(options)
+    }
+  }
+}
 
 // Email configuration
 export const EMAIL_CONFIG = {

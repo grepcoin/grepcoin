@@ -24,7 +24,7 @@ export function ActivityItem({ activity }: Props) {
         <p className="text-xs text-gray-500 mt-1">{time}</p>
       </div>
 
-      {activity.data.grepEarned && (
+      {typeof activity.data.grepEarned === 'number' && activity.data.grepEarned > 0 && (
         <span className="text-emerald-400 text-sm font-medium">
           +{activity.data.grepEarned} GREP
         </span>

@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/db'
 import { isValidPushSubscription } from '@/lib/push-notifications'
 
-const prisma = new PrismaClient()
+// Web Push API subscription structure
+interface WebPushSubscription {
+  endpoint: string
+  keys: {
+    p256dh: string
+    auth: string
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { subscription, userId } = body
+    const { subscription, userId } = body as { subscription: WebPushSubscription; userId: string }
 
     if (!userId) {
       return NextResponse.json(

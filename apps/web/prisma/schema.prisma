@@ -110,6 +110,8 @@ model UserAchievement {
   achievementId String
   progress      Int       @default(0)
   unlockedAt    DateTime?
+  mintedAt      DateTime? // When the achievement was minted as an NFT
+  mintTxHash    String?   // Transaction hash of the NFT mint
   createdAt     DateTime  @default(now())
 
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -763,4 +765,17 @@ model PushSubscription {
 
   @@index([userId])
   @@index([endpoint])
+}
+
+// Analytics events for tracking user behavior
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  name       String
+  properties Json?
+  userId     String?
+  createdAt  DateTime @default(now())
+
+  @@index([name])
+  @@index([userId])
+  @@index([createdAt])
 }

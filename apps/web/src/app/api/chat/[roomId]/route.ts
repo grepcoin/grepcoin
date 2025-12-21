@@ -12,9 +12,9 @@ const chatRooms: Map<string, Array<{
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { roomId: string } }
+  { params }: { params: Promise<{ roomId: string }> }
 ) {
-  const { roomId } = params
+  const { roomId } = await params
   const messages = chatRooms.get(roomId) || []
 
   return NextResponse.json({ messages: messages.slice(-50) })
@@ -22,9 +22,9 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { roomId: string } }
+  { params }: { params: Promise<{ roomId: string }> }
 ) {
-  const { roomId } = params
+  const { roomId } = await params
   const body = await req.json()
   const { content, senderId = 'anonymous', senderName = 'Anonymous' } = body
 

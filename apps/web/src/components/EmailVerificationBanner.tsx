@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { useEmailStatus } from '@/hooks/useEmailPreferences'
 
 interface EmailVerificationBannerProps {
-  onResend?: () => Promise<void>
+  onResend?: () => Promise<{ success: boolean; error?: string } | void>
   onDismiss?: () => void
 }
 

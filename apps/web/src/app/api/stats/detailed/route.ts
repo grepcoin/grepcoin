@@ -4,9 +4,24 @@ import { parseSessionToken } from '@/lib/auth'
 import prisma from '@/lib/db'
 
 export async function GET(request: NextRequest) {
-  const session = parseSessionToken(request)
+  const cookieStore = await cookies()
+  const sessionToken = cookieStore.get('session')?.value
+  if (!sessionToken) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const session = parseSessionToken(sessionToken)
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // Find user by wallet address
+  const user = await prisma.user.findUnique({
+    where: { walletAddress: session.address }
+  })
+
+  if (!user) {
+    return NextResponse.json({ error: 'User not found' }, { status: 404 })
   }
 
   // Get all games
@@ -16,7 +31,7 @@ export async function GET(request: NextRequest) {
   const gameStats = await Promise.all(
     games.map(async (game) => {
       const scores = await prisma.gameScore.findMany({
-        where: { userId: session.userId, gameSlug: game.slug }
+        where: { userId: user.id, gameId: game.id }
       })
 
       if (scores.length === 0) return null
@@ -29,7 +44,7 @@ export async function GET(request: NextRequest) {
       // Calculate rank
       const betterScores = await prisma.gameScore.groupBy({
         by: ['userId'],
-        where: { gameSlug: game.slug },
+        where: { gameId: game.id },
         _max: { score: true }
       })
 
@@ -52,11 +67,11 @@ export async function GET(request: NextRequest) {
 
   // Get overall stats
   const allScores = await prisma.gameScore.findMany({
-    where: { userId: session.userId }
+    where: { userId: user.id }
   })
 
   const dailyStats = await prisma.dailyStats.findFirst({
-    where: { userId: session.userId },
+    where: { userId: user.id },
     orderBy: { date: 'desc' }
   })
 
@@ -65,9 +80,8 @@ export async function GET(request: NextRequest) {
     overall: {
       totalPlays: allScores.length,
       totalGrep: allScores.reduce((a, b) => a + b.grepEarned, 0),
-      gamesPlayed: new Set(allScores.map(s => s.gameSlug)).size,
-      currentStreak: dailyStats?.streak || 0,
-      longestStreak: dailyStats?.longestStreak || 0,
+      gamesPlayed: new Set(allScores.map(s => s.gameId)).size,
+      bestStreak: dailyStats?.bestStreak || 0,
       averageScore: allScores.length ? allScores.reduce((a, b) => a + b.score, 0) / allScores.length : 0
     }
   })

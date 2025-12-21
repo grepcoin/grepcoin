@@ -18,7 +18,7 @@ export function useInventory() {
     item: ITEMS.find(i => i.id === inv.itemId)!,
   })).filter(i => i.item)
 
-  const useItem = useCallback(async (itemId: string) => {
+  const consumeItem = useCallback(async (itemId: string) => {
     const res = await fetch('/api/inventory/use', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -42,5 +42,5 @@ export function useInventory() {
     setInventory(prev => prev.map(i => ({ ...i, equipped: i.itemId === itemId })))
   }, [])
 
-  return { items, isLoading, useItem, equipItem }
+  return { items, isLoading, consumeItem, equipItem }
 }

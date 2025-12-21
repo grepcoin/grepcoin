@@ -3,7 +3,7 @@ import { useInventory } from '@/hooks/useInventory'
 import { ItemCard } from './ItemCard'
 
 export function InventoryGrid() {
-  const { items, isLoading, useItem, equipItem } = useInventory()
+  const { items, isLoading, consumeItem, equipItem } = useInventory()
 
   if (isLoading) return <div className="animate-pulse bg-gray-800 rounded-lg h-64" />
 
@@ -16,7 +16,7 @@ export function InventoryGrid() {
         <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
           {items.map(({ item, quantity, equipped }) => (
             <ItemCard key={item.id} item={item} quantity={quantity} equipped={equipped}
-              onUse={() => useItem(item.id)} onEquip={() => equipItem(item.id)} />
+              onUse={() => consumeItem(item.id)} onEquip={() => equipItem(item.id)} />
           ))}
         </div>
       )}

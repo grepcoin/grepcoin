@@ -106,9 +106,9 @@ export function useBurn() {
   }, [writeContract])
 
   return {
-    totalBurned: totalBurned ? formatEther(totalBurned) : '0',
-    userBurned: userBurned ? formatEther(userBurned) : '0',
-    userTier: userTier || 'None',
+    totalBurned: totalBurned ? formatEther(totalBurned as bigint) : '0',
+    userBurned: userBurned ? formatEther(userBurned as bigint) : '0',
+    userTier: (userTier as string) || 'None',
     approve,
     burn,
     isApproving,

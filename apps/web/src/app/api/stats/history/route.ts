@@ -4,17 +4,37 @@ import { parseSessionToken } from '@/lib/auth'
 import prisma from '@/lib/db'
 
 export async function GET(request: NextRequest) {
-  const session = parseSessionToken(request)
+  const cookieStore = await cookies()
+  const sessionToken = cookieStore.get('session')?.value
+  if (!sessionToken) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const session = parseSessionToken(sessionToken)
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // Find user by wallet address
+  const user = await prisma.user.findUnique({
+    where: { walletAddress: session.address }
+  })
+
+  if (!user) {
+    return NextResponse.json({ error: 'User not found' }, { status: 404 })
   }
 
   const { searchParams } = new URL(request.url)
   const gameSlug = searchParams.get('game')
 
-  const where: any = { userId: session.userId }
+  const where: { userId: string; gameId?: string } = { userId: user.id }
   if (gameSlug) {
-    where.gameSlug = gameSlug
+    const game = await prisma.game.findUnique({
+      where: { slug: gameSlug }
+    })
+    if (game) {
+      where.gameId = game.id
+    }
   }
 
   const scores = await prisma.gameScore.findMany({

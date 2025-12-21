@@ -12,7 +12,7 @@ type EventName =
   | 'tournament_join'
 
 interface EventProperties {
-  [key: string]: string | number | boolean | undefined
+  [key: string]: string | number | boolean | null | undefined
 }
 
 class Analytics {
