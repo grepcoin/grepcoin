@@ -5,14 +5,23 @@ import { NotificationPayload } from '@/lib/push-notifications'
 
 const prisma = new PrismaClient()
 
-// Internal API key for server-to-server communication
-const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || 'dev-key-change-in-production'
+// Internal API key for server-to-server communication (REQUIRED in production)
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY
 
 export async function POST(req: NextRequest) {
   try {
+    // Verify internal API key is configured
+    if (!INTERNAL_API_KEY) {
+      console.error('INTERNAL_API_KEY environment variable is not configured')
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      )
+    }
+
     // Verify internal API key
     const apiKey = req.headers.get('x-api-key')
-    if (apiKey !== INTERNAL_API_KEY) {
+    if (!apiKey || apiKey !== INTERNAL_API_KEY) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }

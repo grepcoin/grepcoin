@@ -4,6 +4,7 @@ import prisma from '@/lib/db'
 import { parseSessionToken } from '@/lib/auth'
 import { rateLimiters } from '@/lib/rate-limit'
 import { calculateFee, calculateSellerProceeds } from '@/lib/marketplace'
+import { hasEnoughGrep } from '@/lib/grep-balance'
 
 // POST /api/marketplace/[id]/buy - Purchase a listing
 export async function POST(
@@ -99,27 +100,28 @@ export async function POST(
       const marketplaceFee = calculateFee(listing.price)
       const sellerProceeds = calculateSellerProceeds(listing.price)
 
-      // For GREP currency, we need to verify balance
+      // For GREP currency, verify on-chain balance
       if (listing.currency === 'GREP') {
-        // TODO: In a real implementation, check user's GREP balance
-        // For now, we'll assume they have enough
-        // const userBalance = await getUserGrepBalance(user.id)
-        // if (userBalance < listing.price) {
-        //   throw new Error('Insufficient GREP balance')
-        // }
+        // Check buyer's on-chain GREP balance
+        const balanceCheck = await hasEnoughGrep(
+          user.walletAddress,
+          listing.price
+        )
 
-        // TODO: Deduct GREP from buyer
-        // await deductGrep(user.id, listing.price)
+        if (!balanceCheck.hasEnough) {
+          throw new Error(
+            `Insufficient GREP balance. You have ${balanceCheck.balance.toFixed(2)} GREP but need ${balanceCheck.required} GREP`
+          )
+        }
 
-        // TODO: Add GREP to seller (minus fee)
-        // await addGrep(listing.sellerId, sellerProceeds)
-
-        // TODO: Add marketplace fee to platform
-        // await addGrep('platform', marketplaceFee)
+        // Note: Actual GREP transfer happens on-chain via smart contract
+        // The frontend will call the marketplace contract's buy function
+        // which handles the token transfer atomically
+        // This API just records the intent and validates state
       } else {
-        // For ETH, this would require on-chain transaction
-        // For this demo, we'll just create the record
-        // In production, verify the ETH transaction on-chain
+        // For ETH, this requires on-chain transaction verification
+        // The frontend submits the tx, then calls this API with txHash
+        // We would verify the tx on-chain before updating status
       }
 
       // Update listing status

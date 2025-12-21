@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
 import { cookies } from 'next/headers'
+import { parseSessionToken } from '@/lib/auth'
 import {
   WEEKLY_REWARD_TIERS,
   MONTHLY_REWARD_TIERS,
@@ -16,23 +17,19 @@ const ADMIN_ADDRESSES = (process.env.ADMIN_ADDRESSES || '').split(',').map((a) =
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const sessionId = cookieStore.get('session_id')?.value
+    const sessionToken = cookieStore.get('session')?.value
 
-    if (!sessionId) {
+    if (!sessionToken) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    // Get session
-    const session = await prisma.session.findUnique({
-      where: { id: sessionId },
-    })
-
-    if (!session || session.expiresAt < new Date()) {
-      return NextResponse.json({ error: 'Session expired' }, { status: 401 })
+    const session = parseSessionToken(sessionToken)
+    if (!session) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
     // Check if user is admin
-    if (!ADMIN_ADDRESSES.includes(session.walletAddress.toLowerCase())) {
+    if (!ADMIN_ADDRESSES.includes(session.address.toLowerCase())) {
       return NextResponse.json({ error: 'Unauthorized - Admin only' }, { status: 403 })
     }
 
@@ -214,23 +211,19 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const sessionId = cookieStore.get('session_id')?.value
+    const sessionToken = cookieStore.get('session')?.value
 
-    if (!sessionId) {
+    if (!sessionToken) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    // Get session
-    const session = await prisma.session.findUnique({
-      where: { id: sessionId },
-    })
-
-    if (!session || session.expiresAt < new Date()) {
-      return NextResponse.json({ error: 'Session expired' }, { status: 401 })
+    const session = parseSessionToken(sessionToken)
+    if (!session) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
     // Check if user is admin
-    if (!ADMIN_ADDRESSES.includes(session.walletAddress.toLowerCase())) {
+    if (!ADMIN_ADDRESSES.includes(session.address.toLowerCase())) {
       return NextResponse.json({ error: 'Unauthorized - Admin only' }, { status: 403 })
     }
 

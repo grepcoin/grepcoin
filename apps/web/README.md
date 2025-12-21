@@ -1,26 +1,46 @@
-# GrepCoin Arcade
+# GrepCoin Web Application
 
-A play-to-earn cryptocurrency arcade where players earn GREP tokens by playing browser-based games. Built with Next.js, Prisma, and Web3 authentication.
+The official web application for GrepCoin - a blockchain gaming arcade on Base L2. Play developer-themed games, earn GREP tokens, stake for rewards, and engage with a vibrant community.
 
 ## Features
 
-- **4 Playable Games**: Grep Rails, Stack Panic, Merge Miners, Quantum Grep
-- **Play-to-Earn**: Earn GREP tokens based on your performance
-- **Web3 Authentication**: Sign in with your Ethereum wallet (SIWE)
-- **Staking Multipliers**: Stake GREP to earn up to 2.5x rewards
-- **Achievements**: Unlock badges and earn bonus rewards
-- **Daily Challenges**: Complete challenges for extra GREP
-- **Leaderboards**: Compete globally and per-game
-- **Live Activity Feed**: See real-time player activity
+### Games
+- **8 Playable Games**: Grep Rails, Stack Panic, Merge Miners, Quantum Grep, Bug Hunter, Crypto Snake, Syntax Sprint, RegEx Crossword
+- **Play-to-Earn**: Earn GREP tokens based on gameplay performance
+- **Anti-cheat System**: Server-side validation and pattern detection
+- **Daily Challenges**: Complete challenges for bonus GREP rewards
+- **Leaderboards**: Global and per-game competition
+
+### Web3 Integration
+- **Sign-In with Ethereum**: Wallet-based authentication using SIWE
+- **Staking**: 5-tier staking system with 5%-20% APY
+- **Reward Multipliers**: Up to 2x rewards based on staking tier
+- **NFT Achievements**: Soulbound ERC-1155 achievement badges
+- **NFT Items**: Tradeable in-game items and cosmetics
+- **On-chain Governance**: Vote on proposals with GREP tokens
+
+### Social Features
+- **Guilds**: Create and join player guilds
+- **Tournaments**: Participate in scheduled competitive events
+- **Seasons & Battle Pass**: Unlock seasonal rewards
+- **Live Activity Feed**: Real-time player activity updates
+- **Quests**: Complete objectives for rewards
+- **Marketplace**: Buy, sell, and auction NFT items
+- **Profile System**: Track stats, achievements, and progress
 
 ## Tech Stack
 
-- **Framework**: Next.js 15.5
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: SIWE (Sign In With Ethereum)
-- **Web3**: wagmi + viem
-- **Styling**: Tailwind CSS
+- **Framework**: Next.js 15.5 with App Router
 - **Language**: TypeScript
+- **Database**: PostgreSQL with Prisma ORM v5.22
+- **Authentication**: SIWE (Sign-In with Ethereum) v3 with NextAuth
+- **Web3**: wagmi v3, viem v2, @tanstack/react-query
+- **Styling**: Tailwind CSS v3.4
+- **UI**: Framer Motion for animations, Lucide React for icons
+- **Real-time**: Socket.io v4.8 for live updates
+- **Email**: Resend for transactional emails
+- **Push Notifications**: Web Push API with VAPID
+- **Anti-cheat**: Custom @grepcoin/anti-cheat package
 
 ## Getting Started
 
@@ -160,60 +180,164 @@ Mine commits and resolve merge conflicts. Stack miners to increase your hash pow
 Patterns exist in superposition! Match quantum regex before the wave function collapses.
 - Rewards: 10-75 GREP per game
 
-## API Endpoints
+## API Routes
 
-### Authentication
-- `GET /api/auth/nonce` - Get SIWE nonce
-- `POST /api/auth/verify` - Verify signature and create session
-- `GET /api/auth/session` - Check current session
-- `POST /api/auth/logout` - Clear session
+The app provides a comprehensive REST API organized by feature:
 
-### Games
-- `GET /api/games` - List all games
-- `GET /api/games/:slug` - Game details with leaderboard
-- `POST /api/games/:slug/submit` - Submit score (authenticated)
+### Authentication (`/api/auth/*`)
+- `GET /nonce` - Generate SIWE nonce for wallet signature
+- `POST /verify` - Verify signed message and create session
+- `GET /session` - Get current user session
+- `POST /logout` - Clear user session
+- `GET /user` - Get authenticated user data
 
-### Data
-- `GET /api/leaderboard` - Global leaderboard
-- `GET /api/stats` - Platform statistics
-- `GET /api/achievements` - All achievements
-- `GET /api/achievements/:wallet` - User achievements
-- `GET /api/challenges` - Today's challenges
-- `POST /api/challenges/complete` - Complete challenge (authenticated)
-- `GET /api/activity` - Activity feed
-- `GET /api/users/:wallet` - User profile
+### Games (`/api/games/*`)
+- `GET /` - List all games with metadata
+- `GET /:slug` - Get game details and leaderboard
+- `POST /:slug/submit` - Submit score (requires auth)
+- `GET /:slug/leaderboard` - Get game-specific leaderboard
 
-## Staking Tiers
+### Leaderboard (`/api/leaderboard/*`)
+- `GET /` - Global leaderboard
+- `GET /game/:slug` - Game-specific leaderboard
+- `GET /weekly` - Weekly leaderboard
 
-| Tier | Stake Amount | Lock Period | Multiplier |
-|------|-------------|-------------|------------|
-| Flexible | Any | None | 1.0x |
-| Bronze | 1,000+ GREP | 30 days | 1.1x |
-| Silver | 5,000+ GREP | 60 days | 1.25x |
-| Gold | 10,000+ GREP | 90 days | 1.5x |
-| Diamond | 50,000+ GREP | 180 days | 2.0x |
+### Stats & Analytics (`/api/stats/*`)
+- `GET /` - Platform-wide statistics
+- `GET /user/:wallet` - User-specific statistics
+- `GET /game/:slug` - Game-specific statistics
+
+### Achievements (`/api/achievements/*`)
+- `GET /` - All available achievements
+- `GET /user/:wallet` - User's achievements
+- `POST /claim` - Claim achievement (requires auth + signature)
+
+### Challenges (`/api/challenges/*`)
+- `GET /` - Today's active challenges
+- `GET /history` - Challenge history
+- `POST /complete` - Complete challenge (requires auth)
+
+### Activity (`/api/activity/*`)
+- `GET /` - Recent activity feed
+- `GET /user/:wallet` - User activity history
+- `GET /live` - Live activity stream (SSE)
+
+### Guilds (`/api/guilds/*`)
+- `GET /` - List all guilds
+- `POST /create` - Create new guild (requires auth)
+- `GET /:id` - Guild details
+- `POST /:id/join` - Join guild (requires auth)
+- `POST /:id/leave` - Leave guild (requires auth)
+
+### Tournaments (`/api/tournaments/*`)
+- `GET /` - List active tournaments
+- `GET /:id` - Tournament details
+- `POST /:id/register` - Register for tournament (requires auth)
+- `GET /:id/bracket` - Tournament bracket
+
+### Marketplace (`/api/marketplace/*`)
+- `GET /items` - List items for sale
+- `GET /auctions` - Active auctions
+- `POST /list` - List item for sale (requires auth)
+- `POST /buy` - Purchase item (requires auth)
+
+### Quests (`/api/quests/*`)
+- `GET /` - Available quests
+- `GET /user` - User quest progress (requires auth)
+- `POST /claim` - Claim quest reward (requires auth)
+
+### Governance (`/api/governance/*`)
+- `GET /proposals` - List all proposals
+- `POST /propose` - Create proposal (requires auth + tokens)
+- `POST /vote` - Vote on proposal (requires auth)
+
+### Notifications (`/api/notifications/*`)
+- `GET /` - User notifications (requires auth)
+- `POST /subscribe` - Subscribe to push notifications
+- `PATCH /:id/read` - Mark notification as read
+
+## Staking System
+
+GrepCoin's staking system integrates directly with on-chain smart contracts:
+
+| Tier | Minimum | Lock Period | APY | Multiplier | Bonus Plays |
+|------|---------|-------------|-----|------------|-------------|
+| Flexible | 100 GREP | None | 5% | 1.1x | +2 daily |
+| Bronze | 1,000 GREP | 7 days | 8% | 1.25x | +5 daily |
+| Silver | 5,000 GREP | 14 days | 12% | 1.5x | +10 daily |
+| Gold | 10,000 GREP | 30 days | 15% | 1.75x | +15 daily |
+| Diamond | 50,000 GREP | 90 days | 20% | 2.0x | +25 daily |
+
+**Benefits:**
+- Higher APY based on tier and lock duration
+- Gameplay reward multipliers
+- Additional daily plays
+- Governance voting power
+- Early access to new features
 
 ## Deployment
 
 ### Vercel (Recommended)
 
-```bash
-# Install Vercel CLI
-npm i -g vercel
+1. **Connect Repository**
+   - Import your GitHub repository to Vercel
+   - Select the `apps/web` directory as the root
 
-# Deploy
-vercel
+2. **Configure Build Settings**
+   - Framework: Next.js
+   - Build Command: `npm run build`
+   - Output Directory: `.next`
+   - Install Command: `npm install`
 
-# Set environment variables in Vercel dashboard
-```
+3. **Set Environment Variables**
+   - Go to Project Settings > Environment Variables
+   - Add all required variables from `.env.example`
+   - Generate production secrets for `NEXTAUTH_SECRET` and `INTERNAL_API_KEY`
+
+4. **Deploy**
+   ```bash
+   # Using Vercel CLI
+   npm i -g vercel
+   vercel --prod
+   ```
 
 ### Environment Variables for Production
 
-Ensure these are set in your deployment platform:
-- `DATABASE_URL`
-- `DIRECT_URL`
-- `NEXTAUTH_SECRET`
-- `NEXTAUTH_URL`
+**Required:**
+- `DATABASE_URL` - Production PostgreSQL connection
+- `DIRECT_URL` - Direct database connection for migrations
+- `NEXTAUTH_SECRET` - Strong random secret (use `openssl rand -base64 32`)
+- `NEXTAUTH_URL` - Your production URL (https://grepcoin.io)
+
+**Blockchain (Required for full functionality):**
+- `NEXT_PUBLIC_ALCHEMY_API_KEY` - Alchemy API key
+- `NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID` - WalletConnect project ID
+- `NEXT_PUBLIC_CHAIN_ID` - 8453 for Base mainnet
+- `NEXT_PUBLIC_GREP_TOKEN_ADDRESS` - Deployed token address
+- `NEXT_PUBLIC_STAKING_POOL_ADDRESS` - Deployed staking address
+
+**Optional Services:**
+- `RESEND_API_KEY` - For email notifications
+- `VAPID_PUBLIC_KEY` & `VAPID_PRIVATE_KEY` - For push notifications
+- `INTERNAL_API_KEY` - For authenticated service-to-service calls
+
+### Other Platforms
+
+**Docker:**
+```bash
+# Build image
+docker build -t grepcoin-web .
+
+# Run container
+docker run -p 3000:3000 --env-file .env grepcoin-web
+```
+
+**Self-hosted:**
+```bash
+npm run build
+npm start
+# Runs on port 3000
+```
 
 ## Database Schema
 

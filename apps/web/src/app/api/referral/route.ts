@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
 import { cookies } from 'next/headers'
 import { nanoid } from 'nanoid'
+import { parseSessionToken } from '@/lib/auth'
 
 const REFERRAL_BONUS = 100 // GREP bonus for new user
 const REFERRER_PERCENTAGE = 10 // % of referee's earnings
@@ -17,22 +18,19 @@ function generateReferralCode(): string {
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const sessionId = cookieStore.get('session_id')?.value
+    const sessionToken = cookieStore.get('session')?.value
 
-    if (!sessionId) {
+    if (!sessionToken) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    const session = await prisma.session.findUnique({
-      where: { id: sessionId },
-    })
-
-    if (!session || session.expiresAt < new Date()) {
-      return NextResponse.json({ error: 'Session expired' }, { status: 401 })
+    const session = parseSessionToken(sessionToken)
+    if (!session) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
     let user = await prisma.user.findUnique({
-      where: { walletAddress: session.walletAddress },
+      where: { walletAddress: session.address },
       include: {
         referralsMade: {
           include: {
@@ -140,22 +138,19 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const sessionId = cookieStore.get('session_id')?.value
+    const sessionToken = cookieStore.get('session')?.value
 
-    if (!sessionId) {
+    if (!sessionToken) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    const session = await prisma.session.findUnique({
-      where: { id: sessionId },
-    })
-
-    if (!session || session.expiresAt < new Date()) {
-      return NextResponse.json({ error: 'Session expired' }, { status: 401 })
+    const session = parseSessionToken(sessionToken)
+    if (!session) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
     const user = await prisma.user.findUnique({
-      where: { walletAddress: session.walletAddress },
+      where: { walletAddress: session.address },
       include: { referredBy: true },
     })
 
@@ -231,7 +226,7 @@ export async function POST(request: NextRequest) {
     await prisma.activity.create({
       data: {
         type: 'reward',
-        wallet: session.walletAddress,
+        wallet: session.address,
         username: user.username,
         value: REFERRAL_BONUS,
         message: `Welcome bonus from referral: ${REFERRAL_BONUS} GREP`,

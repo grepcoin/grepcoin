@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { AuctionStatus, AuctionWithDetails } from '@/lib/auctions'
 
 interface UseAuctionsOptions {
@@ -14,8 +14,15 @@ export function useAuctions(options: UseAuctionsOptions = {}) {
   const [auctions, setAuctions] = useState<AuctionWithDetails[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const fetchAuctions = useCallback(async () => {
+    // Cancel any in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    abortControllerRef.current = new AbortController()
+
     try {
       setIsLoading(true)
       setError(null)
@@ -26,7 +33,9 @@ export function useAuctions(options: UseAuctionsOptions = {}) {
       if (options.itemType) params.set('itemType', options.itemType)
       if (options.limit) params.set('limit', options.limit.toString())
 
-      const response = await fetch(`/api/auctions?${params.toString()}`)
+      const response = await fetch(`/api/auctions?${params.toString()}`, {
+        signal: abortControllerRef.current.signal,
+      })
       const data = await response.json()
 
       if (!response.ok) {
@@ -35,6 +44,7 @@ export function useAuctions(options: UseAuctionsOptions = {}) {
 
       setAuctions(data.auctions || [])
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') return
       setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setIsLoading(false)
@@ -47,7 +57,18 @@ export function useAuctions(options: UseAuctionsOptions = {}) {
     // Auto-refresh every 10 seconds if enabled
     if (options.autoRefresh) {
       const interval = setInterval(fetchAuctions, 10000)
-      return () => clearInterval(interval)
+      return () => {
+        clearInterval(interval)
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort()
+        }
+      }
+    }
+
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
     }
   }, [fetchAuctions, options.autoRefresh])
 
@@ -58,6 +79,7 @@ export function useAuction(id: string | null, autoRefresh = true) {
   const [auction, setAuction] = useState<AuctionWithDetails | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const fetchAuction = useCallback(async () => {
     if (!id) {
@@ -65,10 +87,18 @@ export function useAuction(id: string | null, autoRefresh = true) {
       return
     }
 
+    // Cancel any in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    abortControllerRef.current = new AbortController()
+
     try {
       setError(null)
 
-      const response = await fetch(`/api/auctions/${id}`)
+      const response = await fetch(`/api/auctions/${id}`, {
+        signal: abortControllerRef.current.signal,
+      })
       const data = await response.json()
 
       if (!response.ok) {
@@ -77,6 +107,7 @@ export function useAuction(id: string | null, autoRefresh = true) {
 
       setAuction(data.auction)
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') return
       setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setIsLoading(false)
@@ -89,7 +120,18 @@ export function useAuction(id: string | null, autoRefresh = true) {
     // Auto-refresh every 5 seconds for real-time updates
     if (autoRefresh && id) {
       const interval = setInterval(fetchAuction, 5000)
-      return () => clearInterval(interval)
+      return () => {
+        clearInterval(interval)
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort()
+        }
+      }
+    }
+
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
     }
   }, [fetchAuction, autoRefresh, id])
 

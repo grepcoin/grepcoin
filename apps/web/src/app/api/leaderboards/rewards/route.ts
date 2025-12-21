@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
 import { cookies } from 'next/headers'
+import { parseSessionToken } from '@/lib/auth'
 import {
   getNextDistributionDate,
   getCurrentPeriodStart,
@@ -18,18 +19,16 @@ export async function GET(request: NextRequest) {
     const includeProjected = searchParams.get('projected') === 'true'
 
     const cookieStore = await cookies()
-    const sessionId = cookieStore.get('session_id')?.value
+    const sessionToken = cookieStore.get('session')?.value
 
     let userId: string | null = null
     let userAddress: string | null = null
 
-    if (sessionId) {
-      const session = await prisma.session.findUnique({
-        where: { id: sessionId },
-      })
+    if (sessionToken) {
+      const session = parseSessionToken(sessionToken)
 
-      if (session && session.expiresAt > new Date()) {
-        userAddress = session.walletAddress
+      if (session) {
+        userAddress = session.address
         const user = await prisma.user.findUnique({
           where: { walletAddress: userAddress },
         })

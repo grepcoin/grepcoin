@@ -1,29 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
 import { cookies } from 'next/headers'
+import { parseSessionToken } from '@/lib/auth'
 import { REWARD_BADGES } from '@/lib/leaderboard-rewards'
 
 // POST - Claim earned rewards
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const sessionId = cookieStore.get('session_id')?.value
+    const sessionToken = cookieStore.get('session')?.value
 
-    if (!sessionId) {
+    if (!sessionToken) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    // Get session and user
-    const session = await prisma.session.findUnique({
-      where: { id: sessionId },
-    })
-
-    if (!session || session.expiresAt < new Date()) {
-      return NextResponse.json({ error: 'Session expired' }, { status: 401 })
+    const session = parseSessionToken(sessionToken)
+    if (!session) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
     const user = await prisma.user.findUnique({
-      where: { walletAddress: session.walletAddress },
+      where: { walletAddress: session.address },
     })
 
     if (!user) {
@@ -148,7 +145,7 @@ export async function POST(request: NextRequest) {
       await tx.activity.create({
         data: {
           type: 'reward',
-          wallet: session.walletAddress,
+          wallet: session.address,
           username: user.username,
           value: reward.grepAmount,
           message: `Claimed ${reward.distribution.period.toLowerCase()} leaderboard reward: ${reward.grepAmount} GREP (Rank #${reward.rank})`,
@@ -198,23 +195,19 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const sessionId = cookieStore.get('session_id')?.value
+    const sessionToken = cookieStore.get('session')?.value
 
-    if (!sessionId) {
+    if (!sessionToken) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    // Get session and user
-    const session = await prisma.session.findUnique({
-      where: { id: sessionId },
-    })
-
-    if (!session || session.expiresAt < new Date()) {
-      return NextResponse.json({ error: 'Session expired' }, { status: 401 })
+    const session = parseSessionToken(sessionToken)
+    if (!session) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
     const user = await prisma.user.findUnique({
-      where: { walletAddress: session.walletAddress },
+      where: { walletAddress: session.address },
     })
 
     if (!user) {

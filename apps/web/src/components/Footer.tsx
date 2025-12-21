@@ -14,7 +14,7 @@ const footerLinks = {
   Resources: [
     { name: 'Documentation', href: '#' },
     { name: 'GitHub', href: 'https://github.com/grepcoin' },
-    { name: 'Risk Disclaimer', href: '/disclaimer' },
+    { name: 'Whitepaper', href: '#' },
     { name: 'API', href: '#' },
   ],
   Community: [
@@ -24,8 +24,10 @@ const footerLinks = {
     { name: 'Blog', href: '#' },
   ],
   Legal: [
-    { name: 'Privacy Policy', href: '/privacy' },
     { name: 'Terms of Service', href: '/terms' },
+    { name: 'Privacy Policy', href: '/privacy' },
+    { name: 'Risk Disclaimer', href: '/disclaimer' },
+    { name: 'Token Disclaimer', href: '/token-disclaimer' },
     { name: 'Cookie Policy', href: '/cookies' },
   ],
 }
@@ -111,14 +113,14 @@ export default function Footer() {
           </div>
 
           <div className="flex items-center gap-6 text-sm">
-            <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
-              Privacy
-            </Link>
             <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
               Terms
             </Link>
-            <Link href="/cookies" className="text-gray-400 hover:text-white transition-colors">
-              Cookies
+            <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
+              Privacy
+            </Link>
+            <Link href="/disclaimer" className="text-gray-400 hover:text-white transition-colors">
+              Disclaimer
             </Link>
           </div>
         </div>

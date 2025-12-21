@@ -15,27 +15,27 @@ const steps = [
   {
     number: '02',
     icon: Coins,
-    title: 'Get GREP Tokens',
+    title: 'Play & Earn',
     description:
-      'Acquire GREP through our DEX, staking rewards, or by backing projects on the launchpad.',
+      'Play any of our 8 arcade games to earn GREP tokens. The better you play, the more you earn.',
     color: 'from-grep-pink to-grep-orange',
     glowColor: 'rgba(236, 72, 153, 0.3)',
   },
   {
     number: '03',
     icon: Gamepad2,
-    title: 'Explore Ecosystem',
+    title: 'Collect & Trade',
     description:
-      'Play games, back projects, trade assets, and earn rewards across the entire ecosystem.',
+      'Unlock NFT achievements, earn in-game items, and trade them on the marketplace.',
     color: 'from-grep-orange to-grep-yellow',
     glowColor: 'rgba(249, 115, 22, 0.3)',
   },
   {
     number: '04',
     icon: Vote,
-    title: 'Govern & Earn',
+    title: 'Stake & Govern',
     description:
-      'Stake your tokens to earn up to 20% APY and vote on ecosystem decisions that shape our future.',
+      'Stake GREP tokens in 5 tiers for up to 20% APY and 2.0x multipliers. Vote on ecosystem proposals.',
     color: 'from-grep-cyan to-grep-blue',
     glowColor: 'rgba(6, 182, 212, 0.3)',
   },

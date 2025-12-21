@@ -149,7 +149,7 @@ export async function askClaude(
         inputTokens: response.usage.input_tokens,
         outputTokens: response.usage.output_tokens
       },
-      stopReason: response.stop_reason
+      stopReason: response.stop_reason ?? undefined
     }
   }
 
@@ -157,9 +157,10 @@ export async function askClaude(
     return await retryWithBackoff(callAPI, retries, retryDelayMs)
   } catch (error) {
     if (error instanceof Anthropic.APIError) {
+      const errorType = (error as unknown as Record<string, unknown>).type as string | undefined
       throw new Error(
         `Claude API Error (${error.status}): ${error.message}\n` +
-        `Type: ${error.type || 'unknown'}\n` +
+        `Type: ${errorType || 'unknown'}\n` +
         `This may be due to: rate limits, invalid API key, or service issues.`
       )
     }
@@ -224,9 +225,10 @@ async function askClaudeStreaming(
     return await retryWithBackoff(callAPI, retries, retryDelayMs)
   } catch (error) {
     if (error instanceof Anthropic.APIError) {
+      const errorType = (error as unknown as Record<string, unknown>).type as string | undefined
       throw new Error(
         `Claude API Error (${error.status}): ${error.message}\n` +
-        `Type: ${error.type || 'unknown'}`
+        `Type: ${errorType || 'unknown'}`
       )
     }
     throw new Error(`Failed to stream response from Claude: ${error instanceof Error ? error.message : String(error)}`)

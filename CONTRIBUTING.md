@@ -4,14 +4,7 @@ Thank you for your interest in contributing to GrepCoin! This document provides 
 
 ## Code of Conduct
 
-By participating in this project, you agree to maintain a respectful and inclusive environment. We expect all contributors to:
-
-- Be respectful and considerate in all interactions
-- Welcome newcomers and help them get started
-- Focus on what is best for the community
-- Show empathy towards other community members
-
-Unacceptable behavior includes harassment, trolling, or any form of discrimination.
+This project adheres to the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to conduct@greplabs.io.
 
 ## How to Contribute
 
@@ -56,17 +49,36 @@ We welcome feature suggestions! Please:
 #### Development Setup
 
 ```bash
-# Website (Next.js)
-cd website
-pnpm install
+# Clone the repository
+git clone https://github.com/grepcoin/grepcoin.git
+cd grepcoin
+
+# Install all dependencies (from root)
+npm install
+
+# Web App (Next.js)
+cd apps/web
 cp .env.example .env
-# Configure your .env file
-pnpm dev
+# Configure your .env file with database URL, API keys, etc.
+npm run db:push    # Set up database schema
+npm run db:seed    # Seed initial data
+npm run dev        # Start dev server
 
 # Smart Contracts (Hardhat)
-cd contracts-dev
+cd packages/contracts
 npm install
-npx hardhat test
+npm test           # Run 47 tests
+
+# AI Agents (Optional)
+cd packages/agents
+npm install
+npm run agent:community -- --interactive
+
+# Discord Bot (Optional)
+cd apps/discord-bot
+cp .env.example .env
+# Add your Discord bot token
+npm run dev
 ```
 
 #### Making Changes
@@ -94,16 +106,27 @@ npx hardhat test
 
 #### Testing
 
-**Website:**
+**Web App:**
 ```bash
-pnpm lint       # Run linter
-pnpm build      # Build to check for errors
+cd apps/web
+npm run lint       # Run ESLint
+npm run build      # Build to check for errors
+npm run test       # Run tests (if configured)
 ```
 
 **Smart Contracts:**
 ```bash
-npx hardhat test              # Run all tests
-npx hardhat coverage          # Check coverage (if configured)
+cd packages/contracts
+npm test                    # Run all 47 tests
+npm run coverage            # Check test coverage
+npm run lint                # Run Solidity linter
+```
+
+**Agents:**
+```bash
+cd packages/agents
+npm test                    # Run agent tests
+npm run lint                # Run linter
 ```
 
 #### Submitting
@@ -125,18 +148,36 @@ npx hardhat coverage          # Check coverage (if configured)
 
 ## Development Guidelines
 
-### Website Development
+### Project Structure
+
+GrepCoin uses a monorepo architecture with the following structure:
+
+```
+grepcoin/
+├── apps/
+│   ├── web/                 # Next.js 15 web application
+│   └── discord-bot/         # Discord community bot
+├── packages/
+│   ├── contracts/           # Solidity smart contracts
+│   ├── agents/              # AI agent system
+│   ├── anti-cheat/          # Game anti-cheat system
+│   └── subgraph/            # The Graph indexer
+└── docs/                    # Documentation
+```
+
+### Web App Development
 
 **File Structure:**
-- Pages go in `src/app/`
-- Reusable components in `src/components/`
-- Hooks in `src/hooks/`
-- Utilities in `src/lib/`
-- API routes in `src/app/api/`
+- Pages go in `apps/web/src/app/`
+- Reusable components in `apps/web/src/components/`
+- Hooks in `apps/web/src/hooks/`
+- Utilities in `apps/web/src/lib/`
+- API routes in `apps/web/src/app/api/`
+- Database schema in `apps/web/prisma/schema.prisma`
 
 **State Management:**
 - Use React Context for global state (Auth, Staking)
-- Use React Query for server state
+- Use custom hooks for Web3 integration (wagmi v3)
 - Keep component state local when possible
 
 **Styling:**
@@ -168,17 +209,21 @@ npx hardhat coverage          # Check coverage (if configured)
 
 Adding a new game:
 
-1. Create page in `src/app/games/[game-name]/page.tsx`
-2. Add game to `src/app/games/page.tsx` game list
-3. Add game to database seed (`prisma/seed.ts`)
-4. Implement scoring and GREP reward logic
-5. Test thoroughly on multiple devices
+1. Create page in `apps/web/src/app/games/[game-name]/page.tsx`
+2. Add game to `apps/web/src/app/games/page.tsx` game list
+3. Add game to database seed (`apps/web/prisma/seed.ts`)
+4. Create API endpoint in `apps/web/src/app/api/games/[game-name]/score/route.ts`
+5. Implement anti-cheat validation (see `packages/anti-cheat`)
+6. Implement scoring and GREP reward logic
+7. Test thoroughly on multiple devices
 
 Game requirements:
 - Mobile-friendly controls
 - Clear instructions
 - Score submission via API
 - Integration with staking multipliers
+- Anti-cheat validation
+- Proper error handling
 
 ## Getting Help
 

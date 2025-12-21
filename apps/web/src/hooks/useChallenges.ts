@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 interface Challenge {
   id: string
@@ -22,20 +22,29 @@ export function useChallenges() {
   const [resetIn, setResetIn] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+
     const fetchChallenges = async () => {
       setIsLoading(true)
       setError(null)
 
       try {
-        const res = await fetch('/api/challenges')
+        const res = await fetch('/api/challenges', {
+          signal: abortController.signal,
+        })
         if (!res.ok) throw new Error('Failed to fetch challenges')
 
         const data = await res.json()
-        setChallenges(data.challenges)
-        setResetIn(data.resetIn)
+        if (!abortController.signal.aborted) {
+          setChallenges(data.challenges)
+          setResetIn(data.resetIn)
+        }
       } catch (e) {
+        if (e instanceof Error && e.name === 'AbortError') return
         setError(e instanceof Error ? e.message : 'Unknown error')
         // Return empty array when API fails - no mock data
         setChallenges([])
@@ -46,7 +55,9 @@ export function useChallenges() {
         midnight.setHours(0, 0, 0, 0)
         setResetIn(midnight.getTime() - now.getTime())
       } finally {
-        setIsLoading(false)
+        if (!abortController.signal.aborted) {
+          setIsLoading(false)
+        }
       }
     }
 
@@ -57,7 +68,10 @@ export function useChallenges() {
       setResetIn((prev) => Math.max(0, prev - 60000))
     }, 60000)
 
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+      abortController.abort()
+    }
   }, [])
 
   return { challenges, resetIn, isLoading, error }

@@ -9,6 +9,7 @@ import {
   shouldExtendAuction,
   calculateExtendedEndTime,
 } from '@/lib/auctions'
+import { hasEnoughGrep } from '@/lib/grep-balance'
 
 export async function POST(
   request: NextRequest,
@@ -110,8 +111,17 @@ export async function POST(
       )
     }
 
-    // TODO: In production, verify user has enough GREP balance
-    // This would check their wallet or database balance
+    // Verify user has enough GREP balance for the bid
+    const balanceCheck = await hasEnoughGrep(session.address, amount)
+
+    if (!balanceCheck.hasEnough) {
+      return NextResponse.json(
+        {
+          error: `Insufficient GREP balance. You have ${balanceCheck.balance.toFixed(2)} GREP but need ${balanceCheck.required} GREP to place this bid`,
+        },
+        { status: 400 }
+      )
+    }
 
     // Check if auction should be extended (bid in last 5 minutes)
     const bidTime = new Date()

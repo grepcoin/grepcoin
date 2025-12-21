@@ -115,7 +115,7 @@ export default function Hero() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-grep-green opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-grep-green" />
               </span>
-              <span className="text-sm text-gray-300">4 Games Live</span>
+              <span className="text-sm text-gray-300">8 Games Live</span>
               <span className="text-xs px-2 py-0.5 rounded-full bg-grep-purple/20 text-grep-purple">
                 Play to Earn
               </span>
@@ -206,7 +206,7 @@ export default function Hero() {
                   href="/games"
                   className="inline-flex items-center gap-2 text-grep-purple hover:text-grep-pink transition-colors"
                 >
-                  <span>Try all 4 games</span>
+                  <span>Try all 8 games</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>

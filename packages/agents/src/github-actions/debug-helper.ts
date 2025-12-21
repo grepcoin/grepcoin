@@ -80,9 +80,10 @@ async function debugHelper(): Promise<void> {
   })
 
   // Check if it's a bug
-  const isBug = issue.labels.some((l: { name?: string }) =>
-    typeof l === 'object' && l.name?.toLowerCase().includes('bug')
-  )
+  const isBug = issue.labels.some((l) => {
+    if (typeof l === 'string') return l.toLowerCase().includes('bug')
+    return typeof l === 'object' && l?.name?.toLowerCase().includes('bug')
+  })
 
   if (!isBug) {
     console.log('⏭️ Issue is not labeled as bug, skipping debug analysis')

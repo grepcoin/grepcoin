@@ -80,6 +80,8 @@ contract GrepItems is ERC1155, ERC1155Burnable, ERC1155Supply, Ownable, Pausable
         uint256 amount,
         bytes memory data
     ) external onlyMinter {
+        require(to != address(0), "Cannot mint to zero address");
+        require(amount > 0, "Amount must be greater than zero");
         _mint(to, tokenId, amount, data);
         emit ItemMinted(to, tokenId, amount);
     }
@@ -93,6 +95,9 @@ contract GrepItems is ERC1155, ERC1155Burnable, ERC1155Supply, Ownable, Pausable
         uint256[] memory amounts,
         bytes memory data
     ) external onlyMinter {
+        require(to != address(0), "Cannot mint to zero address");
+        require(tokenIds.length > 0, "Empty token array");
+        require(tokenIds.length == amounts.length, "Array length mismatch");
         _mintBatch(to, tokenIds, amounts, data);
         emit BatchItemMinted(to, tokenIds, amounts);
     }

@@ -1,52 +1,27 @@
 ## Description
+Brief description of changes.
 
-Brief description of the changes in this PR.
+## Related Issue
+Fixes #(issue)
 
 ## Type of Change
-
-- [ ] Bug fix (non-breaking change that fixes an issue)
-- [ ] New feature (non-breaking change that adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
 - [ ] Documentation update
-- [ ] Refactoring (no functional changes)
-- [ ] Performance improvement
-- [ ] Test coverage improvement
-
-## Related Issues
-
-Closes #(issue number)
 
 ## Changes Made
-
-- Change 1
-- Change 2
-- Change 3
-
-## Screenshots (if applicable)
-
-Add screenshots here if your changes affect the UI.
+- 
+- 
 
 ## Testing
-
-Describe how you tested your changes:
-
-- [ ] Tested locally
-- [ ] Tested on mobile viewport
-- [ ] Tested wallet connection flow
-- [ ] Added/updated unit tests
-- [ ] All existing tests pass
+- [ ] Unit tests pass
+- [ ] Build succeeds
+- [ ] Manual testing done
 
 ## Checklist
-
-- [ ] My code follows the project's style guidelines
-- [ ] I have performed a self-review of my code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
-- [ ] Any dependent changes have been merged and published
-
-## Notes for Reviewers
-
-Add any notes for reviewers here.
+- [ ] Code follows style guidelines
+- [ ] Self-review completed
+- [ ] Documentation updated
+- [ ] No new warnings
+- [ ] Tests added/updated

@@ -8,58 +8,60 @@ import {
   ShoppingBag,
   Vote,
   Zap,
-  Shield
+  Shield,
+  Trophy,
+  Lock
 } from 'lucide-react'
 
 const features = [
   {
-    icon: Rocket,
-    title: 'Fund Projects',
-    description: 'Back indie games and hobby projects with milestone-based funding. Smart contracts protect your investment.',
+    icon: Gamepad2,
+    title: '8 Playable Games',
+    description: 'Full arcade of skill-based games including Grep Rails, Stack Panic, Merge Miners, Quantum Grep, and more. Earn GREP with every win.',
     color: 'from-grep-purple to-grep-pink',
     glow: 'glow-purple',
   },
   {
-    icon: Gamepad2,
-    title: 'Cross-Game Economy',
-    description: 'One token across all ecosystem games. Earn, spend, and trade GREP wherever you play.',
-    color: 'from-grep-pink to-grep-orange',
-    glow: 'glow-pink',
-  },
-  {
-    icon: Coins,
-    title: 'Stake & Earn',
-    description: '5 staking tiers with up to 20% APY. Lock longer, earn more. Compound your rewards automatically.',
+    icon: Lock,
+    title: 'Staking Tiers',
+    description: '5 staking tiers with 5-20% APY. Flexible to Diamond tiers with bonus daily plays and reward multipliers up to 2.0x.',
     color: 'from-grep-orange to-grep-yellow',
     glow: 'glow-purple',
   },
   {
-    icon: ShoppingBag,
-    title: 'Trade Assets',
-    description: 'Buy, sell, and trade in-game items across the ecosystem. Only 2.5% fees—not 30%.',
-    color: 'from-grep-cyan to-grep-blue',
-    glow: 'glow-blue',
+    icon: Trophy,
+    title: 'NFT Achievements',
+    description: 'ERC-1155 achievement badges and in-game items. Collect, trade, and showcase your gaming accomplishments on-chain.',
+    color: 'from-grep-pink to-grep-orange',
+    glow: 'glow-pink',
   },
   {
     icon: Vote,
-    title: 'Govern Together',
-    description: 'Your tokens, your voice. Vote on ecosystem grants, new projects, and protocol upgrades.',
+    title: 'On-Chain Governance',
+    description: 'Checkpoint-based voting system. Propose and vote on ecosystem changes with flash loan protection.',
     color: 'from-grep-blue to-grep-purple',
     glow: 'glow-blue',
   },
   {
-    icon: Users,
-    title: 'Creator First',
-    description: 'Creators keep 97.5% of revenue. Direct relationships with your community, no middlemen.',
+    icon: ShoppingBag,
+    title: 'Item Marketplace',
+    description: 'Trade in-game items and NFTs across the ecosystem. Tradeable items with rarity tiers from common to legendary.',
+    color: 'from-grep-cyan to-grep-blue',
+    glow: 'glow-blue',
+  },
+  {
+    icon: Rocket,
+    title: 'Smart Contracts',
+    description: 'Production-ready Solidity contracts for tokens, staking, governance, achievements, and items. Audited and deployment-ready.',
     color: 'from-grep-green to-grep-cyan',
     glow: 'glow-blue',
   },
 ]
 
 const highlights = [
-  { icon: Zap, text: 'Sub-second transactions' },
-  { icon: Shield, text: 'Audited smart contracts' },
-  { icon: Coins, text: 'Multi-chain support' },
+  { icon: Shield, text: 'Production-ready contracts' },
+  { icon: Zap, text: 'ERC-20, ERC-1155 standards' },
+  { icon: Coins, text: 'Full tokenomics system' },
 ]
 
 export default function Features() {

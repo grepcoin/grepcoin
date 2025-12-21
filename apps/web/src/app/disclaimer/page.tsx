@@ -223,7 +223,37 @@ export default function RiskDisclaimer() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-display font-semibold text-white mb-4">11. Contact</h2>
+            <h2 className="text-2xl font-display font-semibold text-white mb-4">11. Related Legal Documents</h2>
+            <p className="text-gray-300 leading-relaxed mb-4">
+              Please also review our other legal documents:
+            </p>
+            <div className="grid md:grid-cols-3 gap-4 mb-6">
+              <Link
+                href="/terms"
+                className="bg-dark-800 border border-dark-600 hover:border-grep-purple rounded-lg p-4 transition-colors group"
+              >
+                <h3 className="font-semibold text-white group-hover:text-grep-purple mb-2">Terms of Service</h3>
+                <p className="text-gray-400 text-sm">Complete terms and conditions for using GrepCoin</p>
+              </Link>
+              <Link
+                href="/privacy"
+                className="bg-dark-800 border border-dark-600 hover:border-grep-purple rounded-lg p-4 transition-colors group"
+              >
+                <h3 className="font-semibold text-white group-hover:text-grep-purple mb-2">Privacy Policy</h3>
+                <p className="text-gray-400 text-sm">How we collect, use, and protect your data</p>
+              </Link>
+              <Link
+                href="/token-disclaimer"
+                className="bg-dark-800 border border-dark-600 hover:border-grep-purple rounded-lg p-4 transition-colors group"
+              >
+                <h3 className="font-semibold text-white group-hover:text-grep-purple mb-2">Token Disclaimer</h3>
+                <p className="text-gray-400 text-sm">GREP token-specific information</p>
+              </Link>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-display font-semibold text-white mb-4">12. Contact</h2>
             <p className="text-gray-300 leading-relaxed">
               If you have questions about these risk disclosures:
             </p>

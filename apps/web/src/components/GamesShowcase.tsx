@@ -45,6 +45,46 @@ const games = [
     players: '1.2k',
     preview: 'quantum',
   },
+  {
+    id: 'bug-hunter',
+    name: 'Bug Hunter',
+    description: 'Find and squash bugs in code snippets',
+    icon: '🐛',
+    color: 'from-grep-pink to-grep-purple',
+    rewards: '8-45 GREP',
+    players: '1.5k',
+    preview: 'regex',
+  },
+  {
+    id: 'regex-crossword',
+    name: 'Regex Crossword',
+    description: 'Solve pattern puzzles in crossword style',
+    icon: '🧩',
+    color: 'from-grep-yellow to-grep-orange',
+    rewards: '12-55 GREP',
+    players: '0.9k',
+    preview: 'regex',
+  },
+  {
+    id: 'syntax-sprint',
+    name: 'Syntax Sprint',
+    description: 'Race against time to fix syntax errors',
+    icon: '⚡',
+    color: 'from-grep-blue to-grep-cyan',
+    rewards: '7-35 GREP',
+    players: '1.1k',
+    preview: 'stack',
+  },
+  {
+    id: 'crypto-snake',
+    name: 'Crypto Snake',
+    description: 'Collect crypto coins in a blockchain twist',
+    icon: '🐍',
+    color: 'from-grep-green to-grep-blue',
+    rewards: '5-25 GREP',
+    players: '2.0k',
+    preview: 'git',
+  },
 ]
 
 // Mini animated preview for each game
@@ -312,7 +352,7 @@ export default function GamesShowcase() {
           </div>
         </div>
 
-        {/* Games grid */}
+        {/* Games grid - show first 8 games */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {games.map((game) => (
             <Link
@@ -389,7 +429,7 @@ export default function GamesShowcase() {
           </Link>
 
           <p className="mt-4 text-gray-400 text-sm">
-            More games coming soon: Quantum Grep, Signal Flow, and more!
+            More games coming soon! Join the arcade and start earning GREP today.
           </p>
         </div>
 

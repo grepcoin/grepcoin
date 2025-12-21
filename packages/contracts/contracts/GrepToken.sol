@@ -4,20 +4,25 @@ pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
+import "@openzeppelin/contracts/utils/Nonces.sol";
 
 /**
  * @title GrepToken
- * @dev ERC-20 token for the GrepCoin Arcade ecosystem
+ * @dev ERC-20 token for the GrepCoin Arcade ecosystem with governance voting support
  *
  * Total Supply: 1,000,000,000 GREP (1 billion)
  * - 40% (400M) to deployer for liquidity and team
  * - 30% (300M) reserved for staking rewards
  * - 20% (200M) reserved for gameplay rewards
  * - 10% (100M) reserved for airdrops and marketing
+ *
+ * Voting: Uses ERC20Votes for checkpoint-based voting power tracking.
+ * Users must delegate to themselves or others to activate voting power.
  */
-contract GrepToken is ERC20, ERC20Burnable, ERC20Permit, Ownable, Pausable {
+contract GrepToken is ERC20, ERC20Burnable, ERC20Permit, ERC20Votes, Ownable, Pausable {
     uint256 public constant MAX_SUPPLY = 1_000_000_000 * 10**18; // 1 billion tokens
 
     // Addresses that can mint (staking pool, rewards distributor)
@@ -70,6 +75,8 @@ contract GrepToken is ERC20, ERC20Burnable, ERC20Permit, Ownable, Pausable {
      * @dev Mint staking rewards (capped at 300M)
      */
     function mintStakingRewards(address to, uint256 amount) external onlyMinter {
+        require(to != address(0), "Cannot mint to zero address");
+        require(amount > 0, "Amount must be greater than zero");
         require(stakingRewardsMinted + amount <= STAKING_REWARDS_CAP, "Staking rewards cap exceeded");
         require(totalSupply() + amount <= MAX_SUPPLY, "Max supply exceeded");
 
@@ -82,6 +89,8 @@ contract GrepToken is ERC20, ERC20Burnable, ERC20Permit, Ownable, Pausable {
      * @dev Mint gameplay rewards (capped at 200M)
      */
     function mintGameplayRewards(address to, uint256 amount) external onlyMinter {
+        require(to != address(0), "Cannot mint to zero address");
+        require(amount > 0, "Amount must be greater than zero");
         require(gameplayRewardsMinted + amount <= GAMEPLAY_REWARDS_CAP, "Gameplay rewards cap exceeded");
         require(totalSupply() + amount <= MAX_SUPPLY, "Max supply exceeded");
 
@@ -94,6 +103,8 @@ contract GrepToken is ERC20, ERC20Burnable, ERC20Permit, Ownable, Pausable {
      * @dev Mint airdrop tokens (capped at 100M)
      */
     function mintAirdrop(address to, uint256 amount) external onlyMinter {
+        require(to != address(0), "Cannot mint to zero address");
+        require(amount > 0, "Amount must be greater than zero");
         require(airdropsMinted + amount <= AIRDROPS_CAP, "Airdrops cap exceeded");
         require(totalSupply() + amount <= MAX_SUPPLY, "Max supply exceeded");
 
@@ -130,9 +141,16 @@ contract GrepToken is ERC20, ERC20Burnable, ERC20Permit, Ownable, Pausable {
     }
 
     /**
-     * @dev Override _update to add pause functionality
+     * @dev Override _update to add pause functionality and voting checkpoints
      */
-    function _update(address from, address to, uint256 value) internal virtual override whenNotPaused {
+    function _update(address from, address to, uint256 value) internal virtual override(ERC20, ERC20Votes) whenNotPaused {
         super._update(from, to, value);
+    }
+
+    /**
+     * @dev Override nonces for ERC20Permit and ERC20Votes compatibility
+     */
+    function nonces(address owner) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
+        return super.nonces(owner);
     }
 }

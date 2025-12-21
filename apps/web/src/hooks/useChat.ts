@@ -9,26 +9,46 @@ export function useChat(roomId: string) {
   const [isConnected, setIsConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const messageTimestamps = useRef<number[]>([])
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
+    // Create abort controller for cleanup
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+
     // Load initial messages
-    fetch(`/api/chat/${roomId}`)
+    fetch(`/api/chat/${roomId}`, { signal: abortController.signal })
       .then((res) => res.json())
       .then((data) => {
-        setMessages(data.messages || [])
-        setIsConnected(true)
-        setIsLoading(false)
+        if (!abortController.signal.aborted) {
+          setMessages(data.messages || [])
+          setIsConnected(true)
+          setIsLoading(false)
+        }
       })
-      .catch(() => setIsLoading(false))
+      .catch((e) => {
+        if (e.name !== 'AbortError') {
+          setIsLoading(false)
+        }
+      })
 
     // Poll for new messages (would use WebSocket in production)
     const interval = setInterval(() => {
-      fetch(`/api/chat/${roomId}`)
+      if (abortController.signal.aborted) return
+      fetch(`/api/chat/${roomId}`, { signal: abortController.signal })
         .then((res) => res.json())
-        .then((data) => setMessages(data.messages || []))
+        .then((data) => {
+          if (!abortController.signal.aborted) {
+            setMessages(data.messages || [])
+          }
+        })
+        .catch(() => {})  // Ignore errors during polling
     }, 3000)
 
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+      abortController.abort()
+    }
   }, [roomId])
 
   const sendMessage = useCallback(async (content: string): Promise<boolean> => {

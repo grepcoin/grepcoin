@@ -1,26 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import prisma from '@/lib/db'
+import { parseSessionToken } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const sessionId = cookieStore.get('session_id')?.value
+    const sessionToken = cookieStore.get('session')?.value
 
-    if (!sessionId) {
+    if (!sessionToken) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    const session = await prisma.session.findUnique({
-      where: { id: sessionId },
-    })
-
-    if (!session || session.expiresAt < new Date()) {
-      return NextResponse.json({ error: 'Session expired' }, { status: 401 })
+    const session = parseSessionToken(sessionToken)
+    if (!session) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
     const user = await prisma.user.findUnique({
-      where: { walletAddress: session.walletAddress },
+      where: { walletAddress: session.address },
       select: {
         username: true,
         avatar: true,
@@ -52,18 +50,15 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const cookieStore = await cookies()
-    const sessionId = cookieStore.get('session_id')?.value
+    const sessionToken = cookieStore.get('session')?.value
 
-    if (!sessionId) {
+    if (!sessionToken) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    const session = await prisma.session.findUnique({
-      where: { id: sessionId },
-    })
-
-    if (!session || session.expiresAt < new Date()) {
-      return NextResponse.json({ error: 'Session expired' }, { status: 401 })
+    const session = parseSessionToken(sessionToken)
+    if (!session) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
     const { displayName, avatar } = await request.json()
@@ -80,7 +75,7 @@ export async function PUT(request: NextRequest) {
     }
 
     await prisma.user.update({
-      where: { walletAddress: session.walletAddress },
+      where: { walletAddress: session.address },
       data: {
         username: displayName || null,
         avatar: avatar || null
