@@ -152,12 +152,12 @@ contract GrepItems is ERC1155, ERC1155Burnable, ERC1155Supply, Ownable, Pausable
     function getItemInfo(uint256 tokenId) external view returns (
         uint8 rarity,
         bool isTradeable,
-        uint256 totalSupply,
+        uint256 supply,
         string memory tokenURI
     ) {
         rarity = itemRarity[tokenId];
         isTradeable = tradeable[tokenId];
-        totalSupply = totalSupply(tokenId);
+        supply = totalSupply(tokenId);
         tokenURI = uri(tokenId);
     }
 
