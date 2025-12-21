@@ -45,6 +45,62 @@ Track all changes, decisions, and context for parallel agent development.
 
 ---
 
+## Wave 10 - Completed (PRs #46-51 merged)
+
+| Stream | Task | Deliverables |
+|--------|------|--------------|
+| Stream A | Mini-games | `mini-games.ts`, `useMiniGame.ts`, `CoinFlip.tsx`, `TapSpeed.tsx` |
+| Stream B | User levels | `levels.ts`, `useLevel.ts`, `LevelBadge.tsx`, `LevelProgress.tsx` |
+| Stream C | Inventory | `inventory.ts`, `useInventory.ts`, `InventoryGrid.tsx`, `ItemCard.tsx` |
+| Stream D | Guilds | `guilds.ts`, `useGuild.ts`, `GuildDashboard.tsx`, `CreateGuild.tsx` |
+| Stream E | Quests | `quests.ts`, `useQuests.ts`, `QuestCard.tsx`, `QuestList.tsx` |
+| Stream F | Achievements v2 | `achievements-v2.ts`, `useAchievementsV2.ts`, `AchievementCardV2.tsx` |
+
+**Mini-games:**
+- 5 quick games (Coin Flip, Dice Roll, Quick Math, Color Match, Tap Speed)
+- Dynamic reward calculation (5-50 GREP)
+- CoinFlip and TapSpeed fully implemented
+
+**User Levels:**
+- 7 level tiers: Newcomer → Legend
+- XP sources for all actions
+- Level badges and progress UI
+
+**Inventory:**
+- 6 item types with 4 rarity levels
+- Use/Equip functionality
+- Cosmetics and boosters
+
+**Guilds:**
+- Guild creation with tags
+- Member roles (owner/admin/member)
+- Guild perks and leveling
+
+**Quests:**
+- 3 daily + 3 weekly quests
+- Progress tracking
+- Claim rewards system
+
+**Achievements v2:**
+- 5 tiers: bronze → diamond
+- Progressive targets
+- Tier claiming with rewards
+
+---
+
+## Wave 9 - Completed (PRs #40-45 merged)
+
+| Stream | Task | Deliverables |
+|--------|------|--------------|
+| Stream A | Webhooks | `webhooks.ts`, `useWebhooks.ts`, `WebhookManager.tsx` |
+| Stream B | User badges | `badges.ts`, `useBadges.ts`, `BadgeCollection.tsx` |
+| Stream C | Seasonal events | `seasons.ts`, `SeasonBanner.tsx`, `/seasons` page |
+| Stream D | Export data | `export.ts`, `ExportDataModal.tsx` |
+| Stream E | Referral tiers | `referrals.ts`, `ReferralDashboard.tsx` |
+| Stream F | Activity feed | `activity.ts`, `ActivityFeed.tsx`, `/activity` page |
+
+---
+
 ## Wave 8 - Completed (PRs #34-39 merged)
 
 | Stream | Task | Deliverables |
