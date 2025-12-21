@@ -1,0 +1,47 @@
+const ja = {
+  common: {
+    play: 'プレイ',
+    earn: '獲得',
+    stake: 'ステーク',
+    connect: 'ウォレット接続',
+    disconnect: '切断',
+    loading: '読み込み中...',
+    error: 'エラー',
+    success: '成功',
+    cancel: 'キャンセル',
+    save: '保存',
+    close: '閉じる',
+  },
+  nav: {
+    home: 'ホーム',
+    games: 'ゲーム',
+    leaderboard: 'リーダーボード',
+    profile: 'プロフィール',
+    settings: '設定',
+    admin: '管理者',
+  },
+  games: {
+    yourScore: 'あなたのスコア',
+    highScore: 'ハイスコア',
+    grepEarned: '獲得したGREP',
+    playAgain: 'もう一度プレイ',
+    startGame: 'ゲーム開始',
+    gameOver: 'ゲームオーバー',
+  },
+  achievements: {
+    title: '実績',
+    unlocked: 'アンロック済み',
+    locked: 'ロック済み',
+    progress: '進行状況',
+    mint: 'NFTをミント',
+  },
+  staking: {
+    title: 'ステーキング',
+    staked: 'ステーク済み',
+    rewards: '報酬',
+    stake: 'GREPをステーク',
+    unstake: 'アンステーク',
+    claim: '報酬を請求',
+  },
+}
+export default ja

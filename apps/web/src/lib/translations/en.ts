@@ -1,0 +1,47 @@
+const en = {
+  common: {
+    play: 'Play',
+    earn: 'Earn',
+    stake: 'Stake',
+    connect: 'Connect Wallet',
+    disconnect: 'Disconnect',
+    loading: 'Loading...',
+    error: 'Error',
+    success: 'Success',
+    cancel: 'Cancel',
+    save: 'Save',
+    close: 'Close',
+  },
+  nav: {
+    home: 'Home',
+    games: 'Games',
+    leaderboard: 'Leaderboard',
+    profile: 'Profile',
+    settings: 'Settings',
+    admin: 'Admin',
+  },
+  games: {
+    yourScore: 'Your Score',
+    highScore: 'High Score',
+    grepEarned: 'GREP Earned',
+    playAgain: 'Play Again',
+    startGame: 'Start Game',
+    gameOver: 'Game Over',
+  },
+  achievements: {
+    title: 'Achievements',
+    unlocked: 'Unlocked',
+    locked: 'Locked',
+    progress: 'Progress',
+    mint: 'Mint NFT',
+  },
+  staking: {
+    title: 'Staking',
+    staked: 'Staked',
+    rewards: 'Rewards',
+    stake: 'Stake GREP',
+    unstake: 'Unstake',
+    claim: 'Claim Rewards',
+  },
+}
+export default en
