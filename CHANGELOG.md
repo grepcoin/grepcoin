@@ -45,6 +45,49 @@ Track all changes, decisions, and context for parallel agent development.
 
 ---
 
+## Wave 9 - Completed (PRs #40-45 merged)
+
+| Stream | Task | Deliverables |
+|--------|------|--------------|
+| Stream A | Webhooks | `webhooks.ts`, `useWebhooks.ts`, `WebhookManager.tsx`, `/api/webhooks` |
+| Stream B | User badges | `badges.ts`, `useBadges.ts`, `BadgeCard.tsx`, `BadgeCollection.tsx` |
+| Stream C | Seasonal events | `seasons.ts`, `useSeasonProgress.ts`, `SeasonBanner.tsx`, `/seasons` page |
+| Stream D | Export data | `export.ts`, `useExport.ts`, `ExportDataModal.tsx`, `/api/export` |
+| Stream E | Referral tiers | `referrals.ts`, `useReferrals.ts`, `ReferralDashboard.tsx` |
+| Stream F | Activity feed | `activity.ts`, `useActivityFeed.ts`, `ActivityFeed.tsx`, `/activity` page |
+
+**Webhooks System:**
+- 6 event types for external integrations
+- HMAC-SHA256 payload signing
+- Test, toggle, and delete functionality
+
+**User Badges:**
+- 17 badges across 5 categories
+- Badge showcase for profiles
+- Display toggle functionality
+
+**Seasonal Events:**
+- Winter Wonderland season with challenges
+- Daily/weekly/seasonal challenge types
+- Reward track with claim system
+
+**Export Data:**
+- JSON and CSV export formats
+- Selective data export options
+- Progress tracking and download
+
+**Referral Tiers:**
+- 5 tiers: Starter → Diamond Partner
+- Progressive rewards (100-300 GREP/referral)
+- Tier progress tracking
+
+**Activity Feed:**
+- 9 activity types with icons
+- Personal and global feeds
+- Filtering and pagination
+
+---
+
 ## Wave 8 - Completed (PRs #34-39 merged)
 
 | Stream | Task | Deliverables |
