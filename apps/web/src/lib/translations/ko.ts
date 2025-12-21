@@ -1,0 +1,47 @@
+const ko = {
+  common: {
+    play: '플레이',
+    earn: '획득',
+    stake: '스테이킹',
+    connect: '지갑 연결',
+    disconnect: '연결 해제',
+    loading: '로딩 중...',
+    error: '오류',
+    success: '성공',
+    cancel: '취소',
+    save: '저장',
+    close: '닫기',
+  },
+  nav: {
+    home: '홈',
+    games: '게임',
+    leaderboard: '리더보드',
+    profile: '프로필',
+    settings: '설정',
+    admin: '관리자',
+  },
+  games: {
+    yourScore: '당신의 점수',
+    highScore: '최고 점수',
+    grepEarned: '획득한 GREP',
+    playAgain: '다시 플레이',
+    startGame: '게임 시작',
+    gameOver: '게임 오버',
+  },
+  achievements: {
+    title: '업적',
+    unlocked: '잠금 해제됨',
+    locked: '잠김',
+    progress: '진행 상황',
+    mint: 'NFT 발행',
+  },
+  staking: {
+    title: '스테이킹',
+    staked: '스테이킹됨',
+    rewards: '보상',
+    stake: 'GREP 스테이킹',
+    unstake: '언스테이킹',
+    claim: '보상 청구',
+  },
+}
+export default ko

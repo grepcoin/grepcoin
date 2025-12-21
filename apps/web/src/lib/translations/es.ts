@@ -1,0 +1,47 @@
+const es = {
+  common: {
+    play: 'Jugar',
+    earn: 'Ganar',
+    stake: 'Apostar',
+    connect: 'Conectar Billetera',
+    disconnect: 'Desconectar',
+    loading: 'Cargando...',
+    error: 'Error',
+    success: 'Éxito',
+    cancel: 'Cancelar',
+    save: 'Guardar',
+    close: 'Cerrar',
+  },
+  nav: {
+    home: 'Inicio',
+    games: 'Juegos',
+    leaderboard: 'Clasificación',
+    profile: 'Perfil',
+    settings: 'Configuración',
+    admin: 'Admin',
+  },
+  games: {
+    yourScore: 'Tu Puntuación',
+    highScore: 'Puntuación Más Alta',
+    grepEarned: 'GREP Ganado',
+    playAgain: 'Jugar de Nuevo',
+    startGame: 'Iniciar Juego',
+    gameOver: 'Fin del Juego',
+  },
+  achievements: {
+    title: 'Logros',
+    unlocked: 'Desbloqueado',
+    locked: 'Bloqueado',
+    progress: 'Progreso',
+    mint: 'Acuñar NFT',
+  },
+  staking: {
+    title: 'Staking',
+    staked: 'Apostado',
+    rewards: 'Recompensas',
+    stake: 'Apostar GREP',
+    unstake: 'Retirar',
+    claim: 'Reclamar Recompensas',
+  },
+}
+export default es
