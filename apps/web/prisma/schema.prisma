@@ -13,27 +13,40 @@ datasource db {
 
 // Core user model - wallet-based authentication
 model User {
-  id            String    @id @default(cuid())
-  walletAddress String    @unique
-  username      String?   @unique
-  avatar        String?
-  referralCode  String?   @unique  // User's unique referral code
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                      String   @id @default(cuid())
+  walletAddress           String   @unique
+  username                String?  @unique
+  avatar                  String?
+  referralCode            String?  @unique // User's unique referral code
+  notificationPreferences Json? // Push notification preferences
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
   // Relations
-  gameScores     GameScore[]
-  achievements   UserAchievement[]
-  stakes         Stake[]
-  dailyStats     DailyStats[]
-  dailyRewards   DailyReward[]
-  referralsMade  Referral[] @relation("Referrer")
-  referredBy     Referral?  @relation("Referee")
-  friendsInitiated Friendship[] @relation("UserFriends")
-  friendsReceived  Friendship[] @relation("FriendOf")
-  eventParticipations EventParticipant[]
-  battlePassProgress BattlePassProgress[]
+  gameScores               GameScore[]
+  achievements             UserAchievement[]
+  stakes                   Stake[]
+  dailyStats               DailyStats[]
+  dailyRewards             DailyReward[]
+  referralsMade            Referral[]              @relation("Referrer")
+  referredBy               Referral?               @relation("Referee")
+  friendsInitiated         Friendship[]            @relation("UserFriends")
+  friendsReceived          Friendship[]            @relation("FriendOf")
+  eventParticipations      EventParticipant[]
+  battlePassProgress       BattlePassProgress[]
   tournamentParticipations TournamentParticipant[]
+  sellerListings           MarketplaceListing[]    @relation("SellerListings")
+  buyerListings            MarketplaceListing[]    @relation("BuyerListings")
+  leaderboardRewards       LeaderboardReward[]
+  emailSettings            EmailSettings?
+  emailVerifications       EmailVerification[]
+  emailQueue               EmailQueue[]
+  auctionsSelling          Auction[]               @relation("AuctionSeller")
+  auctionsWinning          Auction[]               @relation("AuctionHighestBidder")
+  bids                     Bid[]
+  inventoryItems           InventoryItem[]
+  nftMints                 NFTMint[]
+  pushSubscriptions        PushSubscription[]
 }
 
 // Game definitions
@@ -60,7 +73,7 @@ model GameScore {
   gameId     String
   score      Int
   grepEarned Int
-  duration   Int      // seconds
+  duration   Int // seconds
   streak     Int      @default(0)
   multiplier Float    @default(1)
   createdAt  DateTime @default(now())
@@ -76,8 +89,8 @@ model GameScore {
 
 // Achievement definitions
 model Achievement {
-  id          String @id @default(cuid())
-  slug        String @unique
+  id          String  @id @default(cuid())
+  slug        String  @unique
   name        String
   description String
   icon        String
@@ -110,7 +123,7 @@ model Stake {
   id          String    @id @default(cuid())
   userId      String
   amount      BigInt
-  tier        String    // flexible, bronze, silver, gold, diamond
+  tier        String // flexible, bronze, silver, gold, diamond
   multiplier  Float     @default(1)
   lockedUntil DateTime?
   txHash      String?   @unique
@@ -127,7 +140,7 @@ model Stake {
 model DailyChallenge {
   id         String   @id @default(cuid())
   gameId     String
-  type       String   // score, streak, speed, perfect
+  type       String // score, streak, speed, perfect
   target     Int
   reward     Int
   multiplier Float    @default(1)
@@ -154,13 +167,13 @@ model ChallengeCompletion {
 
 // Daily stats per user (for rate limiting and tracking)
 model DailyStats {
-  id         String   @id @default(cuid())
-  userId     String
-  date       DateTime @db.Date
-  grepEarned Int      @default(0)
-  gamesPlayed Int     @default(0)
-  bestStreak Int      @default(0)
-  playsUsed  Int      @default(0)
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime @db.Date
+  grepEarned  Int      @default(0)
+  gamesPlayed Int      @default(0)
+  bestStreak  Int      @default(0)
+  playsUsed   Int      @default(0)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -180,7 +193,7 @@ model GlobalStats {
 // Live activity feed
 model Activity {
   id        String   @id @default(cuid())
-  type      String   // score, achievement, reward, streak, levelup
+  type      String // score, achievement, reward, streak, levelup
   wallet    String
   username  String?
   game      String?
@@ -194,11 +207,11 @@ model Activity {
 
 // Auth sessions (for SIWE)
 model Session {
-  id           String   @id @default(cuid())
+  id            String   @id @default(cuid())
   walletAddress String
-  nonce        String   @unique
-  expiresAt    DateTime
-  createdAt    DateTime @default(now())
+  nonce         String   @unique
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
 
   @@index([walletAddress])
   @@index([expiresAt])
@@ -208,7 +221,7 @@ model Session {
 model DailyReward {
   id        String   @id @default(cuid())
   userId    String
-  day       Int      // 1-7 streak day
+  day       Int // 1-7 streak day
   reward    Int
   claimedAt DateTime @default(now())
 
@@ -243,7 +256,7 @@ model AirdropClaim {
   campaignId    String
   claimedAt     DateTime?
   txHash        String?
-  merkleProof   String?   // JSON array of proof elements
+  merkleProof   String? // JSON array of proof elements
 
   @@unique([walletAddress, campaignId])
   @@index([campaignId])
@@ -255,12 +268,12 @@ model Backer {
   wallet      String?
   email       String?
   name        String?
-  tier        String    // early-bird, builder, partner, genesis
-  amount      Int       // Amount in USD
+  tier        String // early-bird, builder, partner, genesis
+  amount      Int // Amount in USD
   currency    String    @default("USD") // USD, ETH, USDC
   txHash      String?   @unique
   status      String    @default("pending") // pending, confirmed, refunded
-  message     String?   // Optional message from backer
+  message     String? // Optional message from backer
   anonymous   Boolean   @default(false)
   createdAt   DateTime  @default(now())
   confirmedAt DateTime?
@@ -273,8 +286,8 @@ model Backer {
 // Fundraising campaign stats (singleton)
 model FundraiseStats {
   id          String   @id @default("campaign")
-  totalRaised Int      @default(0)     // Total USD raised
-  backerCount Int      @default(0)     // Number of backers
+  totalRaised Int      @default(0) // Total USD raised
+  backerCount Int      @default(0) // Number of backers
   goalAmount  Int      @default(100000) // Target goal in USD
   startDate   DateTime @default(now())
   endDate     DateTime
@@ -417,16 +430,16 @@ enum RewardType {
 
 // Tournament System
 model Tournament {
-  id          String           @id @default(cuid())
-  name        String
-  gameSlug    String
-  entryFee    Int              @default(0)
-  prizePool   Int
-  maxPlayers  Int
-  startTime   DateTime
-  endTime     DateTime
-  status      TournamentStatus @default(REGISTRATION)
-  createdAt   DateTime         @default(now())
+  id         String           @id @default(cuid())
+  name       String
+  gameSlug   String
+  entryFee   Int              @default(0)
+  prizePool  Int
+  maxPlayers Int
+  startTime  DateTime
+  endTime    DateTime
+  status     TournamentStatus @default(REGISTRATION)
+  createdAt  DateTime         @default(now())
 
   participants TournamentParticipant[]
 
@@ -436,12 +449,12 @@ model Tournament {
 }
 
 model TournamentParticipant {
-  id           String     @id @default(cuid())
+  id           String   @id @default(cuid())
   tournamentId String
   userId       String
-  score        Int        @default(0)
+  score        Int      @default(0)
   rank         Int?
-  joinedAt     DateTime   @default(now())
+  joinedAt     DateTime @default(now())
 
   tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -457,4 +470,297 @@ enum TournamentStatus {
   ACTIVE
   COMPLETED
   CANCELLED
+}
+
+// Marketplace System
+model MarketplaceListing {
+  id         String        @id @default(cuid())
+  sellerId   String
+  itemId     String
+  itemName   String
+  itemType   String
+  itemRarity String
+  itemIcon   String
+  price      Int
+  currency   Currency      @default(GREP)
+  status     ListingStatus @default(ACTIVE)
+  listedAt   DateTime      @default(now())
+  expiresAt  DateTime
+  soldAt     DateTime?
+  buyerId    String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  seller User  @relation("SellerListings", fields: [sellerId], references: [id], onDelete: Cascade)
+  buyer  User? @relation("BuyerListings", fields: [buyerId], references: [id], onDelete: SetNull)
+
+  @@index([sellerId])
+  @@index([buyerId])
+  @@index([status])
+  @@index([currency])
+  @@index([price])
+  @@index([itemType])
+  @@index([createdAt(sort: Desc)])
+}
+
+enum Currency {
+  GREP
+  ETH
+}
+
+enum ListingStatus {
+  ACTIVE
+  SOLD
+  CANCELLED
+  EXPIRED
+}
+
+// Leaderboard Rewards Distribution
+model LeaderboardDistribution {
+  id        String             @id @default(cuid())
+  period    DistributionPeriod
+  startDate DateTime
+  endDate   DateTime
+  status    DistributionStatus @default(SCHEDULED)
+  totalPool Int
+  createdAt DateTime           @default(now())
+
+  rewards LeaderboardReward[]
+
+  @@index([period])
+  @@index([status])
+  @@index([endDate])
+}
+
+model LeaderboardReward {
+  id             String       @id @default(cuid())
+  distributionId String
+  userId         String
+  rank           Int
+  grepAmount     Int
+  badgeId        String?
+  multiplier     Float?
+  status         RewardStatus @default(PENDING)
+  claimedAt      DateTime?
+  createdAt      DateTime     @default(now())
+
+  distribution LeaderboardDistribution @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+  user         User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([distributionId, userId])
+  @@index([userId])
+  @@index([status])
+  @@index([distributionId])
+}
+
+enum DistributionPeriod {
+  WEEKLY
+  MONTHLY
+}
+
+enum DistributionStatus {
+  SCHEDULED
+  ACTIVE
+  DISTRIBUTING
+  COMPLETED
+}
+
+enum RewardStatus {
+  PENDING
+  CLAIMED
+  EXPIRED
+}
+
+// Email Notification System
+model EmailSettings {
+  id       String  @id @default(cuid())
+  userId   String  @unique
+  email    String?
+  verified Boolean @default(false)
+
+  // Email preferences - toggles per type
+  welcomeEnabled         Boolean @default(true)
+  weeklyDigestEnabled    Boolean @default(true)
+  achievementEnabled     Boolean @default(true)
+  rewardClaimEnabled     Boolean @default(true)
+  tournamentStartEnabled Boolean @default(true)
+  friendRequestEnabled   Boolean @default(true)
+
+  // Global unsubscribe
+  unsubscribedAll Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([email])
+}
+
+model EmailVerification {
+  id        String   @id @default(cuid())
+  userId    String
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+model EmailQueue {
+  id          String      @id @default(cuid())
+  userId      String?
+  email       String
+  emailType   EmailType
+  subject     String
+  htmlContent String
+  data        Json?
+  status      EmailStatus @default(PENDING)
+  attempts    Int         @default(0)
+  lastError   String?
+  sentAt      DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@index([emailType])
+  @@index([createdAt])
+}
+
+enum EmailType {
+  WELCOME
+  WEEKLY_DIGEST
+  ACHIEVEMENT
+  REWARD_CLAIM
+  TOURNAMENT_START
+  FRIEND_REQUEST
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+  CANCELLED
+}
+
+// Auction System
+model Auction {
+  id              String        @id @default(cuid())
+  sellerId        String
+  itemId          String
+  itemName        String
+  itemType        String
+  itemRarity      String
+  itemIcon        String
+  startingPrice   Int
+  currentBid      Int           @default(0)
+  highestBidderId String?
+  startTime       DateTime
+  endTime         DateTime
+  status          AuctionStatus @default(PENDING)
+  minIncrement    Int           @default(100)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  seller        User  @relation("AuctionSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  highestBidder User? @relation("AuctionHighestBidder", fields: [highestBidderId], references: [id], onDelete: SetNull)
+  bids          Bid[]
+
+  @@index([sellerId])
+  @@index([highestBidderId])
+  @@index([status])
+  @@index([endTime])
+  @@index([currentBid])
+  @@index([createdAt(sort: Desc)])
+}
+
+model Bid {
+  id        String   @id @default(cuid())
+  auctionId String
+  bidderId  String
+  amount    Int
+  timestamp DateTime @default(now())
+  isWinning Boolean  @default(false)
+
+  auction Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  bidder  User    @relation(fields: [bidderId], references: [id], onDelete: Cascade)
+
+  @@index([auctionId])
+  @@index([bidderId])
+  @@index([timestamp(sort: Desc)])
+}
+
+enum AuctionStatus {
+  PENDING
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+// Inventory system with NFT support
+model InventoryItem {
+  id          String   @id @default(cuid())
+  userId      String
+  itemId      String // Item definition ID (avatar-crown, boost-2x, etc)
+  quantity    Int      @default(1)
+  equipped    Boolean  @default(false)
+  tokenId     Int? // NFT token ID if minted on-chain
+  isMinted    Boolean  @default(false) // Whether this item is minted as NFT
+  metadataURI String? // IPFS URI for NFT metadata
+  acquiredAt  DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([itemId])
+  @@index([tokenId])
+  @@index([isMinted])
+}
+
+// Track NFT minting transactions
+model NFTMint {
+  id              String    @id @default(cuid())
+  userId          String
+  inventoryId     String    @unique // Link to InventoryItem
+  tokenId         Int
+  contractAddress String
+  chainId         Int
+  txHash          String?
+  metadataURI     String
+  status          String    @default("pending") // pending, confirmed, failed
+  createdAt       DateTime  @default(now())
+  confirmedAt     DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenId])
+  @@index([status])
+}
+
+// Push Notification Subscriptions
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String // Public key for encryption
+  auth      String // Authentication secret
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([endpoint])
 }

@@ -45,6 +45,55 @@ Track all changes, decisions, and context for parallel agent development.
 
 ---
 
+## Wave 11 - Completed (PRs #52-57)
+
+| Stream | Task | Deliverables |
+|--------|------|--------------|
+| Stream A | Marketplace | `marketplace.ts`, `useMarketplace.ts`, `ListingCard.tsx`, `/marketplace` page |
+| Stream B | Auction house | `auctions.ts`, `useAuctions.ts`, `AuctionCard.tsx`, `BidModal.tsx`, `/auctions` page |
+| Stream C | NFT inventory | `nft-items.ts`, `useNFTItems.ts`, `NFTItemCard.tsx`, `GrepItems.sol` |
+| Stream D | Leaderboard rewards | `leaderboard-rewards.ts`, `useLeaderboardRewards.ts`, `LeaderboardRewards.tsx`, `RewardClaimModal.tsx` |
+| Stream E | Push notifications | `push-notifications.ts`, `send-push.ts`, `usePushNotifications.ts`, `sw-push.js` |
+| Stream F | Email notifications | `email.ts`, `email-templates.ts`, `send-email.ts`, `useEmailPreferences.ts` |
+
+**Marketplace:**
+- Item listings with filters (category, price, sort)
+- 5% marketplace fee
+- Buy/sell functionality
+- Search and pagination
+
+**Auction House:**
+- Bid system with minimum increments
+- 5-minute extension on last-minute bids
+- Real-time countdown timers
+- Quick bid buttons (+10%, +25%, +50%)
+
+**NFT Inventory:**
+- ERC-1155 GrepItems contract
+- Mint in-game items as NFTs
+- Import NFTs to inventory
+- OpenSea integration
+
+**Leaderboard Rewards:**
+- Weekly/monthly distributions
+- Top 10/25 reward tiers
+- Badge and multiplier bonuses
+- Claim interface with animations
+
+**Push Notifications:**
+- Web Push API integration
+- 6 notification types
+- Service worker for background
+- Per-type preferences
+
+**Email Notifications:**
+- Resend integration
+- 6 email templates
+- Verification flow
+- Weekly digest support
+
+---
+
 ## Wave 10 - Completed (PRs #46-51 merged)
 
 | Stream | Task | Deliverables |

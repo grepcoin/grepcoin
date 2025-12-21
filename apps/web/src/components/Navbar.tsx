@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { Menu, X, Gamepad2, Heart, User, Trophy, Star, BarChart3, Settings, LogOut, Bell, Coins } from 'lucide-react'
 import { useAccount, useDisconnect } from 'wagmi'
 import { useAuth } from '@/context/AuthContext'
+import { useStaking } from '@/context/StakingContext'
 import Logo from './Logo'
 import WalletButton from './WalletButton'
 
@@ -27,12 +28,12 @@ const LANDING_LINKS = [
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const [notifications, setNotifications] = useState(3) // Mock notification count
-  const [grepBalance, setGrepBalance] = useState(1250) // Mock GREP balance
+  const [notifications] = useState(0) // TODO: Wire to notification count from API
   const pathname = usePathname()
   const { address, isConnected } = useAccount()
   const { disconnect } = useDisconnect()
   const { user, isAuthenticated, signOut } = useAuth()
+  const { grepBalance } = useStaking()
 
   // Close menus when clicking outside
   useEffect(() => {

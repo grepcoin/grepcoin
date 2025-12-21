@@ -19,7 +19,8 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:seed": "npx tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "generate:vapid": "node scripts/generate-vapid-keys.js"
   },
   "dependencies": {
     "@grepcoin/anti-cheat": "*",
@@ -31,14 +32,17 @@
     "prisma": "^5.22.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "resend": "^6.6.0",
     "siwe": "^3.0.0",
     "viem": "^2.42.0",
-    "wagmi": "^3.1.0"
+    "wagmi": "^3.1.0",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/web-push": "^3.6.3",
     "autoprefixer": "^10.0.1",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.0.0",

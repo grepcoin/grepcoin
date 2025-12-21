@@ -35,23 +35,23 @@ export function formatActivityMessage(activity: Activity): string {
 
   switch (activity.type) {
     case 'game_played':
-      return \`\${config.verb} \${data.gameName} and scored \${(data.score as number).toLocaleString()}\`
+      return `${config.verb} ${data.gameName} and scored ${(data.score as number).toLocaleString()}`
     case 'achievement_unlocked':
-      return \`\${config.verb} "\${data.achievementName}"\`
+      return `${config.verb} "${data.achievementName}"`
     case 'level_up':
-      return \`\${config.verb} level \${data.level}\`
+      return `${config.verb} level ${data.level}`
     case 'friend_added':
-      return \`\${config.verb} \${data.friendName}\`
+      return `${config.verb} ${data.friendName}`
     case 'reward_claimed':
-      return \`\${config.verb} \${data.amount} GREP\`
+      return `${config.verb} ${data.amount} GREP`
     case 'tournament_joined':
-      return \`\${config.verb} tournament "\${data.tournamentName}"\`
+      return `${config.verb} tournament "${data.tournamentName}"`
     case 'tournament_won':
-      return \`\${config.verb} tournament "\${data.tournamentName}" (\${data.prize} GREP)\`
+      return `${config.verb} tournament "${data.tournamentName}" (${data.prize} GREP)`
     case 'stake_created':
-      return \`\${config.verb} \${data.amount} GREP\`
+      return `${config.verb} ${data.amount} GREP`
     case 'referral_joined':
-      return \`\${config.verb} a new player who joined\`
+      return `${config.verb} a new player who joined`
     default:
       return 'performed an action'
   }
@@ -66,8 +66,8 @@ export function getRelativeTime(date: Date): string {
   const days = Math.floor(diff / 86400000)
 
   if (minutes < 1) return 'just now'
-  if (minutes < 60) return \`\${minutes}m ago\`
-  if (hours < 24) return \`\${hours}h ago\`
-  if (days < 7) return \`\${days}d ago\`
+  if (minutes < 60) return `${minutes}m ago`
+  if (hours < 24) return `${hours}h ago`
+  if (days < 7) return `${days}d ago`
   return new Date(date).toLocaleDateString()
 }
