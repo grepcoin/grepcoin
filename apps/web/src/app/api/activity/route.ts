@@ -1,44 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import prisma from '@/lib/db'
 
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url)
-    const limit = parseInt(searchParams.get('limit') || '20')
-    const cursor = searchParams.get('cursor')
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const page = parseInt(searchParams.get('page') || '1')
+  const limit = parseInt(searchParams.get('limit') || '20')
 
-    const activities = await prisma.activity.findMany({
-      take: limit,
-      ...(cursor && {
-        skip: 1,
-        cursor: { id: cursor },
-      }),
-      orderBy: { createdAt: 'desc' },
-    })
+  // Would fetch from database with pagination
+  const activities = [
+    { id: '1', type: 'game_played', userId: 'u1', data: { gameName: 'Snake', score: 1500, grepEarned: 150, userName: 'Player1' }, createdAt: new Date(Date.now() - 300000) },
+    { id: '2', type: 'achievement_unlocked', userId: 'u2', data: { achievementName: 'First Steps', userName: 'Player2' }, createdAt: new Date(Date.now() - 600000) },
+    { id: '3', type: 'level_up', userId: 'u1', data: { level: 10, userName: 'Player1' }, createdAt: new Date(Date.now() - 900000) },
+    { id: '4', type: 'tournament_won', userId: 'u3', data: { tournamentName: 'Weekly Challenge', prize: 500, userName: 'Champion' }, createdAt: new Date(Date.now() - 1800000) },
+    { id: '5', type: 'stake_created', userId: 'u2', data: { amount: 1000, userName: 'Player2' }, createdAt: new Date(Date.now() - 3600000) },
+    { id: '6', type: 'referral_joined', userId: 'u1', data: { userName: 'Player1' }, createdAt: new Date(Date.now() - 7200000) },
+  ]
 
-    const nextCursor = activities.length === limit
-      ? activities[activities.length - 1].id
-      : null
-
-    return NextResponse.json({
-      activities: activities.map((a) => ({
-        id: a.id,
-        type: a.type,
-        wallet: a.wallet,
-        username: a.username,
-        game: a.game,
-        value: a.value,
-        message: a.message,
-        icon: a.icon,
-        timestamp: a.createdAt,
-      })),
-      nextCursor,
-    })
-  } catch (error) {
-    console.error('Activity fetch error:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch activity' },
-      { status: 500 }
-    )
-  }
+  return NextResponse.json({
+    activities,
+    hasMore: page < 3,
+    page,
+  })
 }
