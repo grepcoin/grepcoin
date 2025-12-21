@@ -45,6 +45,56 @@ Track all changes, decisions, and context for parallel agent development.
 
 ---
 
+## Wave 8 - Completed (PRs #34-39 merged)
+
+| Stream | Task | Deliverables |
+|--------|------|--------------|
+| Stream A | i18n support | `i18n.ts`, translations (en/es/zh/ja/ko), `LocaleProvider.tsx`, `LanguageSwitcher.tsx` |
+| Stream B | Theme toggle | `theme.ts`, `ThemeProvider.tsx`, `ThemeToggle.tsx`, `ThemeSelect.tsx` |
+| Stream C | Game replays | `replay.ts`, `useReplay.ts`, `ReplayControls.tsx`, `ReplayViewer.tsx` |
+| Stream D | Chat system | `chat.ts`, `useChat.ts`, `ChatWindow.tsx`, `ChatToggle.tsx`, `/api/chat` |
+| Stream E | Token burn | `GrepBurner.sol`, `useBurn.ts`, `BurnWidget.tsx`, `BurnLeaderboard.tsx` |
+| Stream F | Governance | `GrepGovernance.sol`, `useGovernance.ts`, `ProposalCard.tsx`, `/governance` page |
+
+**Internationalization:**
+- 5 languages: English, Spanish, Chinese, Japanese, Korean
+- LocaleProvider with dynamic translation loading
+- LanguageSwitcher dropdown component
+- localStorage persistence
+
+**Theme System:**
+- Dark/Light/System theme modes
+- System preference detection
+- ThemeToggle button and ThemeSelect dropdown
+- CSS class-based theming
+
+**Game Replays:**
+- ReplayRecorder class for frame recording
+- ReplayPlayer class with variable speed playback
+- ReplayViewer modal with controls
+- /api/replays endpoints
+
+**Chat System:**
+- Real-time messaging with polling
+- ChatWindow component with auto-scroll
+- Floating ChatToggle button
+- Rate limiting (5 msg/10s)
+
+**Token Burn Mechanics:**
+- GrepBurner.sol smart contract
+- Burn tiers: Bronze/Silver/Gold/Diamond
+- BurnWidget with approve+burn flow
+- BurnLeaderboard showing top burners
+
+**Governance Voting:**
+- GrepGovernance.sol smart contract
+- 10,000 GREP proposal threshold
+- 3-day voting period, 4% quorum
+- ProposalCard with voting UI
+- /governance page with filtering
+
+---
+
 ## Wave 7 - Completed (PRs #28-33 merged)
 
 | Stream | Task | Deliverables |
