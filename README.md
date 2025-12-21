@@ -7,11 +7,19 @@ GrepCoin is an open-source, decentralized arcade gaming platform where players c
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 [![Built on Base](https://img.shields.io/badge/Built%20on-Base-blue.svg)](https://base.org)
 [![AI Powered](https://img.shields.io/badge/AI%20Powered-Claude-orange.svg)](https://anthropic.com)
-[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/grepcoin/grepcoin)
-[![Contract Tests](https://img.shields.io/badge/contract%20tests-64%20passing-success.svg)](./packages/contracts/test)
-[![Build Status](https://img.shields.io/badge/build-passing-success.svg)](./docs/STATUS.md)
-[![Status](https://img.shields.io/badge/status-alpha-yellow.svg)](./docs/STATUS.md)
-[![Production Ready](https://img.shields.io/badge/production%20ready-65%25-orange.svg)](./docs/STATUS.md)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://typescriptlang.org)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org)
+[![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636.svg)](https://soliditylang.org)
+
+| Metric | Count |
+|--------|-------|
+| API Endpoints | 91 |
+| React Hooks | 47 |
+| React Components | 112 |
+| Smart Contracts | 7 |
+| Contract Tests | 64 |
+| Arcade Games | 9 |
+| PRs Merged | 51 |
 
 ## The Story
 
@@ -21,54 +29,75 @@ GrepCoin isn't just another crypto project - it's a testament to what's possible
 
 What would traditionally take a team of developers months to build was accomplished in days:
 
-- **8 fully playable arcade games** with unique mechanics and developer-themed narratives
-- **Production-grade smart contracts** with 47 passing tests covering staking, rewards, and tokenomics
-- **Complete web application** with authentication, leaderboards, achievements, and daily challenges
+- **9 fully playable arcade games** with unique mechanics and developer-themed narratives
+- **Production-grade smart contracts** with 64 passing tests covering staking, rewards, NFTs, and governance
+- **Complete web application** with 91 API endpoints, 47 hooks, and 112 components
+- **Full social platform** with guilds, tournaments, battle pass, and multiplayer
+- **AI-powered agents** for code review, security auditing, and community management
 - **Legal framework** with Terms of Service, Privacy Policy, and risk disclaimers
-- **Open-source infrastructure** ready for community contribution
 
-This project proves that the future of software development isn't about replacing developers - it's about amplifying what a single person with a vision can accomplish. GrepCoin was built not by a well-funded startup with a large team, but by one developer who said "let's build something real" and an AI that helped make it happen.
-
-**GrepCoin is for the indie devs, the hobbyists, the dreamers who code after hours.** It's a crypto arcade built by the community, for the community - and it started as a conversation with an AI.
+**GrepCoin is for the indie devs, the hobbyists, the dreamers who code after hours.** It's a crypto arcade built by the community, for the community.
 
 ## Features
 
 ### Core Gameplay
-- **8 Arcade Games** - Developer-themed games including Grep Rails, Stack Panic, Merge Miners, Quantum Grep, Bug Hunter, Crypto Snake, Syntax Sprint, and RegEx Crossword
+- **9 Arcade Games** - Developer-themed games including Grep Rails, Stack Panic, Merge Miners, Quantum Grep, Bug Hunter, Crypto Snake, Syntax Sprint, RegEx Crossword, and Quick Mini-Games
 - **Play-to-Earn** - Real GREP token rewards for gameplay performance
 - **Daily Challenges** - Fresh challenges every day with bonus rewards
-- **Leaderboards** - Global and per-game competition
+- **Global Leaderboards** - Compete globally and per-game with ranking rewards
+- **Anti-Cheat System** - Score validation, timing checks, and rate limiting
 
 ### Web3 Features
 - **Staking System** - 5-tier staking with 5%-20% APY and reward multipliers
-- **NFT Achievements** - Soulbound ERC-1155 badges for milestones
-- **NFT Items** - Tradeable in-game items and cosmetics
+- **NFT Achievements** - Soulbound ERC-1155 badges for milestones (EIP-712 claims)
+- **NFT Items** - Tradeable in-game items with rarity tiers
+- **Marketplace** - Buy and sell NFT items with 5% platform fee
+- **Auction House** - Bid on rare items with anti-sniping protection
 - **Governance** - Token-weighted voting on platform decisions
+- **Token Burning** - Deflationary mechanics with burn tiers
 - **Sign-In with Ethereum** - Secure wallet-based authentication
 
 ### Social Features
-- **Guilds** - Team up with other players
-- **Tournaments** - Compete in scheduled events
-- **Seasons & Battle Pass** - Unlock exclusive rewards
-- **Live Activity Feed** - Real-time player updates
-- **Quests** - Complete objectives for rewards
+- **Guilds/Clans** - Team up with other players, guild perks and leveling
+- **Tournaments** - Scheduled competitive events with prize pools
+- **Seasons & Battle Pass** - Unlock exclusive rewards through progression
+- **Friends System** - Add friends, see their activity, play together
+- **Live Activity Feed** - Real-time player updates and notifications
+- **Quests** - Daily and weekly objectives for bonus rewards
+- **User Levels** - XP system with 7 tiers from Newcomer to Legend
+- **Referral Program** - Tiered rewards for bringing new players
+- **Chat System** - Real-time messaging with other players
 
-### Marketplace
-- **Item Trading** - Buy and sell NFT items
-- **Auctions** - Bid on rare items
-- **GREP Economy** - All transactions use GREP tokens
+### Platform Features
+- **Push Notifications** - Web Push API for game events
+- **Email Notifications** - Resend integration with 6 templates
+- **PWA Support** - Install as app on mobile/desktop
+- **Internationalization** - 5 languages (EN, ES, ZH, JA, KO)
+- **Dark/Light Theme** - System-aware theming
+- **Keyboard Shortcuts** - Power user navigation (Cmd+K search)
+- **Game Replays** - Record and playback game sessions
+- **Data Export** - GDPR-compliant data export
+- **Webhooks** - Integration endpoints for developers
+
+### AI Features
+- **Claude-Powered Code Review** - Automated PR analysis
+- **Security Guardian** - Continuous vulnerability scanning
+- **Debug Helper** - AI-assisted bug investigation
+- **Discord AI Commands** - /analyze, /explain, /debug, /optimize
 
 ## Tech Stack
 
-- **Frontend:** Next.js 15, React, TypeScript, Tailwind CSS
-- **Blockchain:** Base L2, Solidity ^0.8.24, Hardhat
-- **Web3:** wagmi v3, viem v2, SIWE (Sign-In with Ethereum)
-- **Database:** PostgreSQL with Prisma ORM
-- **Authentication:** SIWE with session cookies
-- **Real-time:** Socket.io for live updates
-- **AI Agents:** Ollama/OpenAI integration
-- **NFTs:** ERC-1155 for achievements and items
-- **Email:** Resend for notifications
+| Layer | Technologies |
+|-------|--------------|
+| **Frontend** | Next.js 15, React 18, TypeScript, Tailwind CSS |
+| **Blockchain** | Base L2, Solidity 0.8.24, Hardhat, OpenZeppelin |
+| **Web3** | wagmi v3, viem v2, SIWE, WalletConnect |
+| **Database** | PostgreSQL, Prisma ORM |
+| **Auth** | Sign-In with Ethereum, Session Cookies |
+| **Real-time** | Socket.io, Web Push API |
+| **AI** | Claude API, Ollama, OpenAI |
+| **Email** | Resend |
+| **Indexing** | The Graph Subgraph |
 
 ## Quick Start
 
@@ -77,7 +106,7 @@ This project proves that the future of software development isn't about replacin
 - Node.js 18+
 - npm or pnpm
 - PostgreSQL database
-- Ollama (for AI agents, optional)
+- Wallet (MetaMask, Coinbase Wallet, etc.)
 
 ### Installation
 
@@ -92,20 +121,18 @@ npm install
 # Start the web app
 npm run dev
 
-# Or run specific workspaces
-npm run dev --workspace=apps/web
+# Run contract tests
 npm run test:contracts
-npm run bot:dev
 ```
 
-### Web App
+### Web App Setup
 
 ```bash
 cd apps/web
 
 # Set up environment
 cp .env.example .env
-# Edit .env with your database URL and other required variables
+# Edit .env with your database URL and API keys
 
 # Database setup
 npm run db:push
@@ -117,222 +144,185 @@ npm run dev
 
 Visit `http://localhost:3000` to see the app.
 
-### Environment Variables
-
-The web app requires the following environment variables:
-
-**Database (Required):**
-- `DATABASE_URL` - PostgreSQL connection string
-- `DIRECT_URL` - Direct database connection (for migrations)
-
-**Authentication (Required):**
-- `NEXTAUTH_SECRET` - Generate with `openssl rand -base64 32`
-- `NEXTAUTH_URL` - Your app URL (http://localhost:3000 for dev)
-
-**Blockchain (Optional):**
-- `NEXT_PUBLIC_ALCHEMY_API_KEY` - Alchemy API key for Base network
-- `NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID` - WalletConnect project ID
-- `NEXT_PUBLIC_CHAIN_ID` - Chain ID (8453 for Base mainnet)
-- `NEXT_PUBLIC_GREP_TOKEN_ADDRESS` - Deployed GrepToken contract address
-- `NEXT_PUBLIC_STAKING_POOL_ADDRESS` - Deployed staking contract address
-
-**Services (Optional):**
-- `RESEND_API_KEY` - Resend email API key
-- `INTERNAL_API_KEY` - Server-to-server authentication key
-
-See `.env.example` files for complete configuration.
-
-### Smart Contracts
+### Smart Contract Setup
 
 ```bash
 cd packages/contracts
 
-npm install
-npm test                    # Run 47 tests
-npm run deploy:sepolia      # Deploy to Base Sepolia
-```
+# Run tests (64 tests)
+npm test
 
-### AI Agents
-
-```bash
-cd packages/agents
-
-# Run interactively with Ollama
-npm run agent:community -- --interactive
-npm run agent:social -- --interactive
-npm run agent:guardian -- --interactive
-npm run agent:analytics -- --interactive
-```
-
-### Discord Bot
-
-```bash
-cd apps/discord-bot
-
+# Deploy to testnet
 cp .env.example .env
-# Add your Discord bot token
+# Add DEPLOYER_PRIVATE_KEY
+npm run deploy:testnet
 
-npm run dev
+# Verify on Basescan
+npm run verify
 ```
 
-## Architecture Overview
+### Environment Variables
 
-GrepCoin uses a modern monorepo architecture with clear separation of concerns:
+**Required:**
+```env
+DATABASE_URL=postgresql://...
+DIRECT_URL=postgresql://...
+NEXTAUTH_SECRET=your-secret-here
+NEXTAUTH_URL=http://localhost:3000
+```
+
+**Blockchain:**
+```env
+NEXT_PUBLIC_ALCHEMY_API_KEY=...
+NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=...
+NEXT_PUBLIC_CHAIN_ID=8453
+DEPLOYER_PRIVATE_KEY=0x...
+```
+
+**Services (Optional):**
+```env
+ANTHROPIC_API_KEY=sk-ant-...
+RESEND_API_KEY=re_...
+DISCORD_BOT_TOKEN=...
+```
+
+See `.env.example` files for complete configuration.
+
+## Architecture
 
 ```
-grepcoin/                        # Turborepo monorepo
+grepcoin/
 ├── apps/
 │   ├── web/                     # Next.js 15 web application
-│   │   ├── src/
-│   │   │   ├── app/            # App router pages & API routes
-│   │   │   │   ├── api/        # REST API endpoints
-│   │   │   │   ├── games/      # Game pages
-│   │   │   │   └── ...         # Other pages
-│   │   │   ├── components/     # React components
-│   │   │   ├── context/        # Auth & staking contexts
-│   │   │   ├── hooks/          # Custom React hooks
-│   │   │   └── lib/            # Utilities & config
-│   │   └── prisma/             # Database schema & migrations
+│   │   ├── src/app/            # App router (91 API routes)
+│   │   ├── src/components/     # React components (112)
+│   │   ├── src/hooks/          # Custom hooks (47)
+│   │   └── prisma/             # Database schema
 │   └── discord-bot/            # Discord community bot
-│       └── src/                # Bot commands & event handlers
 ├── packages/
-│   ├── contracts/              # Solidity smart contracts
-│   │   ├── contracts/          # 7 production contracts
-│   │   │   ├── GrepToken.sol
-│   │   │   ├── GrepStakingPool.sol
-│   │   │   ├── GrepItems.sol
-│   │   │   ├── GrepAchievements.sol
-│   │   │   ├── GrepVesting.sol
-│   │   │   ├── GrepGovernance.sol
-│   │   │   └── GrepBurner.sol
-│   │   ├── test/               # Comprehensive test suite
+│   ├── contracts/              # Solidity smart contracts (7)
+│   │   ├── contracts/          # GrepToken, Staking, NFTs, Governance
+│   │   ├── test/               # 64 tests
 │   │   └── scripts/            # Deployment & verification
 │   ├── agents/                 # AI Agent system
-│   │   ├── src/agents/         # Specialized agents
-│   │   ├── src/providers/      # LLM providers
-│   │   └── src/core/           # Agent framework
-│   ├── anti-cheat/             # Game anti-cheat system
+│   │   ├── src/providers/      # Claude, OpenAI, Ollama
+│   │   └── src/github-actions/ # PR reviewer, Security guardian
+│   ├── anti-cheat/             # Game validation system
 │   └── subgraph/               # The Graph indexer
 ├── docs/                       # Documentation
-│   └── WHITEPAPER.md          # Tokenomics & vision
-├── marketing/                  # Marketing materials
-├── .github/                    # CI/CD workflows
-│   └── workflows/
-│       ├── contracts.yml       # Smart contract testing
-│       ├── web.yml            # Web app testing
-│       └── discord.yml        # Discord bot deployment
-└── [Development docs]         # CONTEXT.md, AGENTS-GUIDE.md, etc.
+└── marketing/                  # Press kit, pitch deck
 ```
-
-### Data Flow
-
-1. **User Authentication**: SIWE → NextAuth → Session cookies
-2. **Game Scores**: Client → API route → Anti-cheat validation → Database
-3. **Blockchain**: wagmi hooks → viem → Base L2 RPC → Smart contracts
-4. **Rewards**: Score submission → Multiplier calculation → Token minting
-5. **Real-time**: Socket.io → Live activity feed & notifications
-
-## Development Documentation
-
-For Claude agents and developers working on GrepCoin:
-
-| Document | Purpose |
-|----------|---------|
-| [STATUS.md](./docs/STATUS.md) | Current project state, build status, production readiness |
-| [PLANS-OVERVIEW.md](./PLANS-OVERVIEW.md) | Overview of 4 parallel development streams |
-| [CONTEXT.md](./CONTEXT.md) | Full codebase structure, patterns, conventions |
-| [AGENTS-GUIDE.md](./AGENTS-GUIDE.md) | Development instructions and code style |
-| [KEY-FILES.md](./KEY-FILES.md) | Reference of important files by stream |
-| [CHANGELOG.md](./CHANGELOG.md) | Track all changes and decisions |
-| [THINKING.md](./THINKING.md) | Architectural reasoning and decisions |
-
-### Parallel Development Streams
-
-| Stream | Focus | Plan |
-|--------|-------|------|
-| Stream 1 | AI Agents | [PLAN-STREAM1-AI-AGENTS.md](./PLAN-STREAM1-AI-AGENTS.md) |
-| Stream 2 | Game Backend | [PLAN-STREAM2-GAME-BACKEND.md](./PLAN-STREAM2-GAME-BACKEND.md) |
-| Stream 3 | Crypto/Blockchain | [PLAN-STREAM3-CRYPTO.md](./PLAN-STREAM3-CRYPTO.md) |
-| Stream 4 | Social Features | [PLAN-STREAM4-SOCIAL.md](./PLAN-STREAM4-SOCIAL.md) |
 
 ## Smart Contracts
 
-GrepCoin's smart contract ecosystem is built with Solidity ^0.8.24 and OpenZeppelin libraries.
-
 | Contract | Type | Description |
 |----------|------|-------------|
-| `GrepToken.sol` | ERC-20 | Main token with 1B supply, categorized minting caps, burnable, pausable |
-| `GrepStakingPool.sol` | DeFi | 5-tier staking system with APY rewards (5%-20%), lock periods, multipliers |
-| `GrepItems.sol` | ERC-1155 | NFT game items with rarity system, tradability controls |
-| `GrepAchievements.sol` | ERC-1155 | Soulbound achievement badges with signature-based claiming |
-| `GrepVesting.sol` | Finance | Token vesting with cliff periods for team/advisors |
-| `GrepGovernance.sol` | DAO | Proposal voting system with quorum requirements |
-| `GrepBurner.sol` | Utility | Deflationary burn mechanism with tier-based benefits |
-
-### Deployed Contract Addresses
-
-**Base Sepolia Testnet:**
-- GrepToken: `TBD`
-- GrepStakingPool: `TBD`
-- GrepItems: `TBD`
-- GrepAchievements: `TBD`
-- GrepVesting: `TBD`
-- GrepGovernance: `TBD`
-- GrepBurner: `TBD`
-
-**Base Mainnet:**
-- Coming soon after audit
+| `GrepToken.sol` | ERC-20 | 1B supply, categorized minting, burnable, pausable |
+| `GrepStakingPool.sol` | DeFi | 5-tier staking (5-20% APY), lock periods, multipliers |
+| `GrepItems.sol` | ERC-1155 | NFT game items with rarity system |
+| `GrepAchievements.sol` | ERC-1155 | Soulbound achievements, EIP-712 claims |
+| `GrepVesting.sol` | Finance | Token vesting with cliff periods |
+| `GrepGovernance.sol` | DAO | Proposal voting, 4% quorum |
+| `GrepBurner.sol` | Utility | Deflationary burn mechanism |
 
 ### Staking Tiers
 
-| Tier | Minimum | Lock Period | APY | Multiplier | Bonus Plays |
-|------|---------|-------------|-----|------------|-------------|
-| Flexible | 100 GREP | None | 5% | 1.1x | +2 |
-| Bronze | 1,000 GREP | 7 days | 8% | 1.25x | +5 |
-| Silver | 5,000 GREP | 14 days | 12% | 1.5x | +10 |
-| Gold | 10,000 GREP | 30 days | 15% | 1.75x | +15 |
-| Diamond | 50,000 GREP | 90 days | 20% | 2.0x | +25 |
-
-Staking rewards are minted from the 300M GREP staking rewards allocation.
+| Tier | Minimum | Lock | APY | Multiplier |
+|------|---------|------|-----|------------|
+| Flexible | 100 GREP | None | 5% | 1.1x |
+| Bronze | 1,000 GREP | 7 days | 8% | 1.25x |
+| Silver | 5,000 GREP | 14 days | 12% | 1.5x |
+| Gold | 10,000 GREP | 30 days | 15% | 1.75x |
+| Diamond | 50,000 GREP | 90 days | 20% | 2.0x |
 
 ## Games
 
-1. **Grep Rails** - Build train tracks by matching regex patterns
-2. **Stack Panic** - Return functions in LIFO order before they overflow
-3. **Merge Miners** - Navigate Git branches and resolve merge conflicts
-4. **Quantum Grep** - Observe quantum particles and collapse them into patterns
-5. **Bug Hunter** - Find and squash bugs in scrolling code
-6. **Crypto Snake** - Classic snake with blockchain vibes
-7. **Syntax Sprint** - Tetris meets JavaScript - build valid code from falling tokens
-8. **RegEx Crossword** - Solve crossword puzzles with regex clues
+| Game | Description | Mechanic |
+|------|-------------|----------|
+| **Grep Rails** | Build train tracks | Match regex patterns |
+| **Stack Panic** | Clear the call stack | LIFO ordering |
+| **Merge Miners** | Navigate Git branches | Resolve conflicts |
+| **Quantum Grep** | Observe quantum particles | Pattern matching |
+| **Bug Hunter** | Find bugs in code | Click accuracy |
+| **Crypto Snake** | Classic snake game | Blockchain theme |
+| **Syntax Sprint** | Build valid code | Falling tokens |
+| **RegEx Crossword** | Solve puzzles | Regex clues |
+| **Mini-Games** | Quick games | Coin flip, dice, etc. |
+
+## API Documentation
+
+See [docs/API.md](docs/API.md) for complete API reference.
+
+### Key Endpoints
+
+| Category | Endpoints |
+|----------|-----------|
+| Auth | `/api/auth/nonce`, `/api/auth/verify`, `/api/auth/session` |
+| Games | `/api/games`, `/api/games/[slug]/submit` |
+| Leaderboards | `/api/leaderboards`, `/api/leaderboards/[game]` |
+| Social | `/api/friends`, `/api/guilds`, `/api/tournaments` |
+| Economy | `/api/marketplace`, `/api/auctions`, `/api/battle-pass` |
+| AI | `/api/ai/chat` |
+
+## Development
+
+### Running Tests
+
+```bash
+# Smart contracts (64 tests)
+cd packages/contracts && npm test
+
+# Web app build
+cd apps/web && npm run build
+
+# Lint
+npm run lint
+```
+
+### Creating a New Game
+
+1. Create page: `apps/web/src/app/games/[name]/page.tsx`
+2. Add to games list: `apps/web/src/app/games/page.tsx`
+3. Add to database seed: `apps/web/prisma/seed.ts`
+4. Implement anti-cheat: `packages/anti-cheat/src/validators/`
+5. Create submit API: `apps/web/src/app/api/games/[name]/submit/route.ts`
+
+### Adding an API Endpoint
+
+1. Create route: `apps/web/src/app/api/[path]/route.ts`
+2. Add authentication: `parseSessionToken()`
+3. Add rate limiting: `rateLimit()`
+4. Create hook: `apps/web/src/hooks/use[Feature].ts`
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Development Workflow
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+2. Create a feature branch
 3. Make your changes
-4. Run tests (`pnpm test` / `npx hardhat test`)
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
+4. Run tests
+5. Submit a PR
 
 ## Security
 
-Found a security vulnerability? Please see our [Security Policy](SECURITY.md) for responsible disclosure guidelines.
+Found a vulnerability? Please see [SECURITY.md](SECURITY.md) for responsible disclosure.
 
-## Legal
+## Documentation
 
-- [Terms of Service](https://grepcoin.io/terms)
-- [Privacy Policy](https://grepcoin.io/privacy)
-- [Risk Disclaimer](https://grepcoin.io/disclaimer)
+| Document | Purpose |
+|----------|---------|
+| [WHITEPAPER.md](docs/WHITEPAPER.md) | Tokenomics, vision, roadmap |
+| [ROADMAP.md](docs/ROADMAP.md) | Development milestones |
+| [API.md](docs/API.md) | API reference |
+| [CHANGELOG.md](CHANGELOG.md) | Version history |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guide |
+| [SECURITY.md](SECURITY.md) | Security policy |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community guidelines |
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see [LICENSE](LICENSE).
 
 ## Links
 
@@ -340,6 +330,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **GitHub:** [github.com/grepcoin](https://github.com/grepcoin)
 - **Twitter:** [@grepcoin](https://twitter.com/grepcoin)
 - **Discord:** [discord.gg/grepcoin](https://discord.gg/grepcoin)
+- **Documentation:** [docs.grepcoin.io](https://docs.grepcoin.io)
 
 ---
 
