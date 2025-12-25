@@ -1,6 +1,26 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { AIProvider, Message, Tool } from '../core/types'
 
+// Type definitions for Anthropic SDK compatibility
+interface ToolUseBlock {
+  type: 'tool_use'
+  id: string
+  name: string
+  input: Record<string, unknown>
+}
+
+interface TextBlock {
+  type: 'text'
+  text: string
+}
+
+type ContentBlock = TextBlock | ToolUseBlock | { type: string }
+
+interface MessageResponse {
+  stop_reason: string | null
+  content: ContentBlock[]
+}
+
 export class ClaudeProvider implements AIProvider {
   name = 'claude'
   private client: Anthropic
@@ -26,7 +46,7 @@ export class ClaudeProvider implements AIProvider {
     }))
 
     try {
-      const response = await this.client.messages.create({
+      const createParams = {
         model: this.model,
         max_tokens: 4096,
         system: systemMessage,
@@ -34,14 +54,17 @@ export class ClaudeProvider implements AIProvider {
           role: m.role as 'user' | 'assistant',
           content: m.content
         })),
-        tools: toolDefs && toolDefs.length > 0 ? toolDefs : undefined
-      })
+        ...(toolDefs && toolDefs.length > 0 ? { tools: toolDefs } : {})
+      }
+
+      const rawResponse = await this.client.messages.create(createParams as unknown as Parameters<typeof this.client.messages.create>[0])
+      const response = rawResponse as unknown as MessageResponse
 
       // Handle tool use
       if (response.stop_reason === 'tool_use') {
-        const toolResults: any[] = []
+        const toolResults: { type: 'tool_result'; tool_use_id: string; content: string; is_error?: boolean }[] = []
         const toolUseBlocks = response.content.filter(
-          (block): block is Anthropic.Messages.ToolUseBlock => block.type === 'tool_use'
+          (block): block is ToolUseBlock => block.type === 'tool_use'
         )
 
         for (const toolUseBlock of toolUseBlocks) {
@@ -66,7 +89,7 @@ export class ClaudeProvider implements AIProvider {
         }
 
         // Continue conversation with tool results
-        const followUpResponse = await this.client.messages.create({
+        const followUpParams = {
           model: this.model,
           max_tokens: 4096,
           system: systemMessage,
@@ -84,7 +107,10 @@ export class ClaudeProvider implements AIProvider {
               content: toolResults
             }
           ]
-        })
+        }
+
+        const rawFollowUp = await this.client.messages.create(followUpParams as unknown as Parameters<typeof this.client.messages.create>[0])
+        const followUpResponse = rawFollowUp as unknown as MessageResponse
 
         return this.extractTextContent(followUpResponse.content)
       }
@@ -112,7 +138,7 @@ export class ClaudeProvider implements AIProvider {
     }))
 
     try {
-      const stream = await this.client.messages.stream({
+      const streamParams = {
         model: this.model,
         max_tokens: 4096,
         system: systemMessage,
@@ -120,15 +146,19 @@ export class ClaudeProvider implements AIProvider {
           role: m.role as 'user' | 'assistant',
           content: m.content
         })),
-        tools: toolDefs && toolDefs.length > 0 ? toolDefs : undefined
-      })
+        ...(toolDefs && toolDefs.length > 0 ? { tools: toolDefs } : {})
+      }
+
+      const stream = await this.client.messages.stream(streamParams as unknown as Parameters<typeof this.client.messages.stream>[0])
 
       for await (const chunk of stream) {
+        const chunkAny = chunk as { type?: string; delta?: { type?: string; text?: string } }
         if (
-          chunk.type === 'content_block_delta' &&
-          chunk.delta.type === 'text_delta'
+          chunkAny.type === 'content_block_delta' &&
+          chunkAny.delta?.type === 'text_delta' &&
+          chunkAny.delta?.text
         ) {
-          yield chunk.delta.text
+          yield chunkAny.delta.text
         }
       }
     } catch (error) {
@@ -140,31 +170,32 @@ export class ClaudeProvider implements AIProvider {
     }
   }
 
-  private extractTextContent(content: Anthropic.Messages.ContentBlock[]): string {
+  private extractTextContent(content: ContentBlock[]): string {
     return content
-      .filter((block): block is Anthropic.Messages.TextBlock => block.type === 'text')
+      .filter((block): block is TextBlock => block.type === 'text')
       .map(block => block.text)
       .join('\n')
   }
 
-  private zodToJsonSchema(schema: any): any {
+  private zodToJsonSchema(schema: unknown): Record<string, unknown> {
     try {
-      const shape = schema._def?.shape?.()
+      const schemaAny = schema as { _def?: { shape?: () => Record<string, unknown> } }
+      const shape = schemaAny._def?.shape?.()
       if (!shape) {
         return { type: 'object', properties: {}, required: [] }
       }
 
-      const properties: Record<string, any> = {}
+      const properties: Record<string, unknown> = {}
       const required: string[] = []
 
       for (const [key, value] of Object.entries(shape)) {
-        const def = (value as any)._def
+        const def = (value as { _def?: { typeName?: string; description?: string; innerType?: { _def?: { typeName?: string } } } })._def
         const typeName = def?.typeName?.replace('Zod', '').toLowerCase() || 'string'
 
         // Handle optional types
         const isOptional = typeName === 'optional'
         const actualType = isOptional
-          ? (def.innerType?._def?.typeName?.replace('Zod', '').toLowerCase() || 'string')
+          ? (def?.innerType?._def?.typeName?.replace('Zod', '').toLowerCase() || 'string')
           : typeName
 
         // Map Zod types to JSON Schema types

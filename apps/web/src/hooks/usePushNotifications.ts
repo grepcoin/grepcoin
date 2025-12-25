@@ -54,11 +54,6 @@ export function usePushNotifications(userId?: string) {
   const [error, setError] = useState<string | null>(null)
   const { permission, isSupported, requestPermission, isGranted } = useNotificationPermission()
 
-  // Check subscription status on mount
-  useEffect(() => {
-    checkSubscription()
-  }, [userId])
-
   const checkSubscription = useCallback(async () => {
     if (!isSupported || !userId) return
 
@@ -70,6 +65,11 @@ export function usePushNotifications(userId?: string) {
       console.error('Error checking subscription:', error)
     }
   }, [isSupported, userId])
+
+  // Check subscription status on mount
+  useEffect(() => {
+    checkSubscription()
+  }, [userId, checkSubscription])
 
   const subscribeToPush = useCallback(async () => {
     if (!isSupported) {
@@ -130,9 +130,10 @@ export function usePushNotifications(userId?: string) {
 
       setIsSubscribed(true)
       return true
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error subscribing to push:', error)
-      setError(error.message || 'Failed to subscribe to notifications')
+      const errorMessage = error instanceof Error ? error.message : 'Failed to subscribe to notifications'
+      setError(errorMessage)
       return false
     } finally {
       setIsLoading(false)
@@ -170,9 +171,10 @@ export function usePushNotifications(userId?: string) {
 
       setIsSubscribed(false)
       return true
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error unsubscribing from push:', error)
-      setError(error.message || 'Failed to unsubscribe from notifications')
+      const errorMessage = error instanceof Error ? error.message : 'Failed to unsubscribe from notifications'
+      setError(errorMessage)
       return false
     } finally {
       setIsLoading(false)

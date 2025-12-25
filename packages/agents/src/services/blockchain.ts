@@ -101,7 +101,7 @@ export class BlockchainService {
     this.client = createPublicClient({
       chain,
       transport: http()
-    })
+    }) as PublicClient
   }
 
   /**

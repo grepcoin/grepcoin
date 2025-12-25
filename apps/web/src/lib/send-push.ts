@@ -112,12 +112,14 @@ export async function sendToUser(
 
       await sendPushNotification(pushSubscription, notification)
       results.sent++
-    } catch (error: any) {
-      console.error(`Failed to send to user ${userId}:`, error.message)
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      const statusCode = error && typeof error === 'object' && 'statusCode' in error ? (error as { statusCode: number }).statusCode : undefined
+      console.error(`Failed to send to user ${userId}:`, errorMessage)
       results.failed++
 
       // Mark invalid subscriptions for cleanup
-      if (error.statusCode === 410 || error.statusCode === 404) {
+      if (statusCode === 410 || statusCode === 404) {
         invalidSubscriptions.push(sub.id)
       }
     }
@@ -178,11 +180,13 @@ export async function sendToAll(
 
           await sendPushNotification(pushSubscription, notification)
           results.sent++
-        } catch (error: any) {
-          console.error(`Failed to send notification:`, error.message)
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          const statusCode = error && typeof error === 'object' && 'statusCode' in error ? (error as { statusCode: number }).statusCode : undefined
+          console.error(`Failed to send notification:`, errorMessage)
           results.failed++
 
-          if (error.statusCode === 410 || error.statusCode === 404) {
+          if (statusCode === 410 || statusCode === 404) {
             invalidSubscriptions.push(sub.id)
           }
         }

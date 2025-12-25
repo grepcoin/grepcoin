@@ -69,7 +69,13 @@ export function createAgent(type: AgentType, provider: AIProvider) {
 }
 
 // Convenience function to create an agent with default settings
-export function quickAgent(type: AgentType, options: AgentFactoryOptions = {}) {
+// Function overloads for proper type inference
+export function quickAgent(type: 'community', options?: AgentFactoryOptions): CommunityAgent
+export function quickAgent(type: 'social', options?: AgentFactoryOptions): SocialAgent
+export function quickAgent(type: 'guardian', options?: AgentFactoryOptions): GuardianAgent
+export function quickAgent(type: 'analytics', options?: AgentFactoryOptions): AnalyticsAgent
+export function quickAgent(type: AgentType, options?: AgentFactoryOptions): CommunityAgent | SocialAgent | GuardianAgent | AnalyticsAgent
+export function quickAgent(type: AgentType, options: AgentFactoryOptions = {}): CommunityAgent | SocialAgent | GuardianAgent | AnalyticsAgent {
   const provider = createProvider(options)
   return createAgent(type, provider)
 }
