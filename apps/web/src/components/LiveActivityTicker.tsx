@@ -69,22 +69,6 @@ export default function LiveActivityTicker() {
         ))}
       </div>
 
-      <style jsx>{`
-        @keyframes scroll-left {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-        .animate-scroll-left {
-          animation: scroll-left 60s linear infinite;
-        }
-        .animate-scroll-left:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
     </div>
   )
 }

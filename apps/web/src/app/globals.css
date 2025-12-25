@@ -133,3 +133,24 @@ html {
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
+
+/* HeroMiniGame fade-in animation */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* LiveActivityTicker scroll animation */
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-scroll-left {
+  animation: scroll-left 60s linear infinite;
+}
+.animate-scroll-left:hover {
+  animation-play-state: paused;
+}
