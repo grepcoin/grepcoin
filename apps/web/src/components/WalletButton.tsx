@@ -11,10 +11,15 @@ export default function WalletButton() {
   const { disconnect } = useDisconnect()
   const { user, isAuthenticated, signIn, signOut, isLoading } = useAuth()
 
+  const [mounted, setMounted] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
   const [showConnectors, setShowConnectors] = useState(false)
   const [copied, setCopied] = useState(false)
   const [availableConnectors, setAvailableConnectors] = useState<Connector[]>([])
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     // Filter to only show available/ready connectors
@@ -36,6 +41,21 @@ export default function WalletButton() {
   const handleConnect = (connector: Connector) => {
     connect({ connector })
     setShowConnectors(false)
+  }
+
+  // Prevent hydration mismatch by rendering consistent state until mounted
+  if (!mounted) {
+    return (
+      <div className="relative">
+        <button
+          disabled
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-grep-purple to-grep-pink font-semibold hover:opacity-90 transition-all"
+        >
+          <Wallet className="w-4 h-4" />
+          Connect Wallet
+        </button>
+      </div>
+    )
   }
 
   // Not connected - show connect button
