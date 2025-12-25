@@ -54,7 +54,7 @@ export default function LiveActivityTicker() {
 
   return (
     <div className="w-full overflow-hidden bg-dark-800/50 border-y border-dark-700 py-3">
-      <div className="flex animate-scroll-left">
+      <div className="inline-flex animate-scroll-left" style={{ width: 'max-content' }}>
         {/* Double the items for seamless loop */}
         {[...displayActivities, ...displayActivities].map((activity, index) => (
           <div
