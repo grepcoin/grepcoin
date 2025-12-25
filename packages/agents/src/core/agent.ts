@@ -93,7 +93,7 @@ export abstract class Agent extends EventEmitter {
 
   // Add task to queue
   addTask(task: Omit<Task, 'id' | 'createdAt'>): string {
-    const id = `${this.name}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    const id = `${this.name}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
     const fullTask: Task = {
       ...task,
       id,

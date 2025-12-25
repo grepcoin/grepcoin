@@ -315,7 +315,14 @@ Just ask in the support channels and I'll help!`
         try {
           const response = await fetch(`${WEB_APP_URL}/api/stats`)
           if (response.ok) {
-            const stats = await response.json()
+            const stats = await response.json() as {
+              totalPlayers?: number
+              totalGrepEarned?: number
+              totalGamesPlayed?: number
+              activeGames?: number
+              todayGames?: number
+              todayGrep?: number
+            }
             const embed = createStatsEmbed({
               totalPlayers: stats.totalPlayers || 0,
               totalGrepEarned: stats.totalGrepEarned || 0,

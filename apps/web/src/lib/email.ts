@@ -167,6 +167,7 @@ export function generateVerificationToken(): string {
 }
 
 // Get email subject by type
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getEmailSubject(type: EmailType, data?: any): string {
   switch (type) {
     case EmailType.WELCOME:

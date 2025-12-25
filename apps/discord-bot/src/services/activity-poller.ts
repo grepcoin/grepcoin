@@ -112,7 +112,7 @@ export class ActivityPoller {
       throw new Error(`Failed to fetch activities: ${response.statusText}`)
     }
 
-    const data = await response.json()
+    const data = await response.json() as { activities?: Activity[] }
     return data.activities || []
   }
 
