@@ -17,7 +17,7 @@ export class OllamaProvider {
     this.config = {
       baseUrl: config?.baseUrl || process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
       model: config?.model || process.env.OLLAMA_MODEL || 'llama3.2:3b',
-      temperature: config?.temperature ?? 0.7
+      temperature: config?.temperature ?? 0.3  // Lower temp for consistent JSON
     }
   }
 
@@ -27,10 +27,12 @@ export class OllamaProvider {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: this.config.model,
-        prompt: `${systemPrompt}\n\n${userPrompt}`,
+        prompt: `${systemPrompt}\n\nUser: ${userPrompt}\n\nAssistant:`,
         stream: false,
+        format: 'json',  // Request JSON format
         options: {
-          temperature: this.config.temperature
+          temperature: this.config.temperature,
+          num_predict: 2048
         }
       })
     })

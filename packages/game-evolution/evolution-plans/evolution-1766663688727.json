@@ -1,0 +1,284 @@
+{
+  "id": "evolution-1766663688727",
+  "createdAt": "2025-12-25T11:54:48.727Z",
+  "metrics": [
+    {
+      "gameSlug": "stack-panic",
+      "gameName": "Stack Panic",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "merge-miners",
+      "gameName": "Merge Miners",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "grep-rails",
+      "gameName": "Grep Rails",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "quantum-grep",
+      "gameName": "Quantum Grep",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "syntax-sprint",
+      "gameName": "Syntax Sprint",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "regex-crossword",
+      "gameName": "RegEx Crossword",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "crypto-snake",
+      "gameName": "Crypto Snake",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "bug-hunter",
+      "gameName": "Bug Hunter",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    }
+  ],
+  "suggestions": [
+    {
+      "type": "regex_pattern",
+      "game": "grep-rails",
+      "tier": 2,
+      "content": {
+        "pattern": "^[a-z]+$",
+        "display": "Lowercase letters only",
+        "hint": "Only lowercase letters",
+        "examples": {
+          "matches": [
+            "hello",
+            "world",
+            "test"
+          ],
+          "nonMatches": [
+            "Hello",
+            "123",
+            "A1"
+          ]
+        },
+        "tier": 2
+      },
+      "reasoning": "Adding medium patterns to Grep Rails. Current completion rate: 0%, 0 total plays. Difficulty distribution suggests need for tier 2 content."
+    },
+    {
+      "type": "regex_pattern",
+      "game": "grep-rails",
+      "tier": 2,
+      "content": {
+        "pattern": "^[a-z]+[0-9]*$",
+        "display": "Lowercase letters and numbers",
+        "hint": "Lowercase letters followed by numbers",
+        "examples": {
+          "matches": [
+            "hello123",
+            "world456",
+            "test789"
+          ],
+          "nonMatches": [
+            "Hello123",
+            "123",
+            "A1"
+          ]
+        },
+        "tier": 2
+      },
+      "reasoning": "Adding medium patterns to Grep Rails. Current completion rate: 0%, 0 total plays. Difficulty distribution suggests need for tier 2 content."
+    },
+    {
+      "type": "regex_pattern",
+      "game": "regex-crossword",
+      "tier": 2,
+      "content": {
+        "pattern": "^[a-z]+$",
+        "display": "Lowercase letters only",
+        "hint": "Only alphabets",
+        "examples": {
+          "matches": [
+            "hello",
+            "world",
+            "test"
+          ],
+          "nonMatches": [
+            "Hello",
+            "123",
+            "A1"
+          ]
+        },
+        "tier": 2
+      },
+      "reasoning": "Adding medium patterns to RegEx Crossword. Current completion rate: 0%, 0 total plays. Difficulty distribution suggests need for tier 2 content."
+    },
+    {
+      "type": "regex_pattern",
+      "game": "regex-crossword",
+      "tier": 2,
+      "content": {
+        "pattern": "^[a-z]+[0-9]*$",
+        "display": "Lowercase letters and numbers",
+        "hint": "Letters and numbers",
+        "examples": {
+          "matches": [
+            "hello10",
+            "world20",
+            "test30"
+          ],
+          "nonMatches": [
+            "Hello123",
+            "World!",
+            "Test@"
+          ]
+        },
+        "tier": 2
+      },
+      "reasoning": "Adding medium patterns to RegEx Crossword. Current completion rate: 0%, 0 total plays. Difficulty distribution suggests need for tier 2 content."
+    },
+    {
+      "type": "code_snippet",
+      "game": "bug-hunter",
+      "tier": 2,
+      "content": {
+        "lines": [
+          "function add(a, b) {",
+          "  return a + a;",
+          "}"
+        ],
+        "bugLine": 1,
+        "bugType": "typo",
+        "explanation": "Wrong variable used",
+        "tier": 2,
+        "points": 100
+      },
+      "reasoning": "Adding typo bug challenges to Bug Hunter. Players averaging 0 points with 0s sessions."
+    }
+  ],
+  "summary": "New content is being added to games such as Grep Rails and RegEx Crossword, including medium-tier regex patterns and code snippet challenges for Bug Hunter. This new content aims to increase player engagement by providing more challenging puzzles and experiences.",
+  "estimatedImpact": "{\"impact\": \"moderate\", \"reasoning\": \"The addition of new content is expected to attract more players who enjoy a challenge, but may also alienate some casual players who find the new content too difficult.\"}"
+}

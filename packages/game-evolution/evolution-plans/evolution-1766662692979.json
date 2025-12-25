@@ -1,0 +1,237 @@
+{
+  "id": "evolution-1766662692979",
+  "createdAt": "2025-12-25T11:38:12.979Z",
+  "metrics": [
+    {
+      "gameSlug": "stack-panic",
+      "gameName": "Stack Panic",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "merge-miners",
+      "gameName": "Merge Miners",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "grep-rails",
+      "gameName": "Grep Rails",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "quantum-grep",
+      "gameName": "Quantum Grep",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "syntax-sprint",
+      "gameName": "Syntax Sprint",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "regex-crossword",
+      "gameName": "RegEx Crossword",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "crypto-snake",
+      "gameName": "Crypto Snake",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "bug-hunter",
+      "gameName": "Bug Hunter",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    }
+  ],
+  "suggestions": [
+    {
+      "type": "regex_pattern",
+      "game": "regex-crossword",
+      "tier": 2,
+      "content": {
+        "pattern": "^\\b[a-z]+\\b$",
+        "display": "^\\b[a-z]+\\b$",
+        "hint": "word boundaries with word chars",
+        "examples": {
+          "matches": [
+            "hello",
+            "world"
+          ],
+          "nonMatches": [
+            "Hello",
+            "123",
+            "a1b2"
+          ]
+        },
+        "tier": 2
+      },
+      "reasoning": "Adding medium patterns to RegEx Crossword. Current completion rate: 0%, 0 total plays. Difficulty distribution suggests need for tier 2 content."
+    },
+    {
+      "type": "regex_pattern",
+      "game": "regex-crossword",
+      "tier": 2,
+      "content": {
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+        "display": "^\\d{4}-\\d{2}-\\d{2}$",
+        "hint": "date format with alternation",
+        "examples": {
+          "matches": [
+            "2022-07-25",
+            "1999-12-31"
+          ],
+          "nonMatches": [
+            "2022/07/25",
+            "jan 1, 2020"
+          ]
+        },
+        "tier": 2
+      },
+      "reasoning": "Adding medium patterns to RegEx Crossword. Current completion rate: 0%, 0 total plays. Difficulty distribution suggests need for tier 2 content."
+    },
+    {
+      "type": "regex_pattern",
+      "game": "regex-crossword",
+      "tier": 2,
+      "content": {
+        "pattern": "^\\b[A-Z][a-z]*\\b$",
+        "display": "^\\b[A-Z][a-z]*\\b$",
+        "hint": "word boundaries with mixed case",
+        "examples": {
+          "matches": [
+            "Hello",
+            "Abc"
+          ],
+          "nonMatches": [
+            "hello",
+            "!@#$"
+          ]
+        },
+        "tier": 2
+      },
+      "reasoning": "Adding medium patterns to RegEx Crossword. Current completion rate: 0%, 0 total plays. Difficulty distribution suggests need for tier 2 content."
+    }
+  ],
+  "summary": "New medium tier regex patterns will be added to RegEx Crossword, increasing difficulty level and providing a more challenging experience for players.",
+  "estimatedImpact": "Moderate to high, with potential to boost player engagement by 10-20% due to increased sense of accomplishment from completing more complex levels."
+}

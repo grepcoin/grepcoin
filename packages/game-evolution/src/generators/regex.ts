@@ -2,55 +2,34 @@ import { ContentGenerator } from './base'
 import { RegexPattern, GameMetrics } from '../types'
 
 export class RegexPatternGenerator extends ContentGenerator {
-  private readonly systemPrompt = `You are an expert regex pattern designer for a programming-themed arcade game called "Grep Rails".
-
-Your task is to generate regex patterns that are:
-1. Educational - teach real regex concepts
-2. Fun - progressively challenging
-3. Testable - have clear matching and non-matching examples
+  private readonly systemPrompt = `You generate regex patterns as JSON. Output a JSON object with a "patterns" array.
 
 Tier definitions:
-- Tier 1 (Easy): Basic character classes [a-z], [0-9], simple quantifiers +, *
-- Tier 2 (Medium): Word boundaries, alternation |, groups (), specific quantifiers {n,m}
-- Tier 3 (Hard): Lookahead (?=), lookbehind (?<=), non-capturing groups (?:)
-- Tier 4 (Expert): Complex combinations, nested groups, advanced assertions
-
-Always respond with valid JSON only.`
+- Tier 1: Basic [a-z], [0-9], quantifiers +, *
+- Tier 2: Word boundaries \\b, alternation |, groups (), quantifiers {n,m}
+- Tier 3: Lookahead (?=), lookbehind (?<=), non-capturing (?:)
+- Tier 4: Complex nested patterns, multiple assertions`
 
   async generatePatterns(
     count: number,
     tier: 1 | 2 | 3 | 4,
     metrics?: GameMetrics
   ): Promise<RegexPattern[]> {
-    const context = metrics
-      ? `Current game stats: ${metrics.totalPlays} plays, ${metrics.avgScore} avg score, completion rate ${metrics.completionRate}%.`
-      : ''
+    const prompt = `Generate ${count} regex patterns for Tier ${tier}.
 
-    const prompt = `Generate ${count} unique regex patterns for Tier ${tier}.
-${context}
+Output JSON format:
+{"patterns":[{"pattern":"^[a-z]+$","display":"^[a-z]+$","hint":"lowercase only","examples":{"matches":["hello","world","test"],"nonMatches":["Hello","123","A1"]},"tier":${tier}}]}
 
-Return a JSON array with this structure:
-[{
-  "pattern": "^[a-z]+$",
-  "display": "^[a-z]+$",
-  "hint": "lowercase letters only",
-  "examples": {
-    "matches": ["hello", "world", "abc"],
-    "nonMatches": ["Hello", "123", "a1b2"]
-  },
-  "tier": ${tier}
-}]
-
-Requirements:
-- Patterns must be valid JavaScript regex
-- Include 3-5 matching and 3-5 non-matching examples
-- Hints should be concise (under 30 chars)
-- Each pattern should teach a distinct concept`
+Each pattern needs: pattern, display, hint (under 25 chars), examples with 3 matches and 3 nonMatches, tier.`
 
     const response = await this.generate(this.systemPrompt, prompt)
-    const patterns = this.parseJSON<RegexPattern[]>(response)
+    const result = this.parseJSON<{ patterns?: RegexPattern[] } | RegexPattern[]>(response)
 
-    if (!patterns) return []
+    if (!result) return []
+
+    // Handle both array and object with patterns key
+    const patterns = Array.isArray(result) ? result : (result.patterns || [])
+    if (!Array.isArray(patterns)) return []
 
     // Validate patterns
     return patterns.filter(p => this.validatePattern(p))

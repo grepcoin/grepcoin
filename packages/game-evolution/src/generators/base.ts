@@ -22,12 +22,39 @@ export abstract class ContentGenerator {
 
   protected parseJSON<T>(text: string): T | null {
     try {
-      // Extract JSON from markdown code blocks if present
-      const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/)
-      const jsonStr = jsonMatch ? jsonMatch[1] : text
-      return JSON.parse(jsonStr.trim())
-    } catch {
-      console.error('Failed to parse JSON:', text.substring(0, 200))
+      let jsonStr = text.trim()
+
+      // Remove markdown code blocks if present
+      const codeBlockMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/)
+      if (codeBlockMatch) {
+        jsonStr = codeBlockMatch[1].trim()
+      }
+
+      // Find the first [ or { and last ] or }
+      const arrayStart = jsonStr.indexOf('[')
+      const objectStart = jsonStr.indexOf('{')
+      const start = arrayStart >= 0 && (objectStart < 0 || arrayStart < objectStart)
+        ? arrayStart
+        : objectStart
+
+      if (start < 0) {
+        console.error('No JSON found in response')
+        return null
+      }
+
+      const isArray = jsonStr[start] === '['
+      const endChar = isArray ? ']' : '}'
+      const end = jsonStr.lastIndexOf(endChar)
+
+      if (end < start) {
+        console.error('Malformed JSON - no closing bracket')
+        return null
+      }
+
+      jsonStr = jsonStr.substring(start, end + 1)
+      return JSON.parse(jsonStr)
+    } catch (e) {
+      console.error('Failed to parse JSON:', (e as Error).message)
       return null
     }
   }
