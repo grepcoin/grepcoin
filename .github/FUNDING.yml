@@ -1,4 +1,4 @@
-# These are supported funding model platforms
+# Funding platforms for GrepCoin
 
-github: grepcoin
-custom: ["https://grepcoin.io/support"]
+github: [grepcoin]
+custom: ["https://grepcoin.io/support", "https://grepcoin.io/fundraise"]

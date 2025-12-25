@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discord Community
+    url: https://discord.gg/grepcoin
+    about: Ask questions and get help from the community
+  - name: Documentation
+    url: https://docs.grepcoin.io
+    about: Check out our documentation for answers
+  - name: Security Vulnerability
+    url: https://github.com/grepcoin/grepcoin/security/advisories/new
+    about: Report security vulnerabilities privately
