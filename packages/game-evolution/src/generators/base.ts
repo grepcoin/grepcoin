@@ -1,30 +1,23 @@
-import Anthropic from '@anthropic-ai/sdk'
-import { GeneratorConfig } from '../types'
+import { AIProvider, createProvider, ProviderType } from '../providers'
 
 export abstract class ContentGenerator {
-  protected client: Anthropic
-  protected config: GeneratorConfig
+  protected provider: AIProvider | null = null
+  protected providerType: ProviderType
 
-  constructor(config?: Partial<GeneratorConfig>) {
-    this.client = new Anthropic()
-    this.config = {
-      model: config?.model || 'claude-3-haiku-20240307',
-      maxTokens: config?.maxTokens || 2048,
-      temperature: config?.temperature || 0.7
+  constructor(providerType: ProviderType = 'auto') {
+    this.providerType = providerType
+  }
+
+  protected async ensureProvider(): Promise<AIProvider> {
+    if (!this.provider) {
+      this.provider = await createProvider(this.providerType)
     }
+    return this.provider
   }
 
   protected async generate(systemPrompt: string, userPrompt: string): Promise<string> {
-    const response = await this.client.messages.create({
-      model: this.config.model,
-      max_tokens: this.config.maxTokens,
-      temperature: this.config.temperature,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }]
-    })
-
-    const textBlock = response.content.find(block => block.type === 'text')
-    return textBlock ? textBlock.text : ''
+    const provider = await this.ensureProvider()
+    return provider.generate(systemPrompt, userPrompt)
   }
 
   protected parseJSON<T>(text: string): T | null {
@@ -34,8 +27,12 @@ export abstract class ContentGenerator {
       const jsonStr = jsonMatch ? jsonMatch[1] : text
       return JSON.parse(jsonStr.trim())
     } catch {
-      console.error('Failed to parse JSON:', text)
+      console.error('Failed to parse JSON:', text.substring(0, 200))
       return null
     }
+  }
+
+  getProviderName(): string {
+    return this.provider?.getName() || 'not initialized'
   }
 }

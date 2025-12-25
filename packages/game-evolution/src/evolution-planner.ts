@@ -1,25 +1,31 @@
-import Anthropic from '@anthropic-ai/sdk'
 import { GameMetricsAnalyzer } from './analyzers'
 import { RegexPatternGenerator, CodeSnippetGenerator } from './generators'
+import { AIProvider, createProvider, ProviderType } from './providers'
 import {
   EvolutionPlan,
   GameMetrics,
-  ContentSuggestion,
-  RegexPattern,
-  CodeSnippet
+  ContentSuggestion
 } from './types'
 
 export class EvolutionPlanner {
   private analyzer: GameMetricsAnalyzer
   private regexGenerator: RegexPatternGenerator
   private codeGenerator: CodeSnippetGenerator
-  private client: Anthropic
+  private provider: AIProvider | null = null
+  private providerType: ProviderType
 
-  constructor() {
+  constructor(providerType: ProviderType = 'auto') {
+    this.providerType = providerType
     this.analyzer = new GameMetricsAnalyzer()
-    this.regexGenerator = new RegexPatternGenerator()
-    this.codeGenerator = new CodeSnippetGenerator()
-    this.client = new Anthropic()
+    this.regexGenerator = new RegexPatternGenerator(providerType)
+    this.codeGenerator = new CodeSnippetGenerator(providerType)
+  }
+
+  private async ensureProvider(): Promise<AIProvider> {
+    if (!this.provider) {
+      this.provider = await createProvider(this.providerType)
+    }
+    return this.provider
   }
 
   async createEvolutionPlan(): Promise<EvolutionPlan> {
@@ -127,7 +133,10 @@ export class EvolutionPlanner {
     metrics: GameMetrics[],
     suggestions: ContentSuggestion[]
   ): Promise<{ summary: string; estimatedImpact: string }> {
-    const prompt = `Analyze this game evolution plan and provide a brief summary.
+    const provider = await this.ensureProvider()
+
+    const systemPrompt = 'You are a game analytics expert. Respond only with valid JSON.'
+    const userPrompt = `Analyze this game evolution plan and provide a brief summary.
 
 Game Metrics:
 ${JSON.stringify(metrics, null, 2)}
@@ -150,15 +159,8 @@ Respond in JSON format:
   "estimatedImpact": "..."
 }`
 
-    const response = await this.client.messages.create({
-      model: 'claude-3-haiku-20240307',
-      max_tokens: 500,
-      messages: [{ role: 'user', content: prompt }]
-    })
-
-    const text = response.content.find(b => b.type === 'text')?.text || ''
-
     try {
+      const text = await provider.generate(systemPrompt, userPrompt)
       const jsonMatch = text.match(/\{[\s\S]*\}/)
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0])

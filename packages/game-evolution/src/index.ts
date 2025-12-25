@@ -1,4 +1,5 @@
 export * from './types'
 export * from './analyzers'
 export * from './generators'
+export * from './providers'
 export { EvolutionPlanner } from './evolution-planner'

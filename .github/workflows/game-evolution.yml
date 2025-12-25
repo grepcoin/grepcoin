@@ -6,14 +6,118 @@ on:
     - cron: '0 0 * * 0'
   workflow_dispatch:
     inputs:
+      provider:
+        description: 'AI Provider to use'
+        required: false
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - ollama
+          - claude
       analyze_only:
         description: 'Only analyze metrics (no content generation)'
         required: false
-        default: 'false'
+        default: false
         type: boolean
 
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
 jobs:
-  evolve:
+  # Self-hosted runner with local Ollama (free, preferred)
+  evolve-local:
+    if: ${{ github.event.inputs.provider != 'claude' }}
+    runs-on: self-hosted
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check Ollama
+        id: ollama
+        run: |
+          if curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
+            echo "available=true" >> $GITHUB_OUTPUT
+            echo "🦙 Ollama is running"
+            curl -s http://localhost:11434/api/tags | jq '.models[].name'
+          else
+            echo "available=false" >> $GITHUB_OUTPUT
+            echo "❌ Ollama not available"
+          fi
+
+      - name: Install dependencies
+        if: steps.ollama.outputs.available == 'true'
+        run: |
+          npm install
+          npx prisma generate --schema=apps/web/prisma/schema.prisma
+
+      - name: Run Evolution
+        if: steps.ollama.outputs.available == 'true'
+        id: evolve
+        env:
+          OLLAMA_BASE_URL: http://localhost:11434
+          OLLAMA_MODEL: llama3.2:3b
+        run: |
+          cd packages/game-evolution
+
+          if [ "${{ inputs.analyze_only }}" = "true" ]; then
+            npx ts-node src/cli.ts --analyze-only
+          else
+            npx ts-node src/cli.ts --output=../../evolution-plans
+
+            if [ -d "../../evolution-plans" ]; then
+              PLAN_FILE=$(ls ../../evolution-plans/*.json 2>/dev/null | head -1)
+              if [ -n "$PLAN_FILE" ]; then
+                PLAN_ID=$(basename "$PLAN_FILE" .json)
+                echo "plan_id=$PLAN_ID" >> $GITHUB_OUTPUT
+                echo "has_plan=true" >> $GITHUB_OUTPUT
+              fi
+            fi
+          fi
+
+      - name: Create Pull Request
+        if: steps.evolve.outputs.has_plan == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: '🎮 Game Evolution: ${{ steps.evolve.outputs.plan_id }}'
+          title: '🎮 [AI] Game Content Evolution - Ollama'
+          body: |
+            ## 🦙 AI-Generated Game Content (Ollama - Local)
+
+            This PR contains AI-generated content suggestions using **local Ollama** (free, no API costs).
+
+            ### What's Included
+            - New regex patterns for Grep Rails / Regex Crossword
+            - New code snippets with bugs for Bug Hunter
+            - Analysis of current game metrics
+
+            ### Review Process
+            1. Check `evolution-plans/` for the full plan
+            2. Review each suggestion for quality
+            3. Approve and merge to add content
+
+            ---
+            *Generated locally using Ollama + Llama 3.2*
+          branch: ai/game-evolution-local-${{ github.run_number }}
+          labels: |
+            ai-generated
+            games
+            enhancement
+            ollama
+
+  # Cloud runner with Claude API (fallback)
+  evolve-cloud:
+    if: ${{ github.event.inputs.provider == 'claude' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -31,65 +135,58 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd packages/game-evolution
           npm install
+          npx prisma generate --schema=apps/web/prisma/schema.prisma
 
-      - name: Run Evolution Analysis
+      - name: Run Evolution
         id: evolve
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           cd packages/game-evolution
 
           if [ "${{ inputs.analyze_only }}" = "true" ]; then
-            npm run analyze
+            npx ts-node src/cli.ts --analyze-only
           else
-            npm run evolve -- --output=../../evolution-plans
+            npx ts-node src/cli.ts --output=../../evolution-plans
 
-            # Get the plan ID
-            PLAN_ID=$(ls ../../evolution-plans/*.json | head -1 | xargs basename .json)
-            echo "plan_id=$PLAN_ID" >> $GITHUB_OUTPUT
+            if [ -d "../../evolution-plans" ]; then
+              PLAN_FILE=$(ls ../../evolution-plans/*.json 2>/dev/null | head -1)
+              if [ -n "$PLAN_FILE" ]; then
+                PLAN_ID=$(basename "$PLAN_FILE" .json)
+                echo "plan_id=$PLAN_ID" >> $GITHUB_OUTPUT
+                echo "has_plan=true" >> $GITHUB_OUTPUT
+              fi
+            fi
           fi
 
       - name: Create Pull Request
-        if: ${{ inputs.analyze_only != 'true' }}
+        if: steps.evolve.outputs.has_plan == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: '🎮 Game Evolution Plan: ${{ steps.evolve.outputs.plan_id }}'
-          title: '🎮 [AI] Game Content Evolution Suggestions'
+          commit-message: '🎮 Game Evolution: ${{ steps.evolve.outputs.plan_id }}'
+          title: '🎮 [AI] Game Content Evolution - Claude'
           body: |
-            ## 🤖 AI-Generated Game Content Suggestions
+            ## 🤖 AI-Generated Game Content (Claude API)
 
-            This PR contains AI-generated content suggestions for the GrepCoin arcade games.
+            This PR contains AI-generated content suggestions using **Claude Haiku**.
 
             ### What's Included
             - New regex patterns for Grep Rails / Regex Crossword
             - New code snippets with bugs for Bug Hunter
-            - Analysis of current game metrics and player behavior
+            - Analysis of current game metrics
 
             ### Review Process
-            1. Check the `evolution-plans/` folder for the full plan
-            2. Review each suggestion for quality and appropriateness
-            3. Test patterns/snippets manually if needed
-            4. Approve and merge to add content to games
+            1. Check `evolution-plans/` for the full plan
+            2. Review each suggestion for quality
+            3. Approve and merge to add content
 
             ---
-            *Generated by GrepCoin Game Evolution System using Claude AI*
-          branch: ai/game-evolution-${{ github.run_number }}
+            *Generated using Claude Haiku API*
+          branch: ai/game-evolution-cloud-${{ github.run_number }}
           labels: |
             ai-generated
             games
             enhancement
-
-  notify:
-    needs: evolve
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
-      - name: Summary
-        run: |
-          echo "## 🎮 Game Evolution Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Check the pull request for AI-generated content suggestions." >> $GITHUB_STEP_SUMMARY
+            claude

@@ -1,0 +1,238 @@
+{
+  "id": "evolution-1766662402367",
+  "createdAt": "2025-12-25T11:33:22.367Z",
+  "metrics": [
+    {
+      "gameSlug": "stack-panic",
+      "gameName": "Stack Panic",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "merge-miners",
+      "gameName": "Merge Miners",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "grep-rails",
+      "gameName": "Grep Rails",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "quantum-grep",
+      "gameName": "Quantum Grep",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "syntax-sprint",
+      "gameName": "Syntax Sprint",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "regex-crossword",
+      "gameName": "RegEx Crossword",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "crypto-snake",
+      "gameName": "Crypto Snake",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    },
+    {
+      "gameSlug": "bug-hunter",
+      "gameName": "Bug Hunter",
+      "totalPlays": 0,
+      "uniquePlayers": 0,
+      "avgScore": 0,
+      "avgDuration": 0,
+      "completionRate": 0,
+      "difficultyDistribution": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0,
+        "expert": 0
+      },
+      "recentTrends": {
+        "playsLast7Days": 0,
+        "playsLast30Days": 0,
+        "trend": "stable"
+      }
+    }
+  ],
+  "suggestions": [
+    {
+      "type": "regex_pattern",
+      "game": "grep-rails",
+      "tier": 2,
+      "content": {
+        "pattern": "\\b[a-z]+\\b",
+        "display": "\\b[a-z]+\\b",
+        "hint": "word boundaries",
+        "examples": {
+          "matches": [
+            "hello",
+            "world"
+          ],
+          "nonMatches": [
+            "Hello",
+            "123"
+          ]
+        },
+        "tier": 2
+      },
+      "reasoning": "Adding medium patterns to Grep Rails. Current completion rate: 0%, 0 total plays. Difficulty distribution suggests need for tier 2 content."
+    },
+    {
+      "type": "regex_pattern",
+      "game": "grep-rails",
+      "tier": 2,
+      "content": {
+        "pattern": "\\d+\\D*\\d+",
+        "display": "\\d+\\D*\\d+",
+        "hint": "mixed digit and word characters",
+        "examples": {
+          "matches": [
+            "12abc34",
+            "456def78"
+          ],
+          "nonMatches": [
+            "abcdefg",
+            "!@#$"
+          ]
+        },
+        "tier": 2
+      },
+      "reasoning": "Adding medium patterns to Grep Rails. Current completion rate: 0%, 0 total plays. Difficulty distribution suggests need for tier 2 content."
+    },
+    {
+      "type": "regex_pattern",
+      "game": "regex-crossword",
+      "tier": 2,
+      "content": {
+        "pattern": "^\\s*\\d{4}-\\d{2}-\\d{2}$",
+        "display": "\\d{4}-\\d{2}-\\d{2}",
+        "hint": "date format YYYY-MM-DD",
+        "examples": {
+          "matches": [
+            "2022-07-25",
+            "1999-12-31",
+            "2018-05-20"
+          ],
+          "nonMatches": [
+            "2022/07/25",
+            "1999-12-31-2",
+            "2018 05 20"
+          ]
+        },
+        "tier": 2
+      },
+      "reasoning": "Adding medium patterns to RegEx Crossword. Current completion rate: 0%, 0 total plays. Difficulty distribution suggests need for tier 2 content."
+    }
+  ],
+  "summary": "New content suggestions are being added to Grep Rails and RegEx Crossword, including medium-tier regex patterns, aiming to improve completion rates and player engagement.",
+  "estimatedImpact": "Moderate to High"
+}
