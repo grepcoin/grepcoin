@@ -1,0 +1,23 @@
+{
+  "name": "@grepcoin/game-evolution",
+  "version": "0.1.0",
+  "description": "AI-powered game content evolution system for GrepCoin arcade",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "evolve": "ts-node src/cli.ts",
+    "analyze": "ts-node src/cli.ts --analyze-only"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@prisma/client": "^6.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.0"
+  },
+  "keywords": ["grepcoin", "games", "ai", "evolution", "claude"]
+}
