@@ -26,6 +26,8 @@
     "bot:start": "npm run start --workspace=apps/discord-bot"
   },
   "devDependencies": {
+    "@prisma/client": "^5.22.0",
+    "prisma": "^5.22.0",
     "turbo": "^2.0.0"
   },
   "engines": {

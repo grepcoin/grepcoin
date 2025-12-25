@@ -1,6 +1,14 @@
 import { PrismaClient } from '@prisma/client'
 import { GameMetrics } from '../types'
 
+interface GameScore {
+  id: string
+  userId: string
+  score: number
+  duration: number | null
+  createdAt: Date
+}
+
 export class GameMetricsAnalyzer {
   private prisma: PrismaClient
 
@@ -21,20 +29,20 @@ export class GameMetricsAnalyzer {
 
     if (!game) return null
 
-    const scores = game.scores
+    const scores = game.scores as GameScore[]
     const now = new Date()
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
 
-    const recentScores7d = scores.filter(s => s.createdAt >= sevenDaysAgo)
-    const recentScores30d = scores.filter(s => s.createdAt >= thirtyDaysAgo)
+    const recentScores7d = scores.filter((s: GameScore) => s.createdAt >= sevenDaysAgo)
+    const recentScores30d = scores.filter((s: GameScore) => s.createdAt >= thirtyDaysAgo)
 
-    const uniquePlayers = new Set(scores.map(s => s.userId)).size
+    const uniquePlayers = new Set(scores.map((s: GameScore) => s.userId)).size
     const avgScore = scores.length > 0
-      ? scores.reduce((sum, s) => sum + s.score, 0) / scores.length
+      ? scores.reduce((sum: number, s: GameScore) => sum + s.score, 0) / scores.length
       : 0
     const avgDuration = scores.length > 0
-      ? scores.reduce((sum, s) => sum + (s.duration || 0), 0) / scores.length
+      ? scores.reduce((sum: number, s: GameScore) => sum + (s.duration || 0), 0) / scores.length
       : 0
 
     // Estimate difficulty distribution based on scores
