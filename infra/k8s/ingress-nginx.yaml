@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grepcoin-ingress-nginx
+  namespace: grepcoin
+  annotations:
+    # Use Let's Encrypt production issuer
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # Force HTTPS redirect
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Proxy settings for WebSocket support
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    # Enable WebSocket
+    nginx.ingress.kubernetes.io/websocket-services: "grepcoin-web"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - grepcoin.io
+        - www.grepcoin.io
+      secretName: grepcoin-tls
+  rules:
+    - host: grepcoin.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grepcoin-web
+                port:
+                  number: 80
+    - host: www.grepcoin.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grepcoin-web
+                port:
+                  number: 80

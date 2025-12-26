@@ -7,10 +7,11 @@
 ### Live Deployment
 | Resource | Value |
 |----------|-------|
-| **Static IP** | 136.110.246.71 |
-| **Pods** | 3/3 Running |
+| **Nginx Ingress IP** | 34.94.204.248 |
+| **Pods** | 2-3 Running (autoscaled) |
 | **GKE Cluster** | autopilot-cluster-1 (us-west2) |
 | **Image** | gcr.io/greplabs/grepcoin-web:latest |
+| **SSL** | Let's Encrypt via cert-manager |
 
 ---
 
@@ -30,8 +31,8 @@
 
 | Type | Host | Value |
 |------|------|-------|
-| A | @ | `136.110.246.71` |
-| A | www | `136.110.246.71` |
+| A | @ | `34.94.204.248` |
+| A | www | `34.94.204.248` |
 | CNAME | docs | grepcoin.github.io |
 
 ### GKE Cluster Setup
@@ -425,13 +426,13 @@ npm run build
 ## Progress Log
 
 ### 2025-12-25 Session 6 (Current)
-- **DEPLOYED TO GKE** - 3 pods running on autopilot-cluster-1
-- Reserved static IP: 136.110.246.71
+- **DEPLOYED TO GKE** - pods running on autopilot-cluster-1
+- Installed cert-manager + nginx-ingress controller
+- Set up Let's Encrypt SSL with ClusterIssuer
+- Nginx Ingress IP: 34.94.204.248
 - Built linux/amd64 Docker image and pushed to GCR
 - Created Kubernetes secrets from .env.local
-- SSL certificate provisioning (awaiting DNS)
-- Added your IP to cluster authorized networks
-- Next: Configure DNS in Squarespace, enable GitHub Pages
+- Next: Configure DNS in Squarespace → SSL will auto-provision
 
 ### 2025-12-25 Session 5
 - Added backend documentation: API.md (91 endpoints), database.md (39 models)

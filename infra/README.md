@@ -15,18 +15,19 @@ Production deployment on Google Kubernetes Engine (GKE) with grepcoin.io domain.
 │                   Google Cloud Platform                          │
 ├─────────────────────────────────────────────────────────────────┤
 │  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐       │
-│  │   Cloud     │     │    GKE      │     │   Cloud     │       │
-│  │   Armor     │────▶│  Ingress    │────▶│   Load      │       │
-│  │   (WAF)     │     │  Controller │     │  Balancer   │       │
-│  └─────────────┘     └─────────────┘     └──────┬──────┘       │
-│                                                   │              │
-│  ┌────────────────────────────────────────────────▼─────────┐   │
-│  │                    GKE Cluster                            │   │
-│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐               │   │
-│  │  │   Pod    │  │   Pod    │  │   Pod    │  (2-10 pods)  │   │
-│  │  │ Next.js  │  │ Next.js  │  │ Next.js  │               │   │
-│  │  └──────────┘  └──────────┘  └──────────┘               │   │
-│  └──────────────────────────────────────────────────────────┘   │
+│  │   Nginx     │     │    Cert     │     │   Let's     │       │
+│  │   Ingress   │────▶│   Manager   │────▶│  Encrypt    │       │
+│  │  Controller │     │             │     │   (SSL)     │       │
+│  └─────────────┘     └─────────────┘     └─────────────┘       │
+│         │                                                        │
+│         ▼                                                        │
+│  ┌────────────────────────────────────────────────────────┐     │
+│  │                    GKE Autopilot                        │     │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐              │     │
+│  │  │   Pod    │  │   Pod    │  │   Pod    │  (2-10)      │     │
+│  │  │ Next.js  │  │ Next.js  │  │ Next.js  │              │     │
+│  │  └──────────┘  └──────────┘  └──────────┘              │     │
+│  └────────────────────────────────────────────────────────┘     │
 │                              │                                   │
 │                              ▼                                   │
 │  ┌──────────────────────────────────────────────────────────┐   │
@@ -40,18 +41,11 @@ Production deployment on Google Kubernetes Engine (GKE) with grepcoin.io domain.
 
 ## Domain Configuration (Squarespace)
 
-### Step 1: Get GKE Static IP
+### Current Nginx Ingress IP
 
-After creating the GKE cluster, reserve a static IP:
+The nginx-ingress controller has been assigned IP: **34.94.204.248**
 
-```bash
-gcloud compute addresses create grepcoin-ip --global
-gcloud compute addresses describe grepcoin-ip --global --format="get(address)"
-```
-
-Note the IP address (e.g., `34.120.xxx.xxx`)
-
-### Step 2: Configure Squarespace DNS
+### Configure Squarespace DNS
 
 1. Log in to Squarespace
 2. Go to **Settings** → **Domains** → **grepcoin.io**
@@ -61,8 +55,8 @@ Note the IP address (e.g., `34.120.xxx.xxx`)
 
 | Type | Host | Value | TTL |
 |------|------|-------|-----|
-| A | @ | `<GKE_STATIC_IP>` | 3600 |
-| A | www | `<GKE_STATIC_IP>` | 3600 |
+| A | @ | `34.94.204.248` | 3600 |
+| A | www | `34.94.204.248` | 3600 |
 | CNAME | docs | grepcoin.github.io | 3600 |
 
 ### Step 3: Verify DNS Propagation
