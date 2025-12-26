@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowLeft, Gamepad2, Trophy, Coins, Zap } from 'lucide-react'
+import { ArrowLeft, Gamepad2, Trophy, Coins, Zap, Swords, Star } from 'lucide-react'
 import Leaderboard from '@/components/Leaderboard'
 import StakingBadge from '@/components/StakingBadge'
 import { useStaking } from '@/context/StakingContext'
@@ -86,6 +86,41 @@ const games = [
     icon: '🧩',
     rewards: '10-80 GREP',
     status: 'live',
+  },
+]
+
+const miniGames = [
+  {
+    id: 'coin-flip',
+    name: 'Coin Flip',
+    description: 'Guess heads or tails for instant rewards!',
+    icon: '🪙',
+    rewards: '5-20 GREP',
+    duration: '5 sec',
+  },
+  {
+    id: 'tap-speed',
+    name: 'Tap Speed',
+    description: 'Tap as fast as you can in 10 seconds!',
+    icon: '👆',
+    rewards: '10-40 GREP',
+    duration: '10 sec',
+  },
+  {
+    id: 'quick-math',
+    name: 'Quick Math',
+    description: 'Solve 5 equations before time runs out!',
+    icon: '🧮',
+    rewards: '10-50 GREP',
+    duration: '15 sec',
+  },
+  {
+    id: 'color-match',
+    name: 'Color Match',
+    description: 'Match the color pattern quickly!',
+    icon: '🎨',
+    rewards: '8-35 GREP',
+    duration: '10 sec',
   },
 ]
 
@@ -213,6 +248,81 @@ export default function GamesPage() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Quick Links - Tournaments & Battle Pass */}
+        <div className="mt-12 grid sm:grid-cols-2 gap-6">
+          <Link
+            href="/tournaments"
+            className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-grep-purple/20 to-grep-pink/20 border border-grep-purple/30 hover:border-grep-purple/50 transition-all p-6"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-grep-purple to-grep-pink flex items-center justify-center">
+                <Swords className="w-8 h-8" />
+              </div>
+              <div>
+                <h3 className="text-xl font-display font-bold">Tournaments</h3>
+                <p className="text-gray-400 text-sm">Compete for massive GREP prizes</p>
+              </div>
+            </div>
+            <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-grep-pink/20 text-grep-pink text-xs font-semibold">
+              Live Events
+            </div>
+          </Link>
+
+          <Link
+            href="/battle-pass"
+            className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-grep-orange/20 to-grep-yellow/20 border border-grep-orange/30 hover:border-grep-orange/50 transition-all p-6"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-grep-orange to-grep-yellow flex items-center justify-center">
+                <Star className="w-8 h-8 text-dark-900" />
+              </div>
+              <div>
+                <h3 className="text-xl font-display font-bold">Battle Pass</h3>
+                <p className="text-gray-400 text-sm">Unlock exclusive rewards each season</p>
+              </div>
+            </div>
+            <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-grep-orange/20 text-grep-orange text-xs font-semibold">
+              Season 1
+            </div>
+          </Link>
+        </div>
+
+        {/* Mini-Games Section */}
+        <div className="mt-16">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-3xl">⚡</span>
+            <div>
+              <h2 className="text-2xl font-display font-bold">Quick Games</h2>
+              <p className="text-gray-400 text-sm">Instant play, instant rewards - no skill required!</p>
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {miniGames.map((game) => (
+              <Link
+                key={game.id}
+                href={`/games/mini/${game.id}`}
+                className="group relative overflow-hidden rounded-2xl bg-dark-800/50 border border-dark-700 hover:border-grep-cyan/50 transition-all p-5"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-grep-cyan to-grep-blue flex items-center justify-center text-2xl">
+                    {game.icon}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{game.name}</h3>
+                    <span className="text-xs text-gray-400">{game.duration}</span>
+                  </div>
+                </div>
+                <p className="text-gray-400 text-sm mb-3">{game.description}</p>
+                <div className="flex items-center gap-2">
+                  <Coins className="w-3.5 h-3.5 text-grep-yellow" />
+                  <span className="text-xs font-bold text-grep-green">{game.rewards}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Staking Multipliers */}

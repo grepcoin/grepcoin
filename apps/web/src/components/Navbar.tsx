@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Gamepad2, Heart, User, Trophy, Star, BarChart3, Settings, LogOut, Bell, Coins } from 'lucide-react'
+import { Menu, X, Gamepad2, Heart, User, Trophy, Star, BarChart3, Settings, LogOut, Bell, Coins, Swords } from 'lucide-react'
 import { useAccount, useDisconnect } from 'wagmi'
 import { useAuth } from '@/context/AuthContext'
 import { useStaking } from '@/context/StakingContext'
@@ -12,6 +12,7 @@ import WalletButton from './WalletButton'
 
 const NAV_LINKS = [
   { href: '/games', label: 'Games', icon: Gamepad2 },
+  { href: '/tournaments', label: 'Tournaments', icon: Swords },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
   { href: '/battle-pass', label: 'Battle Pass', icon: Star },
   { href: '/stats', label: 'Stats', icon: BarChart3 },

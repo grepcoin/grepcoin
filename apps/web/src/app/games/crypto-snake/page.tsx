@@ -216,6 +216,28 @@ export default function CryptoSnakeGame() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [gameStatus])
 
+  // Mobile touch direction handler
+  const handleTouchDirection = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
+    if (gameStatus !== 'playing') return
+    const game = gameRef.current
+    const dir = game.direction
+
+    switch (direction) {
+      case 'up':
+        if (dir.y !== 1) game.nextDirection = { x: 0, y: -1 }
+        break
+      case 'down':
+        if (dir.y !== -1) game.nextDirection = { x: 0, y: 1 }
+        break
+      case 'left':
+        if (dir.x !== 1) game.nextDirection = { x: -1, y: 0 }
+        break
+      case 'right':
+        if (dir.x !== -1) game.nextDirection = { x: 1, y: 0 }
+        break
+    }
+  }, [gameStatus])
+
   // Game loop
   useEffect(() => {
     if (gameStatus !== 'playing') return
@@ -775,11 +797,53 @@ export default function CryptoSnakeGame() {
           )}
         </div>
 
+        {/* Mobile Touch Controls */}
+        {gameStatus === 'playing' && (
+          <div className="mt-6 md:hidden">
+            <div className="flex justify-center">
+              <div className="grid grid-cols-3 gap-2 w-40">
+                <div />
+                <button
+                  onTouchStart={() => handleTouchDirection('up')}
+                  className="w-12 h-12 rounded-xl bg-dark-700 border border-dark-600 flex items-center justify-center active:bg-grep-purple/30 active:border-grep-purple transition-colors"
+                >
+                  <ArrowUp className="w-6 h-6" />
+                </button>
+                <div />
+                <button
+                  onTouchStart={() => handleTouchDirection('left')}
+                  className="w-12 h-12 rounded-xl bg-dark-700 border border-dark-600 flex items-center justify-center active:bg-grep-purple/30 active:border-grep-purple transition-colors"
+                >
+                  <ArrowLeftIcon className="w-6 h-6" />
+                </button>
+                <div className="w-12 h-12 rounded-xl bg-dark-800 border border-dark-700 flex items-center justify-center">
+                  <div className="w-3 h-3 rounded-full bg-dark-600" />
+                </div>
+                <button
+                  onTouchStart={() => handleTouchDirection('right')}
+                  className="w-12 h-12 rounded-xl bg-dark-700 border border-dark-600 flex items-center justify-center active:bg-grep-purple/30 active:border-grep-purple transition-colors"
+                >
+                  <ArrowRight className="w-6 h-6" />
+                </button>
+                <div />
+                <button
+                  onTouchStart={() => handleTouchDirection('down')}
+                  className="w-12 h-12 rounded-xl bg-dark-700 border border-dark-600 flex items-center justify-center active:bg-grep-purple/30 active:border-grep-purple transition-colors"
+                >
+                  <ArrowDown className="w-6 h-6" />
+                </button>
+                <div />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Instructions */}
         <div className="mt-6 p-4 rounded-xl bg-dark-800/50 border border-dark-700">
           <h3 className="font-bold text-lg mb-2">How to Play</h3>
           <ul className="text-gray-400 text-sm space-y-1">
-            <li>Use arrow keys or WASD to control the snake</li>
+            <li className="hidden md:block">Use arrow keys or WASD to control the snake</li>
+            <li className="md:hidden">Use the D-pad below to control the snake</li>
             <li>Collect yellow GREP coins to grow and earn points</li>
             <li>Purple $ coins are worth 50 points and grow you by 2!</li>
             <li>Grab power-ups: Shield protects from one crash, Slow-mo reduces speed</li>
