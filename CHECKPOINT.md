@@ -1,8 +1,73 @@
 # GrepCoin Development Checkpoint
 
 **Date:** December 25, 2024
-**Status:** Production deployed, documentation complete
-**Latest Commit:** `1d89f3d6` - docs: comprehensive README update
+**Status:** Wave 5 Parallel Development In Progress
+**Latest Commit:** `c9405225` - feat: update contracts to 500M fixed supply
+
+---
+
+## WAVE 5 STATUS: COMPLETE
+
+> All 6 feature streams have been implemented!
+
+| Stream | Feature | Status | Implementation |
+|--------|---------|--------|----------------|
+| A | Anti-Cheat Integration | ✅ Done | `apps/web/src/app/api/games/[slug]/submit/route.ts` |
+| B | Achievement NFT Minting | ✅ Done | `apps/web/src/app/api/achievements/mint/route.ts` |
+| C | Battle Pass Rewards | ✅ Done | `apps/web/src/app/api/battle-pass/claim/route.ts` |
+| D | Notification System | ✅ Done | `apps/web/src/components/NotificationProvider.tsx` |
+| E | Settings Page | ✅ Done | `apps/web/src/app/settings/page.tsx` (655 lines!) |
+| F | Game Stats Dashboard | ✅ Done | `apps/web/src/app/stats/page.tsx` |
+
+---
+
+## CURRENT PRIORITY: TESTNET DEPLOYMENT
+
+| Task | Status | Details |
+|------|--------|---------|
+| Fund deployer wallet | ⏳ Pending | Need Base Sepolia ETH |
+| Deploy contracts | ⏳ Pending | `forge script script/Deploy.s.sol` |
+| Verify on BaseScan | ⏳ Pending | All 5 contracts |
+| Update frontend addresses | ⏳ Pending | `apps/web/src/lib/contracts.ts` |
+| Fund StakingPool rewards | ⏳ Pending | Transfer GREP to pool |
+| Test staking flow | ⏳ Pending | End-to-end validation |
+
+---
+
+## NEXT STEPS: What Agents Should Work On
+
+### 1. Testnet Deployment (Priority: Critical)
+```bash
+# Environment setup needed:
+export PRIVATE_KEY="deployer_private_key"
+export TREASURY_ADDRESS="0x..."
+export INITIAL_OWNER="0x..."
+
+# Deploy command:
+forge script script/Deploy.s.sol:Deploy \
+  --rpc-url https://sepolia.base.org \
+  --broadcast \
+  --verify
+```
+
+### 2. Post-Deployment Tasks
+- [ ] Set token exemptions for VestingVault, StakingPool, Timelock
+- [ ] Create vesting schedules for team/advisors
+- [ ] Add initial rewards to StakingPool
+- [ ] Create DEX liquidity pool
+
+### 3. Frontend Integration
+- [ ] Update `apps/web/src/lib/contracts.ts` with deployed addresses
+- [ ] Test staking UI with live contracts
+- [ ] Test achievement NFT minting flow
+- [ ] Verify governance voting works
+
+### 4. Testing Checklist
+- [ ] Stake tokens in each tier
+- [ ] Claim staking rewards
+- [ ] Mint achievement NFT
+- [ ] Create governance proposal
+- [ ] Vote on proposal
 
 ---
 
@@ -62,7 +127,7 @@ grepcoin/
 
 | Contract | Purpose | Tests |
 |----------|---------|-------|
-| GrepToken.sol | ERC-20 (1B supply) | Pass |
+| GrepToken.sol | ERC-20 (500M fixed supply) | Pass |
 | GrepStakingPool.sol | 5-tier staking | Pass |
 | GrepItems.sol | ERC-1155 game items | Pass |
 | GrepAchievements.sol | Soulbound badges | Pass |
@@ -171,6 +236,61 @@ f863235b fix: ensure LiveActivityTicker animation works correctly
 232dd28f fix: configure Vercel to properly build monorepo with local packages
 a6aff16e fix: configure Vercel for monorepo root deployment
 ```
+
+---
+
+---
+
+## Resume Instructions for Claude
+
+To continue this work session:
+
+1. **Read this file first** - `CHECKPOINT.md` has all context
+2. **Check agent progress** - Review completed vs pending tasks per stream
+3. **Check branch status** - `git branch -a` to see feature branches
+4. **Continue incomplete streams** - Pick up where agents left off
+5. **Update this checkpoint** - Mark tasks complete, update status
+
+### Key Files to Review
+- `WAVE5-PLAN.md` - Original stream specifications
+- `CONTEXT.md` - Full codebase patterns and conventions
+- `THINKING.md` - Architectural decisions and reasoning
+
+### Quick Commands
+```bash
+# Check all branches
+git branch -a
+
+# Switch to a stream branch
+git checkout feature/wave5-<stream>
+
+# Run tests
+cd apps/web && npm test
+cd packages/contracts && forge test
+
+# Build check
+npm run build
+```
+
+---
+
+## Progress Log
+
+### 2025-12-25 Session (Latest)
+- Confirmed token already at 500M fixed supply
+- **DISCOVERED: All Wave 5 streams already implemented!**
+  - Anti-cheat: Full validation in submit route
+  - Achievement NFT: Mint endpoint ready
+  - Battle Pass: Claim logic with XP/levels
+  - Notifications: Provider + Toast components
+  - Settings: Full page with push/email prefs (655 lines)
+  - Stats Dashboard: Charts + per-game analytics
+- Updated checkpoint to reflect actual status
+- Identified real next priority: **Testnet Deployment**
+
+### Previous Session
+- Updated token to 500M fixed supply
+- Initialized Wave 5 parallel development planning
 
 ---
 
