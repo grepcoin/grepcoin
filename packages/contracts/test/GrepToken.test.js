@@ -4,18 +4,14 @@ const { ethers } = require("hardhat");
 describe("GrepToken", function () {
   let grepToken;
   let owner;
-  let minter;
+  let burner;
   let user1;
   let user2;
 
-  const INITIAL_SUPPLY = ethers.parseEther("400000000"); // 400M
-  const MAX_SUPPLY = ethers.parseEther("1000000000"); // 1B
-  const STAKING_CAP = ethers.parseEther("300000000"); // 300M
-  const GAMEPLAY_CAP = ethers.parseEther("200000000"); // 200M
-  const AIRDROPS_CAP = ethers.parseEther("100000000"); // 100M
+  const TOTAL_SUPPLY = ethers.parseEther("500000000"); // 500M fixed supply
 
   beforeEach(async function () {
-    [owner, minter, user1, user2] = await ethers.getSigners();
+    [owner, burner, user1, user2] = await ethers.getSigners();
 
     const GrepToken = await ethers.getContractFactory("GrepToken");
     grepToken = await GrepToken.deploy();
@@ -28,180 +24,140 @@ describe("GrepToken", function () {
       expect(await grepToken.symbol()).to.equal("GREP");
     });
 
-    it("Should mint initial supply to deployer", async function () {
-      expect(await grepToken.balanceOf(owner.address)).to.equal(INITIAL_SUPPLY);
+    it("Should mint total supply to deployer", async function () {
+      expect(await grepToken.balanceOf(owner.address)).to.equal(TOTAL_SUPPLY);
     });
 
     it("Should set the correct total supply", async function () {
-      expect(await grepToken.totalSupply()).to.equal(INITIAL_SUPPLY);
+      expect(await grepToken.totalSupply()).to.equal(TOTAL_SUPPLY);
     });
 
     it("Should set the correct owner", async function () {
       expect(await grepToken.owner()).to.equal(owner.address);
     });
 
-    it("Should have correct max supply constant", async function () {
-      expect(await grepToken.MAX_SUPPLY()).to.equal(MAX_SUPPLY);
+    it("Should have correct total supply constant", async function () {
+      expect(await grepToken.TOTAL_SUPPLY()).to.equal(TOTAL_SUPPLY);
+    });
+
+    it("Should start with zero burned tokens", async function () {
+      expect(await grepToken.totalBurned()).to.equal(0);
     });
   });
 
-  describe("Minter Management", function () {
-    it("Should allow owner to add minter", async function () {
-      await expect(grepToken.addMinter(minter.address))
-        .to.emit(grepToken, "MinterAdded")
-        .withArgs(minter.address);
+  describe("Burner Management", function () {
+    it("Should allow owner to add burner", async function () {
+      await expect(grepToken.addBurner(burner.address))
+        .to.emit(grepToken, "BurnerAdded")
+        .withArgs(burner.address);
 
-      expect(await grepToken.minters(minter.address)).to.be.true;
+      expect(await grepToken.burners(burner.address)).to.be.true;
     });
 
-    it("Should allow owner to remove minter", async function () {
-      await grepToken.addMinter(minter.address);
+    it("Should allow owner to remove burner", async function () {
+      await grepToken.addBurner(burner.address);
 
-      await expect(grepToken.removeMinter(minter.address))
-        .to.emit(grepToken, "MinterRemoved")
-        .withArgs(minter.address);
+      await expect(grepToken.removeBurner(burner.address))
+        .to.emit(grepToken, "BurnerRemoved")
+        .withArgs(burner.address);
 
-      expect(await grepToken.minters(minter.address)).to.be.false;
+      expect(await grepToken.burners(burner.address)).to.be.false;
     });
 
-    it("Should not allow non-owner to add minter", async function () {
+    it("Should not allow non-owner to add burner", async function () {
       await expect(
-        grepToken.connect(user1).addMinter(minter.address)
+        grepToken.connect(user1).addBurner(burner.address)
       ).to.be.revertedWithCustomError(grepToken, "OwnableUnauthorizedAccount");
     });
 
-    it("Should not allow adding zero address as minter", async function () {
+    it("Should not allow adding zero address as burner", async function () {
       await expect(
-        grepToken.addMinter(ethers.ZeroAddress)
-      ).to.be.revertedWith("Invalid minter address");
+        grepToken.addBurner(ethers.ZeroAddress)
+      ).to.be.revertedWith("Invalid burner address");
     });
   });
 
-  describe("Staking Rewards Minting", function () {
-    beforeEach(async function () {
-      await grepToken.addMinter(minter.address);
+  describe("Burning", function () {
+    it("Should burn tokens correctly", async function () {
+      const burnAmount = ethers.parseEther("1000");
+
+      await grepToken.burn(burnAmount);
+
+      expect(await grepToken.balanceOf(owner.address)).to.equal(TOTAL_SUPPLY - burnAmount);
+      expect(await grepToken.totalSupply()).to.equal(TOTAL_SUPPLY - burnAmount);
+      expect(await grepToken.totalBurned()).to.equal(burnAmount);
     });
 
-    it("Should allow minter to mint staking rewards", async function () {
-      const amount = ethers.parseEther("1000");
+    it("Should burn with reason and emit event", async function () {
+      const burnAmount = ethers.parseEther("100");
+      const reason = "Evolution vote";
 
-      await expect(grepToken.connect(minter).mintStakingRewards(user1.address, amount))
-        .to.emit(grepToken, "StakingRewardsMinted")
-        .withArgs(user1.address, amount);
+      await expect(grepToken.burnWithReason(burnAmount, reason))
+        .to.emit(grepToken, "TokensBurnedFor")
+        .withArgs(owner.address, burnAmount, reason);
 
-      expect(await grepToken.balanceOf(user1.address)).to.equal(amount);
-      expect(await grepToken.stakingRewardsMinted()).to.equal(amount);
+      expect(await grepToken.totalBurned()).to.equal(burnAmount);
     });
 
-    it("Should allow owner to mint staking rewards", async function () {
-      const amount = ethers.parseEther("1000");
-      await grepToken.mintStakingRewards(user1.address, amount);
-      expect(await grepToken.balanceOf(user1.address)).to.equal(amount);
+    it("Should allow burnFrom with approval", async function () {
+      const burnAmount = ethers.parseEther("500");
+
+      // Transfer some tokens to user1
+      await grepToken.transfer(user1.address, burnAmount);
+
+      // User1 approves owner to burn
+      await grepToken.connect(user1).approve(owner.address, burnAmount);
+
+      await grepToken.burnFrom(user1.address, burnAmount);
+
+      expect(await grepToken.balanceOf(user1.address)).to.equal(0);
+      expect(await grepToken.totalBurned()).to.equal(burnAmount);
     });
 
-    it("Should not allow non-minter to mint staking rewards", async function () {
-      const amount = ethers.parseEther("1000");
+    it("Should allow authorized burner to burnFromWithReason", async function () {
+      const burnAmount = ethers.parseEther("100");
+      const reason = "Marketplace fee";
+
+      await grepToken.addBurner(burner.address);
+      await grepToken.transfer(user1.address, burnAmount);
+      await grepToken.connect(user1).approve(burner.address, burnAmount);
+
+      await expect(grepToken.connect(burner).burnFromWithReason(user1.address, burnAmount, reason))
+        .to.emit(grepToken, "TokensBurnedFor")
+        .withArgs(user1.address, burnAmount, reason);
+
+      expect(await grepToken.totalBurned()).to.equal(burnAmount);
+    });
+
+    it("Should not allow unauthorized burnFromWithReason", async function () {
+      const burnAmount = ethers.parseEther("100");
+
+      await grepToken.transfer(user1.address, burnAmount);
+      await grepToken.connect(user1).approve(user2.address, burnAmount);
+
       await expect(
-        grepToken.connect(user1).mintStakingRewards(user2.address, amount)
-      ).to.be.revertedWith("Not authorized to mint");
-    });
-
-    it("Should not exceed staking rewards cap", async function () {
-      const overCap = STAKING_CAP + ethers.parseEther("1");
-      await expect(
-        grepToken.connect(minter).mintStakingRewards(user1.address, overCap)
-      ).to.be.revertedWith("Staking rewards cap exceeded");
+        grepToken.connect(user2).burnFromWithReason(user1.address, burnAmount, "test")
+      ).to.be.revertedWith("Not authorized to burn");
     });
   });
 
-  describe("Gameplay Rewards Minting", function () {
-    beforeEach(async function () {
-      await grepToken.addMinter(minter.address);
+  describe("Supply Tracking", function () {
+    it("Should calculate circulating supply correctly", async function () {
+      const burnAmount = ethers.parseEther("10000");
+
+      await grepToken.burn(burnAmount);
+
+      expect(await grepToken.circulatingSupply()).to.equal(TOTAL_SUPPLY - burnAmount);
     });
 
-    it("Should allow minter to mint gameplay rewards", async function () {
-      const amount = ethers.parseEther("500");
+    it("Should calculate burn percentage correctly", async function () {
+      // Burn 5% of supply (25M)
+      const burnAmount = ethers.parseEther("25000000");
 
-      await expect(grepToken.connect(minter).mintGameplayRewards(user1.address, amount))
-        .to.emit(grepToken, "GameplayRewardsMinted")
-        .withArgs(user1.address, amount);
+      await grepToken.burn(burnAmount);
 
-      expect(await grepToken.balanceOf(user1.address)).to.equal(amount);
-      expect(await grepToken.gameplayRewardsMinted()).to.equal(amount);
-    });
-
-    it("Should not exceed gameplay rewards cap", async function () {
-      const overCap = GAMEPLAY_CAP + ethers.parseEther("1");
-      await expect(
-        grepToken.connect(minter).mintGameplayRewards(user1.address, overCap)
-      ).to.be.revertedWith("Gameplay rewards cap exceeded");
-    });
-  });
-
-  describe("Airdrop Minting", function () {
-    beforeEach(async function () {
-      await grepToken.addMinter(minter.address);
-    });
-
-    it("Should allow minter to mint airdrops", async function () {
-      const amount = ethers.parseEther("100");
-
-      await expect(grepToken.connect(minter).mintAirdrop(user1.address, amount))
-        .to.emit(grepToken, "AirdropMinted")
-        .withArgs(user1.address, amount);
-
-      expect(await grepToken.balanceOf(user1.address)).to.equal(amount);
-      expect(await grepToken.airdropsMinted()).to.equal(amount);
-    });
-
-    it("Should not exceed airdrops cap", async function () {
-      const overCap = AIRDROPS_CAP + ethers.parseEther("1");
-      await expect(
-        grepToken.connect(minter).mintAirdrop(user1.address, overCap)
-      ).to.be.revertedWith("Airdrops cap exceeded");
-    });
-  });
-
-  describe("Max Supply Enforcement", function () {
-    beforeEach(async function () {
-      await grepToken.addMinter(minter.address);
-    });
-
-    it("Should not allow minting beyond max supply", async function () {
-      // Mint up to near max supply via staking rewards
-      await grepToken.connect(minter).mintStakingRewards(user1.address, STAKING_CAP);
-      await grepToken.connect(minter).mintGameplayRewards(user1.address, GAMEPLAY_CAP);
-
-      // Try to mint more than remaining cap
-      const remaining = MAX_SUPPLY - INITIAL_SUPPLY - STAKING_CAP - GAMEPLAY_CAP;
-      const overMax = remaining + ethers.parseEther("1");
-
-      await expect(
-        grepToken.connect(minter).mintAirdrop(user1.address, overMax)
-      ).to.be.revertedWith("Airdrops cap exceeded");
-    });
-  });
-
-  describe("Remaining Mintable", function () {
-    beforeEach(async function () {
-      await grepToken.addMinter(minter.address);
-    });
-
-    it("Should return correct remaining mintable amounts", async function () {
-      const stakingMint = ethers.parseEther("100000");
-      const gameplayMint = ethers.parseEther("50000");
-      const airdropMint = ethers.parseEther("25000");
-
-      await grepToken.connect(minter).mintStakingRewards(user1.address, stakingMint);
-      await grepToken.connect(minter).mintGameplayRewards(user1.address, gameplayMint);
-      await grepToken.connect(minter).mintAirdrop(user1.address, airdropMint);
-
-      const [stakingRemaining, gameplayRemaining, airdropsRemaining] =
-        await grepToken.getRemainingMintable();
-
-      expect(stakingRemaining).to.equal(STAKING_CAP - stakingMint);
-      expect(gameplayRemaining).to.equal(GAMEPLAY_CAP - gameplayMint);
-      expect(airdropsRemaining).to.equal(AIRDROPS_CAP - airdropMint);
+      // 500 basis points = 5%
+      expect(await grepToken.burnPercentage()).to.equal(500);
     });
   });
 
@@ -211,7 +167,7 @@ describe("GrepToken", function () {
       await grepToken.transfer(user1.address, amount);
 
       expect(await grepToken.balanceOf(user1.address)).to.equal(amount);
-      expect(await grepToken.balanceOf(owner.address)).to.equal(INITIAL_SUPPLY - amount);
+      expect(await grepToken.balanceOf(owner.address)).to.equal(TOTAL_SUPPLY - amount);
     });
 
     it("Should approve and transferFrom correctly", async function () {
@@ -224,15 +180,29 @@ describe("GrepToken", function () {
 
       expect(await grepToken.balanceOf(user2.address)).to.equal(amount);
     });
+  });
 
-    it("Should burn tokens correctly", async function () {
-      const burnAmount = ethers.parseEther("1000");
-      const initialBalance = await grepToken.balanceOf(owner.address);
+  describe("Pausable", function () {
+    it("Should allow owner to pause", async function () {
+      await grepToken.pause();
+      expect(await grepToken.paused()).to.be.true;
+    });
 
-      await grepToken.burn(burnAmount);
+    it("Should prevent transfers when paused", async function () {
+      await grepToken.pause();
 
-      expect(await grepToken.balanceOf(owner.address)).to.equal(initialBalance - burnAmount);
-      expect(await grepToken.totalSupply()).to.equal(INITIAL_SUPPLY - burnAmount);
+      await expect(
+        grepToken.transfer(user1.address, ethers.parseEther("100"))
+      ).to.be.revertedWithCustomError(grepToken, "EnforcedPause");
+    });
+
+    it("Should allow transfers after unpause", async function () {
+      await grepToken.pause();
+      await grepToken.unpause();
+
+      const amount = ethers.parseEther("100");
+      await grepToken.transfer(user1.address, amount);
+      expect(await grepToken.balanceOf(user1.address)).to.equal(amount);
     });
   });
 });

@@ -11,119 +11,119 @@ import "@openzeppelin/contracts/utils/Nonces.sol";
 
 /**
  * @title GrepToken
- * @dev ERC-20 token for the GrepCoin Arcade ecosystem with governance voting support
+ * @dev ERC-20 token for the GrepCoin AI Evolution Economy
  *
- * Total Supply: 1,000,000,000 GREP (1 billion)
- * - 40% (400M) to deployer for liquidity and team
- * - 30% (300M) reserved for staking rewards
- * - 20% (200M) reserved for gameplay rewards
- * - 10% (100M) reserved for airdrops and marketing
+ * DEFLATIONARY MODEL - Fixed supply, no minting after deployment
+ *
+ * Total Supply: 500,000,000 GREP (500 million) - ALL minted at deployment
+ *
+ * Distribution (handled off-chain via transfers):
+ * - 40% (200M) Ecosystem & Rewards
+ * - 20% (100M) Liquidity Pool
+ * - 15% (75M)  Team & Founders (4-year vest)
+ * - 15% (75M)  Treasury
+ * - 10% (50M)  Early Supporters
+ *
+ * Burns occur from:
+ * - AI Evolution votes (all voted tokens burned)
+ * - Marketplace fees (2.5%)
+ * - Tournament entries (10%)
+ * - Achievement mints (10 GREP)
+ * - Guild creation (500 GREP)
  *
  * Voting: Uses ERC20Votes for checkpoint-based voting power tracking.
  * Users must delegate to themselves or others to activate voting power.
  */
 contract GrepToken is ERC20, ERC20Burnable, ERC20Permit, ERC20Votes, Ownable, Pausable {
-    uint256 public constant MAX_SUPPLY = 1_000_000_000 * 10**18; // 1 billion tokens
+    uint256 public constant TOTAL_SUPPLY = 500_000_000 * 10**18; // 500 million tokens - FIXED
 
-    // Addresses that can mint (staking pool, rewards distributor)
-    mapping(address => bool) public minters;
+    // Track total burned for transparency
+    uint256 public totalBurned;
 
-    // Track total minted for each purpose
-    uint256 public stakingRewardsMinted;
-    uint256 public gameplayRewardsMinted;
-    uint256 public airdropsMinted;
+    // Addresses authorized to burn on behalf of users (evolution contract, marketplace)
+    mapping(address => bool) public burners;
 
-    // Caps for each category
-    uint256 public constant STAKING_REWARDS_CAP = 300_000_000 * 10**18;  // 300M
-    uint256 public constant GAMEPLAY_REWARDS_CAP = 200_000_000 * 10**18; // 200M
-    uint256 public constant AIRDROPS_CAP = 100_000_000 * 10**18;         // 100M
-
-    event MinterAdded(address indexed minter);
-    event MinterRemoved(address indexed minter);
-    event StakingRewardsMinted(address indexed to, uint256 amount);
-    event GameplayRewardsMinted(address indexed to, uint256 amount);
-    event AirdropMinted(address indexed to, uint256 amount);
+    event BurnerAdded(address indexed burner);
+    event BurnerRemoved(address indexed burner);
+    event TokensBurnedFor(address indexed from, uint256 amount, string reason);
 
     constructor() ERC20("GrepCoin", "GREP") ERC20Permit("GrepCoin") Ownable(msg.sender) {
-        // Mint initial 40% to deployer
-        _mint(msg.sender, 400_000_000 * 10**18);
+        // Mint entire fixed supply to deployer
+        // Distribution to different allocations handled via transfers
+        _mint(msg.sender, TOTAL_SUPPLY);
     }
 
-    modifier onlyMinter() {
-        require(minters[msg.sender] || msg.sender == owner(), "Not authorized to mint");
+    modifier onlyBurner() {
+        require(burners[msg.sender] || msg.sender == owner(), "Not authorized to burn");
         _;
     }
 
     /**
-     * @dev Add a minter (staking pool or rewards distributor)
+     * @dev Add a burner (evolution contract, marketplace, etc.)
      */
-    function addMinter(address minter) external onlyOwner {
-        require(minter != address(0), "Invalid minter address");
-        minters[minter] = true;
-        emit MinterAdded(minter);
+    function addBurner(address burner) external onlyOwner {
+        require(burner != address(0), "Invalid burner address");
+        burners[burner] = true;
+        emit BurnerAdded(burner);
     }
 
     /**
-     * @dev Remove a minter
+     * @dev Remove a burner
      */
-    function removeMinter(address minter) external onlyOwner {
-        minters[minter] = false;
-        emit MinterRemoved(minter);
+    function removeBurner(address burner) external onlyOwner {
+        burners[burner] = false;
+        emit BurnerRemoved(burner);
     }
 
     /**
-     * @dev Mint staking rewards (capped at 300M)
+     * @dev Burn tokens from a user (requires approval)
+     * Used by evolution voting, marketplace, etc.
      */
-    function mintStakingRewards(address to, uint256 amount) external onlyMinter {
-        require(to != address(0), "Cannot mint to zero address");
-        require(amount > 0, "Amount must be greater than zero");
-        require(stakingRewardsMinted + amount <= STAKING_REWARDS_CAP, "Staking rewards cap exceeded");
-        require(totalSupply() + amount <= MAX_SUPPLY, "Max supply exceeded");
-
-        stakingRewardsMinted += amount;
-        _mint(to, amount);
-        emit StakingRewardsMinted(to, amount);
+    function burnFrom(address account, uint256 amount) public virtual override {
+        super.burnFrom(account, amount);
+        totalBurned += amount;
     }
 
     /**
-     * @dev Mint gameplay rewards (capped at 200M)
+     * @dev Burn tokens with a reason (for tracking)
      */
-    function mintGameplayRewards(address to, uint256 amount) external onlyMinter {
-        require(to != address(0), "Cannot mint to zero address");
-        require(amount > 0, "Amount must be greater than zero");
-        require(gameplayRewardsMinted + amount <= GAMEPLAY_REWARDS_CAP, "Gameplay rewards cap exceeded");
-        require(totalSupply() + amount <= MAX_SUPPLY, "Max supply exceeded");
-
-        gameplayRewardsMinted += amount;
-        _mint(to, amount);
-        emit GameplayRewardsMinted(to, amount);
+    function burnWithReason(uint256 amount, string calldata reason) external {
+        _burn(msg.sender, amount);
+        totalBurned += amount;
+        emit TokensBurnedFor(msg.sender, amount, reason);
     }
 
     /**
-     * @dev Mint airdrop tokens (capped at 100M)
+     * @dev Burn tokens from user with reason (requires approval)
+     * Called by authorized burner contracts
      */
-    function mintAirdrop(address to, uint256 amount) external onlyMinter {
-        require(to != address(0), "Cannot mint to zero address");
-        require(amount > 0, "Amount must be greater than zero");
-        require(airdropsMinted + amount <= AIRDROPS_CAP, "Airdrops cap exceeded");
-        require(totalSupply() + amount <= MAX_SUPPLY, "Max supply exceeded");
-
-        airdropsMinted += amount;
-        _mint(to, amount);
-        emit AirdropMinted(to, amount);
+    function burnFromWithReason(address account, uint256 amount, string calldata reason) external onlyBurner {
+        _spendAllowance(account, msg.sender, amount);
+        _burn(account, amount);
+        totalBurned += amount;
+        emit TokensBurnedFor(account, amount, reason);
     }
 
     /**
-     * @dev Get remaining mintable amounts
+     * @dev Override burn to track total burned
      */
-    function getRemainingMintable() external view returns (
-        uint256 stakingRemaining,
-        uint256 gameplayRemaining,
-        uint256 airdropsRemaining
-    ) {
-        stakingRemaining = STAKING_REWARDS_CAP - stakingRewardsMinted;
-        gameplayRemaining = GAMEPLAY_REWARDS_CAP - gameplayRewardsMinted;
-        airdropsRemaining = AIRDROPS_CAP - airdropsMinted;
+    function burn(uint256 amount) public virtual override {
+        super.burn(amount);
+        totalBurned += amount;
+    }
+
+    /**
+     * @dev Get current circulating supply (total - burned)
+     */
+    function circulatingSupply() external view returns (uint256) {
+        return TOTAL_SUPPLY - totalBurned;
+    }
+
+    /**
+     * @dev Get burn percentage (basis points, 100 = 1%)
+     */
+    function burnPercentage() external view returns (uint256) {
+        return (totalBurned * 10000) / TOTAL_SUPPLY;
     }
 
     /**

@@ -9,64 +9,56 @@ describe("GrepStakingPool", function () {
   let user1;
   let user2;
 
-  // Tier enum
+  // Tier enum - Updated for Real Yield Model
   const Tier = {
     None: 0n,
-    Flexible: 1n,
-    Bronze: 2n,
-    Silver: 3n,
-    Gold: 4n,
-    Diamond: 5n,
+    Basic: 1n,
+    Silver: 2n,
+    Gold: 3n,
+    Diamond: 4n,
   };
 
-  // Tier requirements
+  // Tier requirements - Real Yield Model
   const TIER_MIN_STAKES = {
-    1: ethers.parseEther("100"),
-    2: ethers.parseEther("1000"),
-    3: ethers.parseEther("5000"),
-    4: ethers.parseEther("10000"),
-    5: ethers.parseEther("50000"),
+    1: ethers.parseEther("100"),    // Basic
+    2: ethers.parseEther("1000"),   // Silver
+    3: ethers.parseEther("5000"),   // Gold
+    4: ethers.parseEther("25000"),  // Diamond
   };
 
   const TIER_LOCK_DURATIONS = {
-    1: 0n,
-    2: BigInt(7 * 24 * 60 * 60), // 7 days
-    3: BigInt(14 * 24 * 60 * 60), // 14 days
-    4: BigInt(30 * 24 * 60 * 60), // 30 days
-    5: BigInt(90 * 24 * 60 * 60), // 90 days
+    1: 0n,                           // Basic - no lock
+    2: BigInt(7 * 24 * 60 * 60),    // Silver - 7 days
+    3: BigInt(30 * 24 * 60 * 60),   // Gold - 30 days
+    4: BigInt(90 * 24 * 60 * 60),   // Diamond - 90 days
   };
 
-  const TIER_MULTIPLIERS = {
-    1: 11000n, // 1.1x
-    2: 12500n, // 1.25x
-    3: 15000n, // 1.5x
-    4: 17500n, // 1.75x
-    5: 20000n, // 2.0x
+  const TIER_REWARD_WEIGHTS = {
+    1: 100n,   // Basic - 1x
+    2: 125n,   // Silver - 1.25x
+    3: 150n,   // Gold - 1.5x
+    4: 200n,   // Diamond - 2x
   };
 
   const TIER_BONUS_PLAYS = {
     1: 2n,
     2: 5n,
     3: 10n,
-    4: 15n,
-    5: 25n,
+    4: 20n,
   };
 
   beforeEach(async function () {
     [owner, user1, user2] = await ethers.getSigners();
 
-    // Deploy GrepToken
+    // Deploy GrepToken (500M fixed supply)
     const GrepToken = await ethers.getContractFactory("GrepToken");
     grepToken = await GrepToken.deploy();
     await grepToken.waitForDeployment();
 
-    // Deploy StakingPool
+    // Deploy StakingPool (Real Yield Model)
     const GrepStakingPool = await ethers.getContractFactory("GrepStakingPool");
     stakingPool = await GrepStakingPool.deploy(await grepToken.getAddress());
     await stakingPool.waitForDeployment();
-
-    // Add staking pool as minter
-    await grepToken.addMinter(await stakingPool.getAddress());
 
     // Transfer tokens to users for testing
     await grepToken.transfer(user1.address, ethers.parseEther("100000"));
@@ -79,15 +71,15 @@ describe("GrepStakingPool", function () {
     });
 
     it("Should initialize tier info correctly", async function () {
-      const flexibleTier = await stakingPool.tierInfo(Tier.Flexible);
-      expect(flexibleTier.minStake).to.equal(TIER_MIN_STAKES[1]);
-      expect(flexibleTier.lockDuration).to.equal(TIER_LOCK_DURATIONS[1]);
-      expect(flexibleTier.multiplier).to.equal(TIER_MULTIPLIERS[1]);
+      const basicTier = await stakingPool.tierInfo(Tier.Basic);
+      expect(basicTier.minStake).to.equal(TIER_MIN_STAKES[1]);
+      expect(basicTier.lockDuration).to.equal(TIER_LOCK_DURATIONS[1]);
+      expect(basicTier.rewardWeight).to.equal(TIER_REWARD_WEIGHTS[1]);
 
       const diamondTier = await stakingPool.tierInfo(Tier.Diamond);
-      expect(diamondTier.minStake).to.equal(TIER_MIN_STAKES[5]);
-      expect(diamondTier.lockDuration).to.equal(TIER_LOCK_DURATIONS[5]);
-      expect(diamondTier.multiplier).to.equal(TIER_MULTIPLIERS[5]);
+      expect(diamondTier.minStake).to.equal(TIER_MIN_STAKES[4]);
+      expect(diamondTier.lockDuration).to.equal(TIER_LOCK_DURATIONS[4]);
+      expect(diamondTier.rewardWeight).to.equal(TIER_REWARD_WEIGHTS[4]);
     });
 
     it("Should start with zero total staked", async function () {
@@ -98,36 +90,35 @@ describe("GrepStakingPool", function () {
 
   describe("Staking", function () {
     beforeEach(async function () {
-      // Approve staking pool to spend tokens
       await grepToken.connect(user1).approve(
         await stakingPool.getAddress(),
         ethers.parseEther("100000")
       );
     });
 
-    it("Should allow staking at Flexible tier", async function () {
+    it("Should allow staking at Basic tier", async function () {
       const stakeAmount = ethers.parseEther("100");
 
-      await expect(stakingPool.connect(user1).stake(stakeAmount, Tier.Flexible))
+      await expect(stakingPool.connect(user1).stake(stakeAmount, Tier.Basic))
         .to.emit(stakingPool, "Staked");
 
       const stakeInfo = await stakingPool.getStakeInfo(user1.address);
       expect(stakeInfo.amount).to.equal(stakeAmount);
-      expect(stakeInfo.tier).to.equal(Tier.Flexible);
+      expect(stakeInfo.tier).to.equal(Tier.Basic);
     });
 
-    it("Should allow staking at Bronze tier", async function () {
+    it("Should allow staking at Silver tier", async function () {
       const stakeAmount = ethers.parseEther("1000");
 
-      await stakingPool.connect(user1).stake(stakeAmount, Tier.Bronze);
+      await stakingPool.connect(user1).stake(stakeAmount, Tier.Silver);
 
       const stakeInfo = await stakingPool.getStakeInfo(user1.address);
       expect(stakeInfo.amount).to.equal(stakeAmount);
-      expect(stakeInfo.tier).to.equal(Tier.Bronze);
+      expect(stakeInfo.tier).to.equal(Tier.Silver);
     });
 
     it("Should allow staking at Diamond tier", async function () {
-      const stakeAmount = ethers.parseEther("50000");
+      const stakeAmount = ethers.parseEther("25000");
 
       await stakingPool.connect(user1).stake(stakeAmount, Tier.Diamond);
 
@@ -140,7 +131,7 @@ describe("GrepStakingPool", function () {
       const belowMin = ethers.parseEther("50"); // Below 100 GREP minimum
 
       await expect(
-        stakingPool.connect(user1).stake(belowMin, Tier.Flexible)
+        stakingPool.connect(user1).stake(belowMin, Tier.Basic)
       ).to.be.revertedWith("Below minimum stake for tier");
     });
 
@@ -153,7 +144,7 @@ describe("GrepStakingPool", function () {
     it("Should update total staked and stakers count", async function () {
       const stakeAmount = ethers.parseEther("1000");
 
-      await stakingPool.connect(user1).stake(stakeAmount, Tier.Bronze);
+      await stakingPool.connect(user1).stake(stakeAmount, Tier.Silver);
 
       expect(await stakingPool.totalStaked()).to.equal(stakeAmount);
       expect(await stakingPool.totalStakers()).to.equal(1n);
@@ -163,7 +154,7 @@ describe("GrepStakingPool", function () {
         await stakingPool.getAddress(),
         ethers.parseEther("100000")
       );
-      await stakingPool.connect(user2).stake(stakeAmount, Tier.Bronze);
+      await stakingPool.connect(user2).stake(stakeAmount, Tier.Silver);
 
       expect(await stakingPool.totalStaked()).to.equal(stakeAmount * 2n);
       expect(await stakingPool.totalStakers()).to.equal(2n);
@@ -172,24 +163,13 @@ describe("GrepStakingPool", function () {
     it("Should set correct lock duration", async function () {
       const stakeAmount = ethers.parseEther("1000");
 
-      await stakingPool.connect(user1).stake(stakeAmount, Tier.Bronze);
+      await stakingPool.connect(user1).stake(stakeAmount, Tier.Silver);
 
       const stakeInfo = await stakingPool.getStakeInfo(user1.address);
       const expectedLockEnd = BigInt(await time.latest()) + TIER_LOCK_DURATIONS[2];
 
       // Allow 2 second tolerance for block time
       expect(stakeInfo.lockedUntil).to.be.closeTo(expectedLockEnd, 2n);
-    });
-
-    it("Should allow adding to existing stake", async function () {
-      const firstStake = ethers.parseEther("1000");
-      const secondStake = ethers.parseEther("5000"); // Must meet Silver minimum
-
-      await stakingPool.connect(user1).stake(firstStake, Tier.Bronze);
-      await stakingPool.connect(user1).stake(secondStake, Tier.Silver);
-
-      const stakeInfo = await stakingPool.getStakeInfo(user1.address);
-      expect(stakeInfo.amount).to.equal(firstStake + secondStake);
     });
   });
 
@@ -201,27 +181,26 @@ describe("GrepStakingPool", function () {
       );
     });
 
-    it("Should allow unstaking after lock period (Flexible)", async function () {
+    it("Should allow unstaking after lock period (Basic)", async function () {
       const stakeAmount = ethers.parseEther("100");
 
-      await stakingPool.connect(user1).stake(stakeAmount, Tier.Flexible);
+      await stakingPool.connect(user1).stake(stakeAmount, Tier.Basic);
 
-      // Flexible has no lock, can unstake immediately
+      // Basic has no lock, can unstake immediately
       const balanceBefore = await grepToken.balanceOf(user1.address);
       await stakingPool.connect(user1).unstake();
       const balanceAfter = await grepToken.balanceOf(user1.address);
 
-      // May receive small rewards, so check we got at least the stake back
-      expect(balanceAfter - balanceBefore).to.be.gte(stakeAmount);
+      expect(balanceAfter - balanceBefore).to.equal(stakeAmount);
 
       const stakeInfo = await stakingPool.getStakeInfo(user1.address);
       expect(stakeInfo.amount).to.equal(0n);
     });
 
-    it("Should allow unstaking after lock period (Bronze)", async function () {
+    it("Should allow unstaking after lock period (Silver)", async function () {
       const stakeAmount = ethers.parseEther("1000");
 
-      await stakingPool.connect(user1).stake(stakeAmount, Tier.Bronze);
+      await stakingPool.connect(user1).stake(stakeAmount, Tier.Silver);
 
       // Try to unstake before lock ends - should fail
       await expect(stakingPool.connect(user1).unstake()).to.be.revertedWith(
@@ -247,7 +226,7 @@ describe("GrepStakingPool", function () {
     it("Should update total staked and stakers on unstake", async function () {
       const stakeAmount = ethers.parseEther("100");
 
-      await stakingPool.connect(user1).stake(stakeAmount, Tier.Flexible);
+      await stakingPool.connect(user1).stake(stakeAmount, Tier.Basic);
 
       expect(await stakingPool.totalStaked()).to.equal(stakeAmount);
       expect(await stakingPool.totalStakers()).to.equal(1n);
@@ -259,39 +238,72 @@ describe("GrepStakingPool", function () {
     });
   });
 
-  describe("Rewards", function () {
+  describe("Real Yield Rewards", function () {
     beforeEach(async function () {
       await grepToken.connect(user1).approve(
         await stakingPool.getAddress(),
         ethers.parseEther("100000")
       );
+      await grepToken.connect(user2).approve(
+        await stakingPool.getAddress(),
+        ethers.parseEther("100000")
+      );
     });
 
-    it("Should accumulate rewards over time", async function () {
-      const stakeAmount = ethers.parseEther("10000");
+    it("Should allow adding rewards to pool", async function () {
+      const rewardAmount = ethers.parseEther("1000");
 
-      await stakingPool.connect(user1).stake(stakeAmount, Tier.Gold);
+      // Approve staking pool to receive rewards
+      await grepToken.approve(await stakingPool.getAddress(), rewardAmount);
 
-      // Fast forward 30 days
-      await time.increase(30 * 24 * 60 * 60);
+      await expect(stakingPool.addRewards(rewardAmount))
+        .to.emit(stakingPool, "RewardsAdded")
+        .withArgs(rewardAmount, owner.address);
+    });
 
-      const pendingRewards = await stakingPool.pendingRewards(user1.address);
+    it("Should distribute rewards to stakers", async function () {
+      const stakeAmount = ethers.parseEther("1000");
+      const rewardAmount = ethers.parseEther("100");
 
-      // Gold tier is 15% APY
-      // Expected: 10000 * 0.15 * (30/365) = ~123 GREP
-      const expectedRewards = (stakeAmount * 1500n * 30n) / (365n * 10000n);
+      // User1 stakes
+      await stakingPool.connect(user1).stake(stakeAmount, Tier.Silver);
 
-      // Allow small tolerance for timing
-      expect(pendingRewards).to.be.closeTo(expectedRewards, ethers.parseEther("1"));
+      // Add rewards to pool
+      await grepToken.approve(await stakingPool.getAddress(), rewardAmount);
+      await stakingPool.addRewards(rewardAmount);
+
+      // Check pending rewards
+      const pending = await stakingPool.pendingRewards(user1.address);
+      expect(pending).to.be.gt(0n);
+    });
+
+    it("Should distribute rewards proportionally by weight", async function () {
+      // User1 stakes at Basic (1x weight)
+      await stakingPool.connect(user1).stake(ethers.parseEther("100"), Tier.Basic);
+
+      // User2 stakes at Diamond (2x weight)
+      await stakingPool.connect(user2).stake(ethers.parseEther("25000"), Tier.Diamond);
+
+      // Add rewards
+      const rewardAmount = ethers.parseEther("1000");
+      await grepToken.approve(await stakingPool.getAddress(), rewardAmount);
+      await stakingPool.addRewards(rewardAmount);
+
+      const pending1 = await stakingPool.pendingRewards(user1.address);
+      const pending2 = await stakingPool.pendingRewards(user2.address);
+
+      // User2 should have much more due to higher stake and weight
+      expect(pending2).to.be.gt(pending1);
     });
 
     it("Should allow claiming rewards", async function () {
-      const stakeAmount = ethers.parseEther("10000");
+      const stakeAmount = ethers.parseEther("1000");
+      const rewardAmount = ethers.parseEther("100");
 
-      await stakingPool.connect(user1).stake(stakeAmount, Tier.Gold);
+      await stakingPool.connect(user1).stake(stakeAmount, Tier.Silver);
 
-      // Fast forward 30 days
-      await time.increase(30 * 24 * 60 * 60);
+      await grepToken.approve(await stakingPool.getAddress(), rewardAmount);
+      await stakingPool.addRewards(rewardAmount);
 
       const pendingBefore = await stakingPool.pendingRewards(user1.address);
       expect(pendingBefore).to.be.gt(0n);
@@ -300,55 +312,28 @@ describe("GrepStakingPool", function () {
       await stakingPool.connect(user1).claimRewards();
       const balanceAfter = await grepToken.balanceOf(user1.address);
 
-      // User should have received rewards
       expect(balanceAfter).to.be.gt(balanceBefore);
-
-      // Pending rewards should be reset (or very small due to time passing)
-      const pendingAfter = await stakingPool.pendingRewards(user1.address);
-      expect(pendingAfter).to.be.lt(ethers.parseEther("0.01"));
     });
 
     it("Should emit RewardsClaimed event", async function () {
-      const stakeAmount = ethers.parseEther("10000");
+      const stakeAmount = ethers.parseEther("1000");
+      const rewardAmount = ethers.parseEther("100");
 
-      await stakingPool.connect(user1).stake(stakeAmount, Tier.Gold);
+      await stakingPool.connect(user1).stake(stakeAmount, Tier.Silver);
 
-      await time.increase(30 * 24 * 60 * 60);
+      await grepToken.approve(await stakingPool.getAddress(), rewardAmount);
+      await stakingPool.addRewards(rewardAmount);
 
       await expect(stakingPool.connect(user1).claimRewards())
         .to.emit(stakingPool, "RewardsClaimed");
     });
-
-    it("Should track total claimed in stake info", async function () {
-      const stakeAmount = ethers.parseEther("10000");
-
-      await stakingPool.connect(user1).stake(stakeAmount, Tier.Gold);
-
-      await time.increase(30 * 24 * 60 * 60);
-
-      await stakingPool.connect(user1).claimRewards();
-
-      const stakeInfo = await stakingPool.getStakeInfo(user1.address);
-      expect(stakeInfo.totalClaimed).to.be.gt(0n);
-    });
   });
 
-  describe("Multipliers and Bonus Plays", function () {
+  describe("Bonus Plays", function () {
     beforeEach(async function () {
       await grepToken.connect(user1).approve(
         await stakingPool.getAddress(),
         ethers.parseEther("100000")
-      );
-    });
-
-    it("Should return correct multiplier for each tier", async function () {
-      // No stake = 1x (10000 basis points)
-      expect(await stakingPool.getUserMultiplier(user1.address)).to.equal(10000n);
-
-      // Stake at Flexible
-      await stakingPool.connect(user1).stake(ethers.parseEther("100"), Tier.Flexible);
-      expect(await stakingPool.getUserMultiplier(user1.address)).to.equal(
-        TIER_MULTIPLIERS[1]
       );
     });
 
@@ -357,8 +342,17 @@ describe("GrepStakingPool", function () {
       expect(await stakingPool.getUserBonusPlays(user1.address)).to.equal(0n);
 
       // Stake at Diamond
-      await stakingPool.connect(user1).stake(ethers.parseEther("50000"), Tier.Diamond);
-      expect(await stakingPool.getUserBonusPlays(user1.address)).to.equal(TIER_BONUS_PLAYS[5]);
+      await stakingPool.connect(user1).stake(ethers.parseEther("25000"), Tier.Diamond);
+      expect(await stakingPool.getUserBonusPlays(user1.address)).to.equal(TIER_BONUS_PLAYS[4]);
+    });
+
+    it("Should return correct weight for each tier", async function () {
+      // No stake = 1x (100)
+      expect(await stakingPool.getUserWeight(user1.address)).to.equal(100n);
+
+      // Stake at Gold
+      await stakingPool.connect(user1).stake(ethers.parseEther("5000"), Tier.Gold);
+      expect(await stakingPool.getUserWeight(user1.address)).to.equal(TIER_REWARD_WEIGHTS[3]);
     });
   });
 
@@ -373,15 +367,15 @@ describe("GrepStakingPool", function () {
     it("Should return complete stake info", async function () {
       const stakeAmount = ethers.parseEther("5000");
 
-      await stakingPool.connect(user1).stake(stakeAmount, Tier.Silver);
+      await stakingPool.connect(user1).stake(stakeAmount, Tier.Gold);
 
       const info = await stakingPool.getStakeInfo(user1.address);
 
       expect(info.amount).to.equal(stakeAmount);
-      expect(info.tier).to.equal(Tier.Silver);
+      expect(info.tier).to.equal(Tier.Gold);
       expect(info.stakedAt).to.be.gt(0n);
       expect(info.lockedUntil).to.be.gt(0n);
-      expect(info.multiplier).to.equal(TIER_MULTIPLIERS[3]);
+      expect(info.rewardWeight).to.equal(TIER_REWARD_WEIGHTS[3]);
       expect(info.bonusPlays).to.equal(TIER_BONUS_PLAYS[3]);
     });
 
@@ -390,55 +384,32 @@ describe("GrepStakingPool", function () {
 
       expect(info.amount).to.equal(0n);
       expect(info.tier).to.equal(Tier.None);
-      expect(info.multiplier).to.equal(10000n); // Base 1x
+      expect(info.rewardWeight).to.equal(100n); // Base 1x
       expect(info.bonusPlays).to.equal(0n);
     });
   });
 
-  describe("Edge Cases", function () {
-    beforeEach(async function () {
+  describe("Pool Stats", function () {
+    it("Should return correct pool stats", async function () {
       await grepToken.connect(user1).approve(
         await stakingPool.getAddress(),
         ethers.parseEther("100000")
       );
-    });
 
-    it("Should auto-upgrade tier when staking more", async function () {
-      // Start at Flexible
-      await stakingPool.connect(user1).stake(ethers.parseEther("100"), Tier.Flexible);
+      await stakingPool.connect(user1).stake(ethers.parseEther("1000"), Tier.Silver);
 
-      let info = await stakingPool.getStakeInfo(user1.address);
-      expect(info.tier).to.equal(Tier.Flexible);
+      const rewardAmount = ethers.parseEther("500");
+      await grepToken.approve(await stakingPool.getAddress(), rewardAmount);
+      await stakingPool.addRewards(rewardAmount);
 
-      // Add more to qualify for Silver (total 5100 GREP)
-      await stakingPool.connect(user1).stake(ethers.parseEther("5000"), Tier.Silver);
+      await stakingPool.connect(user1).claimRewards();
 
-      info = await stakingPool.getStakeInfo(user1.address);
-      expect(info.tier).to.equal(Tier.Silver);
-      expect(info.amount).to.equal(ethers.parseEther("5100"));
-    });
+      const [totalStaked, totalStakers, rewardPool, totalDistributed] =
+        await stakingPool.getPoolStats();
 
-    it("Should claim pending rewards when adding to stake", async function () {
-      await stakingPool.connect(user1).stake(ethers.parseEther("1000"), Tier.Bronze);
-
-      // Accumulate some rewards
-      await time.increase(30 * 24 * 60 * 60);
-
-      const pendingBefore = await stakingPool.pendingRewards(user1.address);
-      expect(pendingBefore).to.be.gt(0n);
-
-      const balanceBefore = await grepToken.balanceOf(user1.address);
-
-      // Add more stake - should auto-claim (5000 is Silver tier minimum)
-      const additionalStake = ethers.parseEther("5000");
-      await stakingPool.connect(user1).stake(additionalStake, Tier.Silver);
-
-      const balanceAfter = await grepToken.balanceOf(user1.address);
-
-      // Balance change = rewards received - new stake amount
-      // Should have received some rewards (net change + 5000 stake)
-      const netChange = balanceAfter - balanceBefore + additionalStake;
-      expect(netChange).to.be.closeTo(pendingBefore, ethers.parseEther("0.1"));
+      expect(totalStaked).to.equal(ethers.parseEther("1000"));
+      expect(totalStakers).to.equal(1n);
+      expect(totalDistributed).to.be.gt(0n);
     });
   });
 });

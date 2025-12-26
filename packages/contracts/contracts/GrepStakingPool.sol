@@ -7,35 +7,33 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 
-interface IGrepToken {
-    function mintStakingRewards(address to, uint256 amount) external;
-}
-
 /**
  * @title GrepStakingPool
- * @dev Staking contract for GREP tokens with tier-based multipliers
+ * @dev Real Yield Staking - Rewards from platform revenue, NOT from minting
+ *
+ * AI Evolution Economy Model:
+ * - Rewards funded by platform revenue (marketplace fees, tournament fees, etc.)
+ * - No new tokens minted - sustainable yield
+ * - Lower but real APY (3-8% depending on revenue)
  *
  * Tiers:
- * - Flexible: 100 GREP min, no lock, 1.1x multiplier, 5% APY
- * - Bronze: 1,000 GREP min, 7 days lock, 1.25x multiplier, 8% APY
- * - Silver: 5,000 GREP min, 14 days lock, 1.5x multiplier, 12% APY
- * - Gold: 10,000 GREP min, 30 days lock, 1.75x multiplier, 15% APY
- * - Diamond: 50,000 GREP min, 90 days lock, 2.0x multiplier, 20% APY
+ * - Basic:   100 GREP min, no lock, ~3% APY, vote on evolutions
+ * - Silver:  1,000 GREP min, 7 days lock, ~5% APY, early access
+ * - Gold:    5,000 GREP min, 30 days lock, ~6% APY, propose evolutions
+ * - Diamond: 25,000 GREP min, 90 days lock, ~8% APY, revenue share + governance
  */
 contract GrepStakingPool is Ownable, ReentrancyGuard, Pausable {
     using SafeERC20 for IERC20;
 
     IERC20 public immutable grepToken;
-    IGrepToken public immutable grepMinter;
 
     // Tier definitions
-    enum Tier { None, Flexible, Bronze, Silver, Gold, Diamond }
+    enum Tier { None, Basic, Silver, Gold, Diamond }
 
     struct TierInfo {
         uint256 minStake;      // Minimum stake amount (in wei)
         uint256 lockDuration;  // Lock duration in seconds
-        uint256 multiplier;    // Multiplier in basis points (10000 = 1x, 11000 = 1.1x)
-        uint256 apyBps;        // APY in basis points (500 = 5%)
+        uint256 rewardWeight;  // Weight for reward distribution (100 = 1x, 150 = 1.5x)
         uint256 bonusPlays;    // Bonus daily plays
     }
 
@@ -44,7 +42,7 @@ contract GrepStakingPool is Ownable, ReentrancyGuard, Pausable {
         Tier tier;
         uint256 stakedAt;
         uint256 lockedUntil;
-        uint256 lastClaimAt;
+        uint256 rewardDebt;    // For reward calculation
         uint256 totalClaimed;
     }
 
@@ -54,8 +52,14 @@ contract GrepStakingPool is Ownable, ReentrancyGuard, Pausable {
     // User stakes
     mapping(address => StakeInfo) public stakes;
 
+    // Reward pool (funded by platform revenue)
+    uint256 public rewardPool;
+    uint256 public accRewardPerShare; // Accumulated rewards per share (scaled by 1e12)
+    uint256 public lastRewardTime;
+
     // Platform stats
     uint256 public totalStaked;
+    uint256 public totalWeightedStake; // Sum of (stake * weight)
     uint256 public totalStakers;
     uint256 public totalRewardsDistributed;
 
@@ -63,69 +67,103 @@ contract GrepStakingPool is Ownable, ReentrancyGuard, Pausable {
     event Staked(address indexed user, uint256 amount, Tier tier, uint256 lockedUntil);
     event Unstaked(address indexed user, uint256 amount);
     event RewardsClaimed(address indexed user, uint256 amount);
+    event RewardsAdded(uint256 amount, address indexed from);
     event TierUpgraded(address indexed user, Tier oldTier, Tier newTier);
 
     constructor(address _grepToken) Ownable(msg.sender) {
         require(_grepToken != address(0), "Invalid token address");
         grepToken = IERC20(_grepToken);
-        grepMinter = IGrepToken(_grepToken);
+        lastRewardTime = block.timestamp;
 
-        // Initialize tier info
-        tierInfo[Tier.Flexible] = TierInfo({
+        // Initialize tier info - Real Yield Model
+        tierInfo[Tier.Basic] = TierInfo({
             minStake: 100 * 10**18,
             lockDuration: 0,
-            multiplier: 11000,  // 1.1x
-            apyBps: 500,        // 5%
+            rewardWeight: 100,  // 1x
             bonusPlays: 2
         });
 
-        tierInfo[Tier.Bronze] = TierInfo({
+        tierInfo[Tier.Silver] = TierInfo({
             minStake: 1_000 * 10**18,
             lockDuration: 7 days,
-            multiplier: 12500,  // 1.25x
-            apyBps: 800,        // 8%
+            rewardWeight: 125,  // 1.25x
             bonusPlays: 5
         });
 
-        tierInfo[Tier.Silver] = TierInfo({
+        tierInfo[Tier.Gold] = TierInfo({
             minStake: 5_000 * 10**18,
-            lockDuration: 14 days,
-            multiplier: 15000,  // 1.5x
-            apyBps: 1200,       // 12%
+            lockDuration: 30 days,
+            rewardWeight: 150,  // 1.5x
             bonusPlays: 10
         });
 
-        tierInfo[Tier.Gold] = TierInfo({
-            minStake: 10_000 * 10**18,
-            lockDuration: 30 days,
-            multiplier: 17500,  // 1.75x
-            apyBps: 1500,       // 15%
-            bonusPlays: 15
-        });
-
         tierInfo[Tier.Diamond] = TierInfo({
-            minStake: 50_000 * 10**18,
+            minStake: 25_000 * 10**18,
             lockDuration: 90 days,
-            multiplier: 20000,  // 2.0x
-            apyBps: 2000,       // 20%
-            bonusPlays: 25
+            rewardWeight: 200,  // 2x
+            bonusPlays: 20
         });
     }
 
     /**
+     * @dev Add rewards to the pool (called by platform revenue contracts)
+     */
+    function addRewards(uint256 amount) external nonReentrant {
+        require(amount > 0, "Amount must be greater than 0");
+        grepToken.safeTransferFrom(msg.sender, address(this), amount);
+        rewardPool += amount;
+        _updatePool();
+        emit RewardsAdded(amount, msg.sender);
+    }
+
+    /**
+     * @dev Update reward pool calculations
+     */
+    function _updatePool() internal {
+        if (totalWeightedStake == 0) {
+            lastRewardTime = block.timestamp;
+            return;
+        }
+
+        // Distribute reward pool across stakers based on weight
+        if (rewardPool > 0) {
+            accRewardPerShare += (rewardPool * 1e12) / totalWeightedStake;
+            rewardPool = 0;
+        }
+        lastRewardTime = block.timestamp;
+    }
+
+    /**
+     * @dev Calculate user's weighted stake
+     */
+    function _getWeightedStake(address user) internal view returns (uint256) {
+        StakeInfo storage userStake = stakes[user];
+        if (userStake.amount == 0) return 0;
+        return (userStake.amount * tierInfo[userStake.tier].rewardWeight) / 100;
+    }
+
+    /**
      * @dev Stake GREP tokens at a specific tier
-     * @param amount Amount to stake
-     * @param tier Desired tier (must meet minimum requirement)
      */
     function stake(uint256 amount, Tier tier) external nonReentrant whenNotPaused {
         require(tier != Tier.None, "Invalid tier");
         require(amount >= tierInfo[tier].minStake, "Below minimum stake for tier");
 
+        _updatePool();
+
         StakeInfo storage userStake = stakes[msg.sender];
 
         // If user has existing stake, claim rewards first
         if (userStake.amount > 0) {
-            _claimRewards(msg.sender);
+            uint256 pending = _pendingRewards(msg.sender);
+            if (pending > 0) {
+                userStake.totalClaimed += pending;
+                totalRewardsDistributed += pending;
+                grepToken.safeTransfer(msg.sender, pending);
+                emit RewardsClaimed(msg.sender, pending);
+            }
+            // Remove old weighted stake
+            totalWeightedStake -= _getWeightedStake(msg.sender);
         } else {
             totalStakers++;
         }
@@ -137,22 +175,24 @@ contract GrepStakingPool is Ownable, ReentrancyGuard, Pausable {
         uint256 newAmount = userStake.amount + amount;
         uint256 lockedUntil = block.timestamp + tierInfo[tier].lockDuration;
 
-        // Check if upgrading tier
         Tier oldTier = userStake.tier;
         Tier newTier = _calculateTier(newAmount);
 
-        // Use the higher tier between requested and calculated
+        // Use the higher tier
         if (uint256(newTier) > uint256(tier)) {
             tier = newTier;
+            lockedUntil = block.timestamp + tierInfo[tier].lockDuration;
         }
 
         userStake.amount = newAmount;
         userStake.tier = tier;
         userStake.stakedAt = block.timestamp;
         userStake.lockedUntil = lockedUntil;
-        if (userStake.lastClaimAt == 0) {
-            userStake.lastClaimAt = block.timestamp;
-        }
+
+        // Add new weighted stake
+        uint256 weightedStake = (newAmount * tierInfo[tier].rewardWeight) / 100;
+        totalWeightedStake += weightedStake;
+        userStake.rewardDebt = (weightedStake * accRewardPerShare) / 1e12;
 
         totalStaked += amount;
 
@@ -171,15 +211,27 @@ contract GrepStakingPool is Ownable, ReentrancyGuard, Pausable {
         require(userStake.amount > 0, "No stake found");
         require(block.timestamp >= userStake.lockedUntil, "Stake is still locked");
 
-        // Claim any pending rewards first
-        _claimRewards(msg.sender);
+        _updatePool();
+
+        // Claim pending rewards
+        uint256 pending = _pendingRewards(msg.sender);
+        if (pending > 0) {
+            userStake.totalClaimed += pending;
+            totalRewardsDistributed += pending;
+            grepToken.safeTransfer(msg.sender, pending);
+            emit RewardsClaimed(msg.sender, pending);
+        }
 
         uint256 amount = userStake.amount;
+
+        // Remove weighted stake
+        totalWeightedStake -= _getWeightedStake(msg.sender);
 
         // Reset stake
         userStake.amount = 0;
         userStake.tier = Tier.None;
         userStake.lockedUntil = 0;
+        userStake.rewardDebt = 0;
 
         totalStaked -= amount;
         totalStakers--;
@@ -194,41 +246,45 @@ contract GrepStakingPool is Ownable, ReentrancyGuard, Pausable {
      * @dev Claim staking rewards
      */
     function claimRewards() external nonReentrant {
-        _claimRewards(msg.sender);
-    }
+        _updatePool();
 
-    /**
-     * @dev Internal claim rewards logic
-     */
-    function _claimRewards(address user) internal {
-        StakeInfo storage userStake = stakes[user];
-        if (userStake.amount == 0) return;
+        StakeInfo storage userStake = stakes[msg.sender];
+        require(userStake.amount > 0, "No stake found");
 
-        uint256 rewards = pendingRewards(user);
-        if (rewards == 0) return;
+        uint256 pending = _pendingRewards(msg.sender);
+        require(pending > 0, "No rewards to claim");
 
-        userStake.lastClaimAt = block.timestamp;
-        userStake.totalClaimed += rewards;
-        totalRewardsDistributed += rewards;
+        userStake.totalClaimed += pending;
+        totalRewardsDistributed += pending;
 
-        // Mint rewards from token contract
-        grepMinter.mintStakingRewards(user, rewards);
+        // Update reward debt
+        uint256 weightedStake = _getWeightedStake(msg.sender);
+        userStake.rewardDebt = (weightedStake * accRewardPerShare) / 1e12;
 
-        emit RewardsClaimed(user, rewards);
+        grepToken.safeTransfer(msg.sender, pending);
+
+        emit RewardsClaimed(msg.sender, pending);
     }
 
     /**
      * @dev Calculate pending rewards for a user
      */
-    function pendingRewards(address user) public view returns (uint256) {
+    function _pendingRewards(address user) internal view returns (uint256) {
         StakeInfo storage userStake = stakes[user];
-        if (userStake.amount == 0 || userStake.lastClaimAt == 0) return 0;
+        if (userStake.amount == 0) return 0;
 
-        uint256 duration = block.timestamp - userStake.lastClaimAt;
-        uint256 apyBps = tierInfo[userStake.tier].apyBps;
+        uint256 weightedStake = _getWeightedStake(user);
+        uint256 accumulated = (weightedStake * accRewardPerShare) / 1e12;
 
-        // Calculate rewards: amount * APY * duration / (365 days * 10000)
-        return (userStake.amount * apyBps * duration) / (365 days * 10000);
+        if (accumulated <= userStake.rewardDebt) return 0;
+        return accumulated - userStake.rewardDebt;
+    }
+
+    /**
+     * @dev Public view for pending rewards
+     */
+    function pendingRewards(address user) public view returns (uint256) {
+        return _pendingRewards(user);
     }
 
     /**
@@ -238,18 +294,8 @@ contract GrepStakingPool is Ownable, ReentrancyGuard, Pausable {
         if (amount >= tierInfo[Tier.Diamond].minStake) return Tier.Diamond;
         if (amount >= tierInfo[Tier.Gold].minStake) return Tier.Gold;
         if (amount >= tierInfo[Tier.Silver].minStake) return Tier.Silver;
-        if (amount >= tierInfo[Tier.Bronze].minStake) return Tier.Bronze;
-        if (amount >= tierInfo[Tier.Flexible].minStake) return Tier.Flexible;
+        if (amount >= tierInfo[Tier.Basic].minStake) return Tier.Basic;
         return Tier.None;
-    }
-
-    /**
-     * @dev Get user's current multiplier (for game rewards)
-     */
-    function getUserMultiplier(address user) external view returns (uint256) {
-        StakeInfo storage userStake = stakes[user];
-        if (userStake.amount == 0) return 10000; // 1x base multiplier
-        return tierInfo[userStake.tier].multiplier;
     }
 
     /**
@@ -261,16 +307,24 @@ contract GrepStakingPool is Ownable, ReentrancyGuard, Pausable {
         return tierInfo[userStake.tier].bonusPlays;
     }
 
-    // Struct for returning full stake info (avoids stack too deep)
+    /**
+     * @dev Get user's reward weight multiplier
+     */
+    function getUserWeight(address user) external view returns (uint256) {
+        StakeInfo storage userStake = stakes[user];
+        if (userStake.amount == 0) return 100;
+        return tierInfo[userStake.tier].rewardWeight;
+    }
+
+    // Struct for returning full stake info
     struct FullStakeInfo {
         uint256 amount;
         Tier tier;
         uint256 stakedAt;
         uint256 lockedUntil;
-        uint256 lastClaimAt;
         uint256 totalClaimed;
         uint256 pendingReward;
-        uint256 multiplier;
+        uint256 rewardWeight;
         uint256 bonusPlays;
     }
 
@@ -285,58 +339,32 @@ contract GrepStakingPool is Ownable, ReentrancyGuard, Pausable {
         info.tier = userStake.tier;
         info.stakedAt = userStake.stakedAt;
         info.lockedUntil = userStake.lockedUntil;
-        info.lastClaimAt = userStake.lastClaimAt;
         info.totalClaimed = userStake.totalClaimed;
         info.pendingReward = pendingRewards(user);
-        info.multiplier = userStake.amount > 0 ? tInfo.multiplier : 10000;
+        info.rewardWeight = userStake.amount > 0 ? tInfo.rewardWeight : 100;
         info.bonusPlays = userStake.amount > 0 ? tInfo.bonusPlays : 0;
     }
 
     /**
-     * @dev Get tier info
+     * @dev Get pool stats
      */
-    function getTierInfo(Tier tier) external view returns (TierInfo memory) {
-        return tierInfo[tier];
-    }
-
-    /**
-     * @dev Get all tier requirements (for UI)
-     */
-    function getAllTiers() external view returns (
-        TierInfo memory flexible,
-        TierInfo memory bronze,
-        TierInfo memory silver,
-        TierInfo memory gold,
-        TierInfo memory diamond
+    function getPoolStats() external view returns (
+        uint256 _totalStaked,
+        uint256 _totalStakers,
+        uint256 _rewardPool,
+        uint256 _totalDistributed
     ) {
-        return (
-            tierInfo[Tier.Flexible],
-            tierInfo[Tier.Bronze],
-            tierInfo[Tier.Silver],
-            tierInfo[Tier.Gold],
-            tierInfo[Tier.Diamond]
-        );
+        return (totalStaked, totalStakers, rewardPool, totalRewardsDistributed);
     }
 
     /**
-     * @dev Emergency withdraw (owner only, for stuck tokens)
+     * @dev Emergency withdraw (owner only, for stuck tokens other than GREP)
      */
     function emergencyWithdraw(address token, uint256 amount) external onlyOwner {
         require(token != address(grepToken), "Cannot withdraw staked tokens");
         IERC20(token).safeTransfer(owner(), amount);
     }
 
-    /**
-     * @dev Pause staking operations (emergency stop)
-     */
-    function pause() external onlyOwner {
-        _pause();
-    }
-
-    /**
-     * @dev Unpause staking operations
-     */
-    function unpause() external onlyOwner {
-        _unpause();
-    }
+    function pause() external onlyOwner { _pause(); }
+    function unpause() external onlyOwner { _unpause(); }
 }

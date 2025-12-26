@@ -6,30 +6,28 @@ async function main() {
   console.log("Deploying contracts with account:", deployer.address);
   console.log("Account balance:", (await hre.ethers.provider.getBalance(deployer.address)).toString());
 
-  // Deploy GrepToken
-  console.log("\n1. Deploying GrepToken...");
+  // Deploy GrepToken (500M fixed supply - AI Evolution Economy)
+  console.log("\n1. Deploying GrepToken (500M fixed supply)...");
   const GrepToken = await hre.ethers.getContractFactory("GrepToken");
   const grepToken = await GrepToken.deploy();
   await grepToken.waitForDeployment();
   const grepTokenAddress = await grepToken.getAddress();
   console.log("GrepToken deployed to:", grepTokenAddress);
 
-  // Deploy GrepStakingPool
-  console.log("\n2. Deploying GrepStakingPool...");
+  // Check total supply
+  const totalSupply = await grepToken.totalSupply();
+  console.log("Total Supply:", hre.ethers.formatEther(totalSupply), "GREP");
+
+  // Deploy GrepStakingPool (Real Yield Model)
+  console.log("\n2. Deploying GrepStakingPool (Real Yield Model)...");
   const GrepStakingPool = await hre.ethers.getContractFactory("GrepStakingPool");
   const stakingPool = await GrepStakingPool.deploy(grepTokenAddress);
   await stakingPool.waitForDeployment();
   const stakingPoolAddress = await stakingPool.getAddress();
   console.log("GrepStakingPool deployed to:", stakingPoolAddress);
 
-  // Add staking pool as minter
-  console.log("\n3. Adding StakingPool as minter...");
-  const addMinterTx = await grepToken.addMinter(stakingPoolAddress);
-  await addMinterTx.wait();
-  console.log("StakingPool added as minter");
-
   // Deploy GrepVesting
-  console.log("\n4. Deploying GrepVesting...");
+  console.log("\n3. Deploying GrepVesting...");
   const GrepVesting = await hre.ethers.getContractFactory("GrepVesting");
   const grepVesting = await GrepVesting.deploy(grepTokenAddress);
   await grepVesting.waitForDeployment();
