@@ -1,657 +1,396 @@
-# GrepCoin Whitepaper
-
-**Version 1.0**
-**December 2024**
-
-**The Crypto Arcade for Indie Game Lovers**
-
+---
+layout: default
+title: GrepCoin Whitepaper
 ---
 
-## Abstract
+# GrepCoin Whitepaper
 
-GrepCoin is a **deflationary blockchain gaming platform** that combines arcade-style gameplay with AI-generated content evolution. Built on Base L2, GrepCoin introduces the **AI Evolution Economy** - a novel model where platform growth directly drives token scarcity. Every AI-generated game, level, and content piece burns GREP tokens, creating sustainable value appreciation.
+**The AI-Powered Play-to-Earn Crypto Arcade**
 
-This whitepaper outlines GrepCoin's vision, the AI Evolution Economy, technical architecture, and roadmap.
+**Version 2.0 | December 2024**
 
 ---
 
 ## Table of Contents
 
-1. [Introduction](#introduction)
-2. [Vision](#vision)
+1. [Abstract](#abstract)
+2. [Introduction](#introduction)
 3. [The Problem](#the-problem)
-4. [The Solution](#the-solution)
-5. [Tokenomics](#tokenomics)
-6. [Staking System](#staking-system)
-7. [NFT System](#nft-system)
-8. [Governance](#governance)
-9. [Technical Architecture](#technical-architecture)
-10. [Roadmap](#roadmap)
-11. [Team](#team)
-12. [Legal & Compliance](#legal--compliance)
+4. [The GrepCoin Solution](#the-grepcoin-solution)
+5. [Platform Architecture](#platform-architecture)
+6. [Tokenomics](#tokenomics)
+7. [Staking System](#staking-system)
+8. [Deflationary Mechanics](#deflationary-mechanics)
+9. [Governance](#governance)
+10. [Technology](#technology)
+11. [Roadmap](#roadmap)
+12. [Conclusion](#conclusion)
 
 ---
 
-## 1. Introduction
+## Abstract
 
-GrepCoin represents a new paradigm in blockchain gaming: accessible, fun, and rewarding. Unlike complex play-to-earn games that require significant upfront investment or grinding, GrepCoin offers instant gratification through browser-based arcade games that anyone can play and enjoy.
+GrepCoin (GREP) is a deflationary ERC-20 token powering an AI-built play-to-earn crypto arcade on Base L2. The platform combines engaging browser games with sustainable tokenomics, real yield staking, and on-chain achievements.
 
-### Key Highlights
+**Key Features:**
+- **Fixed Supply**: 500 million tokens, no inflation
+- **Real Yield**: Staking rewards from platform revenue
+- **Deflationary**: Multiple burn mechanisms reduce supply
+- **Low Fees**: Base L2 enables sub-cent transactions
+- **AI-Built**: Developed transparently with Claude AI
 
-- **8 Developer-Themed Games**: From regex puzzles to Git merge conflicts
-- **Play-to-Earn**: Earn real cryptocurrency for playing
-- **Staking Rewards**: Up to 20% APY on staked tokens
-- **NFT Achievements**: Collect soulbound badges for milestones
-- **Community Governance**: Vote on platform decisions
-- **Built with AI**: Entire platform developed through human-AI collaboration
-
----
-
-## 2. Vision
-
-**GrepCoin is for the indie devs, the hobbyists, the dreamers who code after hours.**
-
-We envision a gaming platform that:
-
-1. **Celebrates Developer Culture**: Games themed around programming, debugging, and software development
-2. **Rewards Players Fairly**: No pay-to-win mechanics, pure skill-based rewards
-3. **Builds Community**: Guilds, tournaments, and social features
-4. **Remains Open Source**: Transparent, community-driven development
-5. **Demonstrates AI Potential**: Proof that AI can amplify human creativity
-
-### Mission Statement
-
-To create a sustainable, community-owned gaming ecosystem where players are rewarded for their time, skill, and engagement.
+The platform launches with 9 playable games, a 4-tier staking system, achievement NFTs, and full social features. Future phases expand into marketplace, tournaments, and full DAO governance.
 
 ---
 
-## 3. The Problem
+## Introduction
 
-### Current Play-to-Earn Challenges
+### The State of Web3 Gaming
 
-1. **High Barriers to Entry**: Many P2E games require expensive NFT purchases ($100-$1000+)
-2. **Unsustainable Economics**: Ponzi-like tokenomics that collapse when new player influx stops
-3. **Poor Gameplay**: Games prioritize earning over fun
-4. **Complex Onboarding**: Difficult for non-crypto users to start
-5. **Centralization**: Game economies controlled by developers or whales
+Web3 gaming promised player ownership and real earnings. The reality has been disappointing:
 
-### Web2 Gaming Issues
+- **Inflationary Death Spirals**: Most GameFi tokens inflate endlessly
+- **High Gas Fees**: Ethereum mainnet makes micro-transactions impractical
+- **Poor Game Quality**: Tokenomics first, gameplay second
+- **Unsustainable Yields**: 1000% APY doesn't last
 
-1. **No Asset Ownership**: Players don't own their achievements or items
-2. **Walled Gardens**: Can't transfer progress between games
-3. **Developer Lock-in**: No say in game direction
-4. **Time Not Valued**: Thousands of hours with zero monetary value
+GrepCoin takes a different approach: build fun games first, design sustainable economics, and use modern L2 technology.
 
----
+### Why Base Network?
 
-## 4. The Solution
+Base L2 provides the ideal foundation:
 
-GrepCoin addresses these issues through:
-
-### 4.1 Accessible Gameplay
-
-- **Free to Play**: No initial investment required
-- **Browser-Based**: No downloads, play instantly
-- **Low Skill Floor**: Easy to learn, hard to master
-- **Mobile Friendly**: Play on any device
-
-### 4.2 Sustainable Tokenomics
-
-- **Capped Supply**: 1 billion GREP tokens, no infinite minting
-- **Categorized Allocations**: Separate pools for staking, gameplay, airdrops
-- **Burn Mechanisms**: Deflationary pressure through voluntary burns
-- **Long-term Vesting**: Team tokens locked for 3 years
-
-### 4.3 Fun-First Design
-
-- **Engaging Games**: Developer-themed arcade games
-- **Progression Systems**: Achievements, quests, battle passes
-- **Social Features**: Guilds, tournaments, leaderboards
-- **Regular Updates**: New games and features quarterly
-
-### 4.4 True Ownership
-
-- **NFT Achievements**: Soulbound badges you own forever
-- **Tradeable Items**: Buy, sell, auction in-game assets
-- **Governance Rights**: Vote with your tokens
-- **Portable Progress**: Take your achievements anywhere
+| Feature | Benefit |
+|---------|---------|
+| Low fees | Sub-cent transactions |
+| Fast blocks | 2-second finality |
+| Ethereum security | Inherited from L1 |
+| Coinbase ecosystem | Growing adoption |
+| EVM compatible | Familiar tooling |
 
 ---
 
-## 5. Tokenomics
+## The Problem
 
-### 5.1 The AI Evolution Economy
+### Traditional GameFi Failures
 
-GrepCoin introduces a **deflationary utility model** where platform growth drives token scarcity:
+**1. Unsustainable Tokenomics**
+Most GameFi projects mint tokens as rewards. As more players join, more tokens are minted, leading to hyperinflation and value collapse.
 
-- Every AI-generated game burns GREP
-- Every evolution vote burns GREP
-- Every marketplace transaction burns GREP
-- **The more the platform grows, the scarcer GREP becomes**
+**2. Barrier to Entry**
+High gas fees on Ethereum mainnet make small transactions economically unfeasible. A $1 in-game purchase shouldn't cost $20 in gas.
 
-### 5.2 Token Details
+**3. Poor User Experience**
+Complex wallet setups, confusing bridges, and clunky interfaces drive users away before they even play.
 
-- **Name**: GrepCoin
-- **Symbol**: GREP
-- **Type**: ERC-20 on Base L2
-- **Total Supply**: 500,000,000 (500M) - Fixed, no minting
-- **Decimals**: 18
-- **Chain**: Base (Ethereum L2)
-
-### 5.3 Token Distribution
-
-| Allocation | Percentage | Amount | Purpose |
-|------------|------------|--------|---------|
-| Ecosystem & Rewards | 40% | 200,000,000 | Gameplay, staking, grants |
-| Liquidity Pool | 20% | 100,000,000 | DEX liquidity |
-| Team & Founders | 15% | 75,000,000 | 4-year vest |
-| Treasury | 15% | 75,000,000 | Operations |
-| Early Supporters | 10% | 50,000,000 | Seed investors |
-
-### 5.3 Token Utility
-
-**Primary Uses:**
-
-1. **Gameplay Rewards**: Earn GREP by playing games
-2. **Staking**: Lock GREP for APY rewards and multipliers
-3. **Governance**: Vote on proposals (1 GREP = 1 vote)
-4. **Marketplace**: Buy/sell NFT items and cosmetics
-5. **Tournament Entry**: Pay entry fees in GREP
-6. **Guild Operations**: Create guilds, fund guild treasuries
-7. **Premium Features**: Battle pass, custom profiles
-
-### 5.4 Token Release Schedule
-
-**Year 1 (Launch):**
-- 400M: Initial liquidity and team (subject to vesting)
-- 75M: Gameplay rewards (18.75M/quarter)
-- 75M: Staking rewards (18.75M/quarter)
-- 50M: Airdrops and marketing (12.5M/quarter)
-
-**Year 2-4:**
-- Remaining gameplay, staking, and airdrop allocations released linearly
-- Team tokens fully vested by end of Year 3
-
-**Total Circulating Supply Timeline:**
-- Launch: ~400M (40%)
-- Year 1: ~600M (60%)
-- Year 2: ~800M (80%)
-- Year 3+: ~1B (100%)
-
-### 5.5 Burn Mechanisms
-
-To create deflationary pressure:
-
-1. **Voluntary Burns**: Players can burn tokens for tier status
-2. **Marketplace Fees**: 2.5% of sales burned
-3. **Tournament Fees**: 10% of entry fees burned
-4. **Governance Proposals**: Failed proposals' deposits burned
-
-**Target Burn Rate:** 1-2% of supply per year
+**4. Misaligned Incentives**
+When token price drives everything, gameplay suffers. Players become farmers, not gamers.
 
 ---
 
-## 6. Staking System
+## The GrepCoin Solution
 
-### 6.1 Real Yield Model
+### Fixed Supply Economics
 
-Unlike traditional P2E staking that mints new tokens (causing inflation), GrepCoin staking rewards come from **platform revenue**:
+GREP has a fixed supply of 500 million tokens. No new tokens are ever minted. All rewards come from:
 
-- 50% of marketplace fees → Staking pool
-- 50% of tournament fees → Staking pool
-- 30% of premium subscriptions → Staking pool
+- Initial token distribution
+- Platform revenue sharing
+- Treasury allocations
 
-### 6.2 Staking Tiers
+This creates sustainable, predictable economics.
 
-| Tier | Minimum | Lock Period | APY* | Perks |
-|------|---------|-------------|------|-------|
-| Basic | 100 GREP | None | 3% | Vote on evolutions |
-| Silver | 1,000 GREP | 7 days | 5% | Early access to content |
-| Gold | 5,000 GREP | 30 days | 6% | Propose evolutions |
-| Diamond | 25,000 GREP | 90 days | 8% | Revenue share + governance |
+### Real Yield Staking
 
-*APY varies based on platform revenue and total staked
+Staking rewards come from actual platform revenue:
 
-### 6.2 Benefits of Staking
+- 50% of marketplace fees
+- Tournament entry fees
+- Premium feature subscriptions
+- Treasury yield
 
-1. **Passive Income**: Earn APY on staked tokens
-2. **Increased Rewards**: Higher multipliers on gameplay earnings
-3. **More Plays**: Additional daily game plays
-4. **Governance Power**: Staked tokens count for voting
-5. **Early Access**: Beta features for high-tier stakers
-6. **Exclusive NFTs**: Special items for Diamond tier
+Not from printing new tokens.
 
-### 6.3 Reward Calculation
+### Play-First Design
 
-Staking rewards are calculated continuously and can be claimed anytime:
+Games are designed to be fun, not just to extract value:
+
+- 9 polished browser games at launch
+- Score-based GREP rewards
+- Staking multipliers for engaged players
+- Achievements unlock NFTs
+
+### Low-Cost Transactions
+
+Base L2 enables:
+
+- ~$0.001 per transaction
+- 2-second confirmation
+- Practical micro-transactions
+- Seamless user experience
+
+---
+
+## Platform Architecture
+
+### Current Platform (Phase 1)
 
 ```
-Rewards = (Staked Amount × APY × Time Staked) / (365 days)
+┌─────────────────────────────────────────────────────────────┐
+│                    GREPCOIN ARCADE                           │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+│  │   9 Games   │  │   Staking   │  │   Social    │         │
+│  │  Play2Earn  │  │   4 Tiers   │  │   Guilds    │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+│                                                             │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+│  │ Achievements│  │ Battle Pass │  │ Leaderboard │         │
+│  │    NFTs     │  │   Rewards   │  │   Weekly    │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-**Example:**
-- Staked: 10,000 GREP (Gold tier)
-- APY: 15%
-- Time: 30 days
-- Rewards: 10,000 × 0.15 × (30/365) = 123.29 GREP
+### Games Available
 
-### 6.4 Lock Periods
+| Game | Type | Rewards |
+|------|------|---------|
+| Regex Runner | Endless runner | 1-10 GREP |
+| Pattern Match | Puzzle | 1-10 GREP |
+| Code Breaker | Logic | 1-10 GREP |
+| Memory Grid | Memory | 1-10 GREP |
+| Speed Type | Typing | 1-10 GREP |
+| Snake Grep | Classic | 1-10 GREP |
+| Tetris Code | Falling blocks | 1-10 GREP |
+| Grep Golf | Puzzle | 1-10 GREP |
+| Binary Flip | Logic | 1-10 GREP |
 
-- Tokens are locked for the minimum period of the tier
-- After lock expires, can unstake or continue earning
-- Early unstaking not permitted (prevents gaming the system)
-- Can add to existing stake (extends lock period)
+### Future Platform (Phase 2-3)
 
-### 6.5 Sustainability
-
-Staking rewards come from the 300M staking allocation:
-- Average staking rate: 40% of supply
-- Average lock period: 30 days
-- Effective APY: ~12%
-- Staking pool lasts: ~6-7 years at full capacity
-
----
-
-## 7. NFT System
-
-### 7.1 Achievement NFTs (ERC-1155)
-
-**Soulbound Badges**: Non-transferable proof of accomplishments
-
-**Achievement Categories:**
-- **Milestone**: First game, 100 games, 1000 games
-- **Skill**: High scores, perfect runs, speedruns
-- **Seasonal**: Limited-time events
-- **Community**: Guild founder, tournament winner
-- **Special**: Team-awarded for contributions
-
-**Total Achievements:** 100+ at launch, expanding over time
-
-**Claiming Process:**
-1. Complete achievement criteria
-2. Backend generates signed message
-3. Player claims on-chain with signature
-4. Achievement NFT minted to player wallet
-
-### 7.2 Item NFTs (ERC-1155)
-
-**Tradeable In-Game Assets**: Cosmetics, power-ups, collectibles
-
-**Item Types:**
-- **Avatars**: Custom profile pictures
-- **Frames**: Profile borders
-- **Emotes**: In-game expressions
-- **Themes**: UI color schemes
-- **Boosts**: Temporary gameplay bonuses
-
-**Rarity System:**
-- Common (60%): Basic items, low value
-- Rare (25%): Enhanced items, moderate value
-- Epic (10%): Unique items, high value
-- Legendary (5%): One-of-a-kind, very high value
-
-### 7.3 Marketplace
-
-**Item Trading Platform:**
-- List items for fixed price or auction
-- 2.5% marketplace fee (50% to treasury, 50% burned)
-- GREP as currency
-- On-chain settlement for transparency
-
-**Auction Mechanics:**
-- Minimum bid increments: 5%
-- Auction duration: 1-7 days
-- Automatic settlement
-- Bid history visible on-chain
+- NFT Marketplace (buy/sell game items)
+- Tournament System (compete for prizes)
+- Creator SDK (add new games)
+- Mobile PWA (enhanced mobile)
+- DAO Governance (community control)
 
 ---
 
-## 8. Governance
+## Tokenomics
 
-### 8.1 Decentralized Autonomous Organization (DAO)
+### Token Overview
 
-GrepCoin will transition to full community governance within 12 months of launch.
+| Property | Value |
+|----------|-------|
+| Name | GrepCoin |
+| Symbol | GREP |
+| Total Supply | 500,000,000 |
+| Decimals | 18 |
+| Network | Base (L2) |
+| Type | Deflationary |
 
-**Governance Powers:**
-- Approve new games
-- Adjust reward rates
-- Allocate treasury funds
-- Update platform parameters
-- Vote on partnerships
+### Distribution
 
-### 8.2 Proposal Process
+| Allocation | % | Tokens | Vesting |
+|------------|---|--------|---------|
+| Ecosystem & Rewards | 40% | 200M | 4-year release |
+| Liquidity Pool | 20% | 100M | Immediate |
+| Team & Founders | 15% | 75M | 1yr cliff + 3yr vest |
+| Treasury | 15% | 75M | Governance controlled |
+| Early Supporters | 10% | 50M | 6-month vest |
 
-**1. Proposal Creation**
-- Requires 10,000 GREP minimum
-- Include title, description, and actions
-- Published on-chain
+### Token Utility
 
-**2. Voting Period**
-- 3-day voting window
-- 1 GREP = 1 vote
-- Snapshot at proposal creation
-- Vote for or against
-
-**3. Quorum Requirement**
-- Minimum 4% of total supply must vote
-- Prevents low-participation governance attacks
-
-**4. Execution**
-- Proposal passes if >50% vote yes
-- 2-day timelock before execution
-- Community can react to malicious proposals
-
-### 8.3 Governance Roadmap
-
-**Phase 1 (Launch-6 months):** Foundation controls contracts
-**Phase 2 (6-12 months):** Shared control with community multisig
-**Phase 3 (12+ months):** Full DAO control via governance contracts
+1. **Play-to-Earn**: Earn GREP from game scores
+2. **Staking**: Lock for real yield + multipliers
+3. **Governance**: Vote on platform evolution
+4. **NFT Minting**: Burn to mint achievements
+5. **Marketplace**: Trade items (coming)
+6. **Premium Access**: Unlock exclusive features
 
 ---
 
-## 9. Technical Architecture
+## Staking System
 
-### 9.1 Smart Contracts
+### Real Yield Model
 
-Built with Solidity ^0.8.24 on Base L2:
+Unlike inflationary staking where new tokens dilute existing holders, GrepCoin uses a **Real Yield** model:
 
-**Core Contracts:**
-1. **GrepToken**: ERC-20 with minting caps
-2. **GrepStakingPool**: Tiered staking with rewards
-3. **GrepItems**: ERC-1155 tradeable items
-4. **GrepAchievements**: ERC-1155 soulbound badges
-5. **GrepVesting**: Token vesting for team
-6. **GrepGovernance**: DAO voting system
-7. **GrepBurner**: Deflationary burn mechanism
+```
+Platform Revenue
+       │
+       ▼
+┌──────────────────┐
+│   Revenue Pool   │
+└────────┬─────────┘
+         │
+    ┌────┴────┐
+    ▼         ▼
+  50%       50%
+ Burns    Staking
+          Rewards
+```
 
-**Security Measures:**
-- OpenZeppelin library usage
-- ReentrancyGuard on critical functions
-- Access control via Ownable
-- Emergency pause functionality
-- Professional audit before mainnet
+### Staking Tiers
 
-### 9.2 Web Application
+| Tier | Min Stake | Lock | Weight | Bonus Plays |
+|------|-----------|------|--------|-------------|
+| Basic | 100 GREP | None | 1.0x | 2/day |
+| Silver | 1,000 GREP | 7 days | 1.25x | 5/day |
+| Gold | 5,000 GREP | 30 days | 1.5x | 10/day |
+| Diamond | 25,000 GREP | 90 days | 2.0x | 20/day |
 
-**Stack:**
-- Frontend: Next.js 15, React, TypeScript
-- Database: PostgreSQL with Prisma ORM
-- Authentication: SIWE (Sign-In with Ethereum)
-- Real-time: Socket.io
-- Hosting: Vercel
+### Benefits by Tier
 
-**Architecture:**
-- Server-side rendering for SEO
-- API routes for game logic
-- Client-side Web3 integration
-- Responsive mobile design
-
-### 9.3 Game Backend
-
-**Anti-Cheat System:**
-- Server-side validation
-- Pattern detection algorithms
-- Rate limiting
-- Anomaly detection
-- Manual review for suspicious activity
-
-**Reward Distribution:**
-- Scores validated before rewards
-- Multipliers applied based on staking tier
-- Daily play limits to prevent farming
-- Progressive difficulty scaling
-
-### 9.4 Infrastructure
-
-**Blockchain:**
-- Base L2 for low fees (~$0.01/tx)
-- Alchemy RPC for reliability
-- Basescan for block explorer
-- Subgraph for indexed data
-
-**Services:**
-- NeonDB for database
-- Resend for emails
-- Discord for community
-- Cloudflare for CDN
+| Benefit | Basic | Silver | Gold | Diamond |
+|---------|-------|--------|------|---------|
+| Real yield | Yes | Yes | Yes | Yes |
+| Vote on evolutions | Yes | Yes | Yes | Yes |
+| Early access | - | Yes | Yes | Yes |
+| Propose features | - | - | Yes | Yes |
+| Revenue share | - | - | - | Yes |
 
 ---
 
-## 10. Roadmap
+## Deflationary Mechanics
 
-### Phase 1: Foundation (Q4 2024)
+### Burn Sources
 
-**Goals:** Launch platform, onboard initial users
+| Source | Burn Rate | Mechanism |
+|--------|-----------|-----------|
+| Marketplace | 2.5% | 50% of fees burned |
+| Tournaments | 10% | Entry fee burns |
+| Achievement NFTs | 10 GREP | Per mint |
+| Guild Creation | 500 GREP | Per guild |
+| Evolution Votes | 100% | All votes burned |
 
-- Smart contract development and testing
-- Web app MVP with 4 games
-- Community building (Discord, Twitter)
-- Testnet deployment
+### Burn Projections
 
-**Milestones:**
-- 1,000 Discord members
-- 100 testnet players
-- 47 passing smart contract tests
+| Year | Est. Cumulative Burn | Remaining Supply |
+|------|----------------------|------------------|
+| 1 | 10M (2%) | 490M |
+| 2 | 30M (6%) | 470M |
+| 3 | 60M (12%) | 440M |
+| 5 | 100M (20%) | 400M |
 
-### Phase 2: Launch (Q1 2025)
-
-**Goals:** Mainnet deployment, public launch
-
-- Professional smart contract audit
-- Mainnet deployment on Base
-- Token generation event (TGE)
-- Initial liquidity provision
-- Public launch campaign
-- 4 additional games released
-
-**Milestones:**
-- $35,000 raised for audit and liquidity
-- 5,000 registered players
-- $100,000 in initial liquidity
-
-### Phase 3: Growth (Q2-Q3 2025)
-
-**Goals:** Expand features, grow community
-
-- NFT marketplace launch
-- Guild system implementation
-- Tournament system
-- Mobile app development (iOS/Android)
-- 8 total games live
-- Partnership announcements
-
-**Milestones:**
-- 25,000 active players
-- 1,000 NFT items created
-- 100 guilds formed
-- First major tournament ($10k prize pool)
-
-### Phase 4: Governance (Q4 2025)
-
-**Goals:** Community ownership, DAO transition
-
-- Governance contracts deployed
-- First community proposals
-- Treasury management transition
-- Advanced features (seasons, battle pass)
-- Cross-platform integration
-
-**Milestones:**
-- 100,000 registered players
-- Full DAO control
-- 50+ community proposals voted on
-- $1M+ in marketplace volume
-
-### Phase 5: Expansion (2026+)
-
-**Goals:** Platform growth, ecosystem development
-
-- Game SDK for community developers
-- Third-party game integrations
-- Cross-chain expansion
-- Mobile game launches
-- eSports league
-- Physical merchandise
-
-**Milestones:**
-- 500,000 registered players
-- 10+ third-party games
-- Multi-chain deployment
-- $10M+ total value locked
+**Maximum burn cap: 100M tokens (20% of supply)**
 
 ---
 
-## 11. Team
+## Governance
 
-### GrepLabs LLC
+### Progressive Decentralization
 
-**Founded:** 2024
-**Location:** Delaware, USA
-**Structure:** Limited Liability Company
+| Phase | Model |
+|-------|-------|
+| Year 1 | Core team leadership with community input |
+| Year 2 | Shared governance with community veto |
+| Year 3+ | Full DAO with team as contributors |
 
-### Founder
+### Governance Parameters
 
-**Punit Mishra** - Solo Founder & Developer
-- Full-stack development
-- Blockchain architecture
-- AI-assisted development pioneer
-- Vision and strategy
-
-### AI Collaboration
-
-**Claude (Anthropic)** - AI Development Partner
-- Smart contract development
-- Frontend/backend implementation
-- Architecture design
-- Code review and optimization
-
-### Advisors (TBD)
-
-Seeking advisors in:
-- Blockchain gaming
-- Tokenomics
-- Legal/compliance
-- Marketing and growth
+| Parameter | Value |
+|-----------|-------|
+| Proposal Threshold | 100,000 GREP |
+| Quorum | 10% of staked supply |
+| Voting Period | 5 days |
+| Timelock | 48 hours |
+| Passing Threshold | 66% |
 
 ---
 
-## 12. Legal & Compliance
+## Technology
 
-### 12.1 Legal Structure
+### Smart Contracts
 
-- **Entity**: GrepLabs LLC (Delaware)
-- **Registration**: Registered with Delaware Division of Corporations
-- **Status**: Active and compliant
+| Contract | Purpose |
+|----------|---------|
+| GrepToken | ERC-20 with voting, 500M fixed |
+| GrepStakingPool | Real yield, 4 tiers |
+| GrepVesting | Team/advisor vesting |
+| GrepAchievements | Soulbound NFTs |
+| GrepGovernor | DAO voting |
+| TimelockController | Execution delay |
 
-### 12.2 Token Classification
+### Security Measures
 
-GREP is a utility token designed for:
-- In-platform transactions
-- Governance participation
-- Reward distribution
-- Feature access
+- OpenZeppelin contract standards
+- Anti-whale protections (2% max wallet)
+- Pausable for emergencies
+- Pending: External audit
 
-**Not designed as:**
-- Security
-- Investment vehicle
-- Store of value
-- Profit-sharing instrument
+### Tech Stack
 
-### 12.3 Compliance Measures
-
-1. **KYC/AML**: Not required for gameplay, may be required for large transactions
-2. **Geographic Restrictions**: Platform may restrict access in prohibited jurisdictions
-3. **Terms of Service**: Comprehensive ToS and Privacy Policy
-4. **Risk Disclosures**: Clear disclaimers about cryptocurrency risks
-5. **Data Protection**: GDPR and CCPA compliance
-
-### 12.4 Disclaimers
-
-**Investment Risk:**
-- GREP tokens may lose value
-- Cryptocurrency is highly volatile
-- Only invest what you can afford to lose
-- Past performance doesn't guarantee future results
-
-**Regulatory Risk:**
-- Regulations may change
-- Platform may need to adapt
-- Access may be restricted in some jurisdictions
-
-**Technical Risk:**
-- Smart contracts may have bugs
-- Platform may experience downtime
-- Loss of private keys means loss of tokens
-
-**No Guarantees:**
-- No guarantee of earnings
-- No guarantee of token value
-- No guarantee of platform success
-- No guarantee of reward distribution
-
-### 12.5 User Responsibilities
-
-Users must:
-- Be 18+ years old
-- Comply with local laws
-- Secure their own wallets
-- Understand cryptocurrency risks
-- Read and accept Terms of Service
+| Layer | Technologies |
+|-------|--------------|
+| Frontend | Next.js 15, React 18, TypeScript |
+| Blockchain | Base L2, Solidity 0.8.24 |
+| Web3 | wagmi v3, viem v2, SIWE |
+| Database | PostgreSQL, Prisma |
+| AI | Claude API |
 
 ---
 
-## 13. Conclusion
+## Roadmap
 
-GrepCoin represents a new approach to blockchain gaming: accessible, sustainable, and community-driven. By combining engaging gameplay with fair tokenomics and true asset ownership, we aim to create a platform where players are valued and rewarded.
+### Phase 1: Foundation (Complete)
+- [x] 9 browser games
+- [x] Staking system
+- [x] Achievement NFTs
+- [x] Social features
+- [x] Smart contracts
 
-Built entirely through human-AI collaboration, GrepCoin demonstrates the potential of AI to amplify human creativity and accelerate development. We're not just building a gaming platform—we're pioneering a new model of software creation.
+### Phase 2: Launch (Active)
+- [ ] Testnet deployment
+- [ ] Security audit
+- [ ] Mainnet launch
+- [ ] DEX liquidity
 
-**Join us in building the crypto arcade for indie game lovers.**
+### Phase 3: Growth
+- [ ] NFT Marketplace
+- [ ] Tournament system
+- [ ] Creator SDK
+- [ ] Mobile app
 
----
-
-## Appendix
-
-### A. Glossary
-
-- **APY**: Annual Percentage Yield, interest earned per year
-- **Base L2**: Layer 2 blockchain built on Ethereum
-- **DAO**: Decentralized Autonomous Organization
-- **ERC-20**: Fungible token standard on Ethereum
-- **ERC-1155**: Multi-token standard supporting fungible and non-fungible tokens
-- **NFT**: Non-Fungible Token, unique digital asset
-- **P2E**: Play-to-Earn
-- **SIWE**: Sign-In with Ethereum
-- **Soulbound**: Non-transferable NFT tied to one wallet
-- **TGE**: Token Generation Event, initial token distribution
-
-### B. References
-
-- Ethereum Foundation: https://ethereum.org
-- Base Network: https://base.org
-- OpenZeppelin: https://openzeppelin.com
-- EIP-2612 (Permit): https://eips.ethereum.org/EIPS/eip-2612
-- EIP-712 (Typed Data): https://eips.ethereum.org/EIPS/eip-712
-
-### C. Links
-
-- **Website**: https://grepcoin.io
-- **GitHub**: https://github.com/grepcoin/grepcoin
-- **Discord**: https://discord.gg/grepcoin
-- **Twitter**: https://twitter.com/grepcoin
-- **Documentation**: https://docs.grepcoin.io
-- **Email**: hello@greplabs.io
+### Phase 4: Decentralization
+- [ ] Full DAO
+- [ ] Treasury management
+- [ ] Multi-chain expansion
 
 ---
 
-**Document Version:** 1.0
-**Last Updated:** December 2024
-**Next Review:** March 2025
+## Conclusion
 
-**Legal Notice:** This whitepaper is for informational purposes only and does not constitute financial advice, investment advice, or a solicitation to buy GREP tokens. Please consult with qualified professionals before making any investment decisions.
+GrepCoin represents a new approach to Web3 gaming:
+
+- **Sustainable tokenomics** (fixed supply, real yield)
+- **Fun gameplay** (9 polished games)
+- **Low barriers** (Base L2, sub-cent fees)
+- **True ownership** (on-chain achievements)
+- **Community governance** (progressive decentralization)
+
+We're building an arcade where players have fun, earn real rewards, and own their accomplishments. Not a farm. Not a scheme. A game platform that respects both players and economics.
+
+**Play. Earn. Own.**
 
 ---
 
-Built with love by [GrepLabs LLC](https://greplabs.io) | Powered by [Claude](https://anthropic.com)
+## Legal Disclaimer
 
-*Registered in Delaware, USA | Built in California, USA | Crafted with AI*
+This whitepaper is for informational purposes only. GREP tokens are utility tokens for use within the GrepCoin ecosystem. They are not securities or investment contracts.
+
+Participation involves risks including regulatory uncertainty, smart contract vulnerabilities, market volatility, and project non-completion.
+
+---
+
+## Links
+
+- **Platform**: [grepcoin.vercel.app](https://grepcoin.vercel.app)
+- **GitHub**: [github.com/grepcoin](https://github.com/grepcoin/grepcoin)
+- **Twitter**: [@grepcoin](https://twitter.com/grepcoin)
+- **Discord**: [discord.gg/grepcoin](https://discord.gg/grepcoin)
+
+---
+
+*Version 2.0 | December 2024*

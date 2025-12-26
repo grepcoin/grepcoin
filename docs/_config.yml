@@ -1,0 +1,36 @@
+# GrepCoin Documentation Site
+title: GrepCoin
+description: AI-Powered Play-to-Earn Crypto Arcade on Base
+baseurl: "/grepcoin"
+url: "https://grepcoin.github.io"
+
+# Theme
+remote_theme: pages-themes/minimal@v0.2.0
+plugins:
+  - jekyll-remote-theme
+
+# Navigation
+nav:
+  - title: Home
+    url: /
+  - title: Lite Paper
+    url: /litepaper
+  - title: Whitepaper
+    url: /whitepaper
+  - title: Tokenomics
+    url: /tokenomics
+  - title: Architecture
+    url: /architecture
+  - title: Roadmap
+    url: /roadmap
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
