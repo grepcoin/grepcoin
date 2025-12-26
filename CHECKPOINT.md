@@ -1,8 +1,8 @@
 # GrepCoin Development Checkpoint
 
 **Date:** December 25, 2024
-**Status:** Wave 5 Complete - Ready for Testnet Deployment
-**Latest Commit:** `8853254b` - docs: update checkpoint with Wave 5 completion status
+**Status:** Testnet Deployment Ready - Awaiting Wallet Funding
+**Latest Commit:** `6634ea72` - docs: update checkpoint with PR status and tracking
 
 ---
 
@@ -23,51 +23,82 @@
 
 ## CURRENT PRIORITY: TESTNET DEPLOYMENT
 
+### Deployment Status
 | Task | Status | Details |
 |------|--------|---------|
-| Fund deployer wallet | ⏳ Pending | Need Base Sepolia ETH |
-| Deploy contracts | ⏳ Pending | `forge script script/Deploy.s.sol` |
-| Verify on BaseScan | ⏳ Pending | All 5 contracts |
-| Update frontend addresses | ⏳ Pending | `apps/web/src/lib/contracts.ts` |
-| Fund StakingPool rewards | ⏳ Pending | Transfer GREP to pool |
-| Test staking flow | ⏳ Pending | End-to-end validation |
+| Contracts compiled | ✅ Done | Hardhat compilation successful |
+| Deploy script fixed | ✅ Done | Updated `addMinter` → `addBurner` |
+| Environment configured | ✅ Done | `.env` has API keys and RPC URLs |
+| **Fund deployer wallet** | 🔴 BLOCKED | **Need Base Sepolia ETH** |
+| Deploy contracts | ⏳ Pending | Waiting for wallet funding |
+| Verify on BaseScan | ⏳ Pending | After deployment |
+| Update frontend | ⏳ Pending | After deployment |
+
+### Deployer Wallet
+```
+Address: 0xdaBbe447173cC0A40D08Aafcf3361A0EeDF62D28
+Balance: 0 ETH (needs ~0.003 ETH for deployment)
+Network: Base Sepolia (Chain ID: 84532)
+```
+
+### Get Testnet ETH - Faucets
+| Faucet | Link | Amount |
+|--------|------|--------|
+| Alchemy | https://www.alchemy.com/faucets/base-sepolia | 0.1 ETH/day |
+| Coinbase | https://portal.cdp.coinbase.com/faucets | 0.05 ETH/day |
+| Chainlink | https://faucets.chain.link/base-sepolia | 0.1 ETH/day |
+| QuickNode | https://faucet.quicknode.com/base/sepolia | 0.05 ETH/12h |
+| LearnWeb3 | https://learnweb3.io/faucets/base_sepolia/ | 0.01 ETH/day |
 
 ---
 
-## NEXT STEPS: What Agents Should Work On
+## NEXT STEPS
 
-### 1. Testnet Deployment (Priority: Critical)
+### Step 1: Fund Wallet (BLOCKING)
+1. Go to any faucet above
+2. Paste address: `0xdaBbe447173cC0A40D08Aafcf3361A0EeDF62D28`
+3. Request testnet ETH
+
+### Step 2: Deploy Contracts
 ```bash
-# Environment setup needed:
-export PRIVATE_KEY="deployer_private_key"
-export TREASURY_ADDRESS="0x..."
-export INITIAL_OWNER="0x..."
-
-# Deploy command:
-forge script script/Deploy.s.sol:Deploy \
-  --rpc-url https://sepolia.base.org \
-  --broadcast \
-  --verify
+cd packages/contracts
+npx hardhat run scripts/deploy-testnet.js --network baseSepolia
 ```
 
-### 2. Post-Deployment Tasks
-- [ ] Set token exemptions for VestingVault, StakingPool, Timelock
-- [ ] Create vesting schedules for team/advisors
-- [ ] Add initial rewards to StakingPool
-- [ ] Create DEX liquidity pool
+This deploys:
+- GrepToken (500M fixed supply)
+- GrepStakingPool (real yield, 4 tiers)
+- GrepVesting (team/advisor vesting)
+- GrepAchievements (soulbound NFTs)
 
-### 3. Frontend Integration
-- [ ] Update `apps/web/src/lib/contracts.ts` with deployed addresses
-- [ ] Test staking UI with live contracts
-- [ ] Test achievement NFT minting flow
-- [ ] Verify governance voting works
+### Step 3: Verify on BaseScan
+```bash
+npx hardhat run scripts/verify.js --network baseSepolia
+```
 
-### 4. Testing Checklist
-- [ ] Stake tokens in each tier
+### Step 4: Update Frontend
+Edit `apps/web/src/lib/contracts.ts`:
+```typescript
+84532: {  // Base Sepolia
+  GREP_TOKEN: '<deployed_address>',
+  STAKING_POOL: '<deployed_address>',
+  GREP_ITEMS: '<deployed_address>',
+}
+```
+
+### Step 5: Post-Deployment Setup
+- [ ] Transfer GREP to staking pool for rewards
+- [ ] Add burner role for marketplace contract
+- [ ] Test staking in each tier
+- [ ] Test achievement minting
+- [ ] Verify governance proposals work
+
+### Step 6: End-to-End Testing
+- [ ] Connect wallet on grepcoin.vercel.app
+- [ ] Stake tokens at different tiers
 - [ ] Claim staking rewards
-- [ ] Mint achievement NFT
-- [ ] Create governance proposal
-- [ ] Vote on proposal
+- [ ] Mint an achievement NFT
+- [ ] Create and vote on governance proposal
 
 ---
 
@@ -297,7 +328,15 @@ npm run build
 
 ## Progress Log
 
-### 2025-12-25 Session 2 (Current)
+### 2025-12-25 Session 3 (Current)
+- Attempted testnet deployment
+- Fixed deploy script: `addMinter` → `addBurner` (token is now fixed supply)
+- Contracts compile successfully with Hardhat
+- **BLOCKED**: Deployer wallet has 0 ETH
+- Added faucet links and clear deployment steps
+- Next action: Fund wallet, then re-run deployment
+
+### 2025-12-25 Session 2
 - Updated checkpoint with PR status (52 PRs, all merged)
 - Verified no open PRs or pending branches
 - Updated commit history
@@ -324,4 +363,4 @@ npm run build
 
 ---
 
-*Last updated: December 25, 2024 - Session 2*
+*Last updated: December 25, 2024 - Session 3*

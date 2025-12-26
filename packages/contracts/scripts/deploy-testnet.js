@@ -53,11 +53,11 @@ async function main() {
   deployments.GrepAchievements = await achievements.getAddress();
   console.log("✅", deployments.GrepAchievements);
 
-  // Setup roles
-  console.log("\nSetting up minter role...");
-  const tx = await grepToken.addMinter(deployments.GrepStakingPool);
+  // Setup roles - StakingPool can burn tokens for fees
+  console.log("\nSetting up burner role for StakingPool...");
+  const tx = await grepToken.addBurner(deployments.GrepStakingPool);
   await tx.wait();
-  console.log("✅ StakingPool is now a minter");
+  console.log("✅ StakingPool is now a burner");
 
   // Save to file
   const deploymentsDir = path.join(__dirname, "..", "deployments");
