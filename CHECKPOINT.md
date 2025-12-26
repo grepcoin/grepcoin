@@ -1,8 +1,8 @@
 # GrepCoin Development Checkpoint
 
 **Date:** December 26, 2024
-**Status:** ✅ PRODUCTION LIVE
-**Latest Commit:** `94c3a0dd` - feat: add Let's Encrypt SSL with cert-manager
+**Status:** PRODUCTION LIVE + GAMES ENHANCED
+**Latest Commit:** `2d337e2e` - feat: enhance games ecosystem with tournaments, mini-games, and mobile controls
 
 ### Live URLs
 | Site | URL | Platform |
@@ -23,106 +23,84 @@
 
 ---
 
-## GKE INFRASTRUCTURE (NEW)
+## LATEST SESSION: GAME ECOSYSTEM ENHANCEMENTS
 
-### Domain Setup: grepcoin.io
-| Domain | Target | Purpose |
-|--------|--------|---------|
-| grepcoin.io | GKE Load Balancer | Main web app |
-| www.grepcoin.io | GKE Load Balancer | Redirect to root |
-| docs.grepcoin.io | GitHub Pages | Documentation |
+### Completed Today (Dec 26, 2024 - Session 8)
 
-### Squarespace DNS Configuration
-1. Log in to Squarespace → Settings → Domains → grepcoin.io
-2. Go to DNS Settings
-3. Add these records:
+#### 1. Database Connection Fix
+- Fixed Prisma client caching for production environment
+- Updated `apps/web/src/lib/db.ts` to properly cache client in production
+- Resolved "PostgreSQL connection: Error { kind: Closed }" errors
 
-| Type | Host | Value |
-|------|------|-------|
-| A | @ | `34.94.204.248` |
-| A | www | `34.94.204.248` |
-| CNAME | docs | grepcoin.github.io |
+#### 2. Navigation Updates
+- Added **Tournaments** link to main navigation (`Navbar.tsx`)
+- Battle Pass was already in navigation
 
-### GKE Cluster Setup
-```bash
-# 1. Create cluster
-gcloud container clusters create-auto grepcoin-cluster --region us-central1
+#### 3. Games Page Enhancements (`/games`)
+- Added **Quick Links** section with cards for:
+  - Tournaments (with "Live Events" badge)
+  - Battle Pass (with "Season 1" badge)
+- Added **Quick Games** mini-games section with 4 games:
+  - Coin Flip (5 sec, 5-20 GREP)
+  - Tap Speed (10 sec, 10-40 GREP)
+  - Quick Math (15 sec, 10-50 GREP)
+  - Color Match (10 sec, 8-35 GREP)
 
-# 2. Reserve static IP
-gcloud compute addresses create grepcoin-ip --global
-gcloud compute addresses describe grepcoin-ip --global --format="get(address)"
+#### 4. Mini-Games Route
+- Created `/games/mini/[id]` dynamic route
+- CoinFlip and TapSpeed are fully playable
+- QuickMath and ColorMatch show "Coming Soon"
+- File: `apps/web/src/app/games/mini/[id]/page.tsx`
 
-# 3. Get credentials
-gcloud container clusters get-credentials grepcoin-cluster --region us-central1
-```
+#### 5. Mobile Touch Controls
+- Added D-pad touch controls to **Crypto Snake** game
+- Shows only on mobile devices (`md:hidden`)
+- Updated instructions to show "Use D-pad" on mobile
+- File: `apps/web/src/app/games/crypto-snake/page.tsx`
 
-### Infrastructure Files
-| File | Purpose |
+### Files Modified
+| File | Changes |
 |------|---------|
-| `apps/web/Dockerfile` | Multi-stage Next.js build |
-| `infra/k8s/namespace.yaml` | Kubernetes namespace |
-| `infra/k8s/deployment.yaml` | Pod deployment (2-10 replicas) |
-| `infra/k8s/service.yaml` | ClusterIP service |
-| `infra/k8s/ingress.yaml` | Ingress + SSL certificate |
-| `infra/k8s/hpa.yaml` | Horizontal pod autoscaler |
-| `.github/workflows/deploy-gke.yml` | CI/CD pipeline |
-
-### GitHub Secrets Required
-| Secret | Description |
-|--------|-------------|
-| `GCP_PROJECT_ID` | Your GCP project ID |
-| `GCP_WORKLOAD_IDENTITY_PROVIDER` | Workload Identity provider path |
-| `GCP_SERVICE_ACCOUNT` | GitHub Actions service account |
+| `apps/web/src/lib/db.ts` | Fixed Prisma caching for production |
+| `apps/web/src/components/Navbar.tsx` | Added Tournaments nav link |
+| `apps/web/src/app/games/page.tsx` | Added mini-games section, quick links |
+| `apps/web/src/app/games/crypto-snake/page.tsx` | Added mobile touch D-pad |
+| `apps/web/src/app/games/mini/[id]/page.tsx` | NEW - Mini-game page |
+| `packages/contracts/scripts/check-balance.js` | NEW - Balance checker script |
 
 ---
 
-## DOCUMENTATION SITE
+## GAMES ECOSYSTEM OVERVIEW
 
-### GitHub Pages: docs.grepcoin.io
-| File | Purpose |
-|------|---------|
-| `docs/_config.yml` | Jekyll config for docs.grepcoin.io |
-| `docs/CNAME` | Custom domain file |
-| `docs/index.md` | Landing page |
-| `docs/litepaper.md` | Executive summary |
-| `docs/tokenomics.md` | Token economics |
-| `docs/WHITEPAPER.md` | Full whitepaper v2.0 |
-| `docs/ARCHITECTURE.md` | Technical architecture |
-| `docs/API.md` | API reference (91 endpoints) |
-| `docs/database.md` | Database schema (39 models) |
-| `docs/ROADMAP.md` | Development phases |
+### Main Arcade Games (8 Total)
+| Game | Type | Difficulty | Rewards | Status |
+|------|------|-----------|---------|--------|
+| Grep Rails | Regex Pattern Matching | Hard | 10-50 GREP | Live |
+| Stack Panic | Function Stack LIFO | Medium | 5-30 GREP | Live |
+| Merge Miners | Git Branch Merging | Medium | 5-40 GREP | Live |
+| Quantum Grep | Particle Pattern Collapse | Hard | 10-60 GREP | Live |
+| Bug Hunter | Code Scanning | Medium | 10-60 GREP | Live |
+| Crypto Snake | Blockchain Snake | Easy | 5-40 GREP | Live |
+| Syntax Sprint | Code Token Tetris | Hard | 15-70 GREP | Live |
+| Regex Crossword | Pattern Crossword | Medium | 10-80 GREP | Live |
 
-### Enable GitHub Pages
-1. Go to: https://github.com/grepcoin/grepcoin/settings/pages
-2. Source: "Deploy from a branch"
-3. Branch: `main`
-4. Folder: `/docs`
-5. Save
+### Quick Mini-Games (4 Total)
+| Game | Duration | Rewards | Status |
+|------|----------|---------|--------|
+| Coin Flip | 5 sec | 5-20 GREP | Live |
+| Tap Speed | 10 sec | 10-40 GREP | Live |
+| Quick Math | 15 sec | 10-50 GREP | Coming Soon |
+| Color Match | 10 sec | 8-35 GREP | Coming Soon |
 
-**URL:** https://docs.grepcoin.io
-
-### Vision Alignment (Fixed)
-| Before | After |
-|--------|-------|
-| 1B supply (inflationary) | 500M fixed supply |
-| Mint rewards | Real yield from revenue |
-| "Indie game ecosystem" | "Play-to-earn arcade" |
-| Vague roadmap | Hybrid: arcade now, ecosystem later |
-
----
-
-## WAVE 5 STATUS: COMPLETE
-
-> All 6 feature streams have been implemented!
-
-| Stream | Feature | Status | Implementation |
-|--------|---------|--------|----------------|
-| A | Anti-Cheat Integration | ✅ Done | `apps/web/src/app/api/games/[slug]/submit/route.ts` |
-| B | Achievement NFT Minting | ✅ Done | `apps/web/src/app/api/achievements/mint/route.ts` |
-| C | Battle Pass Rewards | ✅ Done | `apps/web/src/app/api/battle-pass/claim/route.ts` |
-| D | Notification System | ✅ Done | `apps/web/src/components/NotificationProvider.tsx` |
-| E | Settings Page | ✅ Done | `apps/web/src/app/settings/page.tsx` (655 lines!) |
-| F | Game Stats Dashboard | ✅ Done | `apps/web/src/app/stats/page.tsx` |
+### Feature Systems
+| Feature | Location | Status |
+|---------|----------|--------|
+| Tournaments | `/tournaments` | Live (API + UI) |
+| Battle Pass | `/battle-pass` | Live (API + UI) |
+| Leaderboard | `/leaderboard` | Live |
+| Stats Dashboard | `/stats` | Live |
+| Achievements | `/api/achievements/*` | Live |
+| Anti-Cheat | `@grepcoin/anti-cheat` | Active |
 
 ---
 
@@ -131,54 +109,52 @@ gcloud container clusters get-credentials grepcoin-cluster --region us-central1
 ### Deployment Status
 | Task | Status | Details |
 |------|--------|---------|
-| Contracts compiled | ✅ Done | Hardhat compilation successful |
-| Deploy script fixed | ✅ Done | Updated `addMinter` → `addBurner` |
-| Environment configured | ✅ Done | `.env` has API keys and RPC URLs |
-| **Fund deployer wallet** | 🔴 BLOCKED | **Need Base Sepolia ETH** |
-| Deploy contracts | ⏳ Pending | Waiting for wallet funding |
-| Verify on BaseScan | ⏳ Pending | After deployment |
-| Update frontend | ⏳ Pending | After deployment |
+| Contracts compiled | Done | Hardhat compilation successful |
+| Deploy script ready | Done | `scripts/deploy.js` |
+| Environment configured | Done | `.env` has API keys and RPC URLs |
+| **Fund deployer wallet** | BLOCKED | **Need Base Sepolia ETH** |
+| Deploy contracts | Pending | Waiting for wallet funding |
+| Verify on BaseScan | Pending | After deployment |
+| Update frontend | Pending | After deployment |
 
 ### Deployer Wallet
 ```
 Address: 0xdaBbe447173cC0A40D08Aafcf3361A0EeDF62D28
-Balance: 0 ETH (needs ~0.003 ETH for deployment)
+Balance: 0 ETH (needs ~0.01 ETH for deployment)
 Network: Base Sepolia (Chain ID: 84532)
 ```
 
 ### Get Testnet ETH - Faucets
-| Faucet | Link | Amount |
-|--------|------|--------|
-| Alchemy | https://www.alchemy.com/faucets/base-sepolia | 0.1 ETH/day |
-| Coinbase | https://portal.cdp.coinbase.com/faucets | 0.05 ETH/day |
-| Chainlink | https://faucets.chain.link/base-sepolia | 0.1 ETH/day |
-| QuickNode | https://faucet.quicknode.com/base/sepolia | 0.05 ETH/12h |
-| LearnWeb3 | https://learnweb3.io/faucets/base_sepolia/ | 0.01 ETH/day |
+| Faucet | Link |
+|--------|------|
+| Coinbase | https://www.coinbase.com/faucets/base-ethereum-sepolia-faucet |
+| Alchemy | https://www.alchemy.com/faucets/base-sepolia |
+| QuickNode | https://faucet.quicknode.com/base/sepolia |
+| Chainlink | https://faucets.chain.link/base-sepolia |
 
 ---
 
 ## NEXT STEPS
 
 ### Step 1: Fund Wallet (BLOCKING)
-1. Go to any faucet above
+1. Go to Coinbase faucet: https://www.coinbase.com/faucets/base-ethereum-sepolia-faucet
 2. Paste address: `0xdaBbe447173cC0A40D08Aafcf3361A0EeDF62D28`
 3. Request testnet ETH
 
 ### Step 2: Deploy Contracts
 ```bash
 cd packages/contracts
-npx hardhat run scripts/deploy-testnet.js --network baseSepolia
+npx hardhat run scripts/deploy.js --network baseSepolia
 ```
 
 This deploys:
 - GrepToken (500M fixed supply)
-- GrepStakingPool (real yield, 4 tiers)
+- GrepStakingPool (real yield, 5 tiers)
 - GrepVesting (team/advisor vesting)
-- GrepAchievements (soulbound NFTs)
 
 ### Step 3: Verify on BaseScan
 ```bash
-npx hardhat run scripts/verify.js --network baseSepolia
+npx hardhat verify --network baseSepolia <contract_address>
 ```
 
 ### Step 4: Update Frontend
@@ -187,59 +163,87 @@ Edit `apps/web/src/lib/contracts.ts`:
 84532: {  // Base Sepolia
   GREP_TOKEN: '<deployed_address>',
   STAKING_POOL: '<deployed_address>',
-  GREP_ITEMS: '<deployed_address>',
+  VESTING: '<deployed_address>',
 }
 ```
 
-### Step 5: Post-Deployment Setup
-- [ ] Transfer GREP to staking pool for rewards
-- [ ] Add burner role for marketplace contract
-- [ ] Test staking in each tier
-- [ ] Test achievement minting
-- [ ] Verify governance proposals work
+### Step 5: Rebuild and Deploy to GKE
+```bash
+# Build new image
+docker buildx build --platform linux/amd64 -t gcr.io/greplabs/grepcoin-web:latest -f apps/web/Dockerfile .
+docker push gcr.io/greplabs/grepcoin-web:latest
 
-### Step 6: End-to-End Testing
-- [ ] Connect wallet on grepcoin.vercel.app
-- [ ] Stake tokens at different tiers
-- [ ] Claim staking rewards
-- [ ] Mint an achievement NFT
-- [ ] Create and vote on governance proposal
+# Restart pods
+kubectl rollout restart deployment/grepcoin-web -n grepcoin
+```
 
 ---
 
-## Current State
+## GKE INFRASTRUCTURE
 
-### Deployment
-| Environment | URL | Status |
-|-------------|-----|--------|
-| **Production** | https://grepcoin.vercel.app | Live |
-| **GitHub** | https://github.com/grepcoin/grepcoin | Up to date |
+### Domain Setup: grepcoin.io
+| Domain | Target | Purpose |
+|--------|--------|---------|
+| grepcoin.io | 34.94.204.248 | Main web app |
+| www.grepcoin.io | 34.94.204.248 | Redirect to root |
+| docs.grepcoin.io | GitHub Pages | Documentation |
 
-### Recent Changes (Today)
-1. Fixed Vercel deployment for monorepo structure
-2. Fixed LiveActivityTicker animation (inline-flex + width: max-content)
-3. Updated root README with ASCII logo and ecosystem diagram
-4. Added READMEs for all packages (discord-bot, anti-cheat, subgraph, game-evolution)
-5. Improved GitHub templates (PR template, issue chooser, FUNDING.yml)
+### Squarespace DNS Configuration
+| Type | Host | Value |
+|------|------|-------|
+| A | @ | `34.94.204.248` |
+| A | www | `34.94.204.248` |
+| CNAME | docs | grepcoin.github.io |
+
+### Infrastructure Files
+| File | Purpose |
+|------|---------|
+| `apps/web/Dockerfile` | Multi-stage Next.js build |
+| `infra/k8s/namespace.yaml` | Kubernetes namespace |
+| `infra/k8s/deployment.yaml` | Pod deployment (2-10 replicas) |
+| `infra/k8s/service.yaml` | ClusterIP service |
+| `infra/k8s/ingress-nginx.yaml` | Nginx Ingress + Let's Encrypt |
+| `infra/k8s/cert-manager.yaml` | Let's Encrypt ClusterIssuer |
+| `infra/k8s/hpa.yaml` | Horizontal pod autoscaler |
+| `.github/workflows/deploy-gke.yml` | CI/CD pipeline |
+
+### Useful kubectl Commands
+```bash
+# Check pods
+kubectl get pods -n grepcoin
+
+# View logs
+kubectl logs -f deployment/grepcoin-web -n grepcoin
+
+# Restart deployment
+kubectl rollout restart deployment/grepcoin-web -n grepcoin
+
+# Check ingress
+kubectl get ingress -n grepcoin
+
+# Check certificates
+kubectl get certificates -n grepcoin
+```
 
 ---
 
-## Platform Overview
+## SMART CONTRACTS
 
-GrepCoin is an AI-built play-to-earn crypto arcade with:
+| Contract | Purpose | Status |
+|----------|---------|--------|
+| GrepToken.sol | ERC-20 (500M fixed supply) | Ready |
+| GrepStakingPool.sol | 5-tier staking with real yield | Ready |
+| GrepItems.sol | ERC-1155 game items | Ready |
+| GrepAchievements.sol | Soulbound badges | Ready |
+| GrepVesting.sol | Token vesting | Ready |
+| GrepGovernance.sol | DAO voting | Ready |
+| GrepBurner.sol | Deflationary burns | Ready |
 
-| Category | Details |
-|----------|---------|
-| **Games** | 9 browser games with score submission |
-| **Token** | GREP (ERC-20) on Base L2 |
-| **Staking** | 5 tiers (5-20% APY, up to 2x multipliers) |
-| **NFTs** | Achievements (soulbound) + Items (tradeable) |
-| **Social** | Guilds, tournaments, battle pass, friends |
-| **AI** | Claude-powered agents and Discord bot |
+**Deployment Status:** Not yet deployed (waiting for wallet funding)
 
 ---
 
-## Repository Structure
+## REPOSITORY STRUCTURE
 
 ```
 grepcoin/
@@ -254,192 +258,30 @@ grepcoin/
 │   ├── subgraph/            # The Graph indexer
 │   └── game-evolution/      # AI content generator
 │
+├── infra/
+│   └── k8s/                 # Kubernetes manifests
+│
 └── docs/                    # Documentation & legal
 ```
 
 ---
 
-## Smart Contracts
+## PROGRESS LOG
 
-| Contract | Purpose | Tests |
-|----------|---------|-------|
-| GrepToken.sol | ERC-20 (500M fixed supply) | Pass |
-| GrepStakingPool.sol | 5-tier staking | Pass |
-| GrepItems.sol | ERC-1155 game items | Pass |
-| GrepAchievements.sol | Soulbound badges | Pass |
-| GrepVesting.sol | Token vesting | Pass |
-| GrepGovernance.sol | DAO voting | Pass |
-| GrepBurner.sol | Deflationary burns | Pass |
+### 2025-12-26 Session 8 (Current)
+- Fixed database connection issues (Prisma caching)
+- Added Tournaments to main navigation
+- Created mini-games section on games page
+- Added mobile touch D-pad to Crypto Snake
+- Created mini-games dynamic route `/games/mini/[id]`
+- Committed and pushed: `2d337e2e`
 
-**Status:** Not yet deployed to mainnet (requires audit)
-
----
-
-## Documentation Status
-
-| Document | Status |
-|----------|--------|
-| README.md (root) | Updated with ASCII logo, ecosystem diagram |
-| apps/web/README.md | Complete |
-| apps/discord-bot/README.md | NEW - Added |
-| packages/contracts/README.md | Complete |
-| packages/agents/README.md | Complete |
-| packages/anti-cheat/README.md | NEW - Added |
-| packages/subgraph/README.md | NEW - Added |
-| packages/game-evolution/README.md | NEW - Added |
-| .github/ templates | Updated |
-| WHITEPAPER.md | Complete |
-| TOKENOMICS.md | Complete |
-
----
-
-## API Summary (91 Endpoints)
-
-```
-Authentication:    /api/auth/* (4)
-Games:             /api/games/* (4)
-Leaderboards:      /api/leaderboards/* (3)
-Stats:             /api/stats/* (3)
-Achievements:      /api/achievements/* (4)
-Battle Pass:       /api/battle-pass/* (3)
-Tournaments:       /api/tournaments/* (4)
-Social:            /api/friends/*, /api/guilds/* (10)
-Marketplace:       /api/marketplace/*, /api/auctions/* (6)
-Notifications:     /api/notifications/* (4)
-AI:                /api/ai/* (2)
-Admin:             /api/admin/* (3)
-+ 41 more endpoints
-```
-
----
-
-## Tech Stack
-
-| Layer | Technologies |
-|-------|--------------|
-| Frontend | Next.js 15, React 18, TypeScript, Tailwind CSS |
-| Blockchain | Base L2, Solidity 0.8.24, Hardhat, OpenZeppelin |
-| Web3 | wagmi v3, viem v2, SIWE, WalletConnect |
-| Database | PostgreSQL, Prisma ORM |
-| AI | Claude API, Ollama, OpenAI |
-| Indexing | The Graph Subgraph |
-| Hosting | Vercel |
-
----
-
-## What's Working
-
-- Web app fully functional at grepcoin.vercel.app
-- All 9 games playable
-- Wallet authentication (SIWE)
-- Score submission and leaderboards
-- Activity feed and live ticker
-- Staking UI (mock data until contract deploy)
-- AI chat integration
-- Push notifications
-- Email system (Resend)
-
----
-
-## What's Next
-
-### Immediate (Testnet Deployment)
-- [ ] Fund wallet `0xdaBbe447173cC0A40D08Aafcf3361A0EeDF62D28` with Base Sepolia ETH
-- [ ] Run `npm run deploy:sepolia` in packages/contracts
-- [ ] Update apps/web/src/lib/contracts.ts with deployed addresses
-- [ ] Test staking UI with live testnet contracts
-
-### Before Token Launch
-1. **Smart Contract Audit** - Required before mainnet deployment
-2. **Deploy to Base Mainnet** - All 7 contracts
-3. **Liquidity Setup** - DEX pool for GREP trading
-4. **The Graph Deploy** - Index on-chain events
-
-### Growth
-1. Community building (Discord, Twitter)
-2. Game content updates via game-evolution
-3. Partnership integrations
-4. Mobile PWA improvements
-
----
-
-## Commit History (Recent)
-
-```
-8853254b docs: update checkpoint with Wave 5 completion status
-c9405225 feat: update contracts to 500M fixed supply with real yield staking
-9c1b4d1b feat: introduce AI Evolution Economy model
-03b13748 docs: update checkpoint with testnet deployment tasks
-54c9435d docs: update checkpoint for December 25, 2024
-1d89f3d6 docs: comprehensive README update and ecosystem documentation
-```
-
----
-
-## Pull Request Status
-
-**Open PRs:** 0
-**Total PRs:** 52 (all merged)
-
-### Recent Merged PRs
-| PR | Title | Status |
-|----|-------|--------|
-| #52 | fix: resolve TypeScript compilation errors | ✅ Merged |
-| #51 | feat(achievements): add tiered achievements | ✅ Merged |
-| #50 | feat(quests): add daily and weekly quest system | ✅ Merged |
-| #49 | feat(guilds): add guild/clan system | ✅ Merged |
-| #48 | feat(inventory): add item inventory system | ✅ Merged |
-| #47 | feat(levels): add XP and leveling system | ✅ Merged |
-| #46 | feat(mini-games): add quick casual mini-games | ✅ Merged |
-| #45 | feat(activity): add user activity feed system | ✅ Merged |
-
-### Branch Cleanup
-- `origin/fix/typescript-eslint-cleanup` - Can be deleted (PR merged)
-
----
-
-## Resume Instructions for Claude
-
-To continue this work session:
-
-1. **Read this file first** - `CHECKPOINT.md` has all context
-2. **Check agent progress** - Review completed vs pending tasks per stream
-3. **Check branch status** - `git branch -a` to see feature branches
-4. **Continue incomplete streams** - Pick up where agents left off
-5. **Update this checkpoint** - Mark tasks complete, update status
-
-### Key Files to Review
-- `WAVE5-PLAN.md` - Original stream specifications
-- `CONTEXT.md` - Full codebase patterns and conventions
-- `THINKING.md` - Architectural decisions and reasoning
-
-### Quick Commands
-```bash
-# Check all branches
-git branch -a
-
-# Switch to a stream branch
-git checkout feature/wave5-<stream>
-
-# Run tests
-cd apps/web && npm test
-cd packages/contracts && forge test
-
-# Build check
-npm run build
-```
-
----
-
-## Progress Log
-
-### 2025-12-26 Session 7 (Current)
+### 2025-12-26 Session 7
 - **PRODUCTION LIVE** - All systems operational
 - https://grepcoin.io - Main app on GKE with Let's Encrypt SSL
 - https://docs.grepcoin.io - Documentation on GitHub Pages
 - DNS configured in Squarespace pointing to 34.94.204.248
 - SSL certificates auto-provisioned and active
-- GitHub Pages enabled with custom domain
 
 ### 2025-12-25 Session 6
 - Deployed to GKE autopilot-cluster-1
@@ -458,42 +300,44 @@ npm run build
 - Created GitHub Pages documentation site
 - Fixed vision alignment (hybrid approach)
 - Fixed tokenomics (500M fixed, real yield, burns)
-- New docs: litepaper.md, tokenomics.md, index.md
-- Updated: WHITEPAPER.md v2.0, ARCHITECTURE.md, ROADMAP.md
-- Added Jekyll config for GitHub Pages
 
 ### 2025-12-25 Session 3
 - Attempted testnet deployment
-- Fixed deploy script: `addMinter` → `addBurner` (token is now fixed supply)
-- Contracts compile successfully with Hardhat
+- Fixed deploy script issues
 - **BLOCKED**: Deployer wallet has 0 ETH
-- Added faucet links and clear deployment steps
-
-### 2025-12-25 Session 2
-- Updated checkpoint with PR status (52 PRs, all merged)
-- Verified no open PRs or pending branches
-- Updated commit history
-- Ready for testnet deployment when wallet is funded
-
-### 2025-12-25 Session 1
-- Confirmed token already at 500M fixed supply
-- **DISCOVERED: All Wave 5 streams already implemented!**
-  - Anti-cheat: Full validation in submit route
-  - Achievement NFT: Mint endpoint ready
-  - Battle Pass: Claim logic with XP/levels
-  - Notifications: Provider + Toast components
-  - Settings: Full page with push/email prefs (655 lines)
-  - Stats Dashboard: Charts + per-game analytics
-- Updated checkpoint to reflect actual status
-- Identified real next priority: **Testnet Deployment**
-- Pushed checkpoint update to main (`8853254b`)
-
-### Previous Sessions
-- Updated token to 500M fixed supply (`c9405225`)
-- Introduced AI Evolution Economy model (`9c1b4d1b`)
-- Fixed Vercel deployment issues
-- Added comprehensive documentation
 
 ---
 
-*Last updated: December 26, 2024 - Session 7*
+## RESUME INSTRUCTIONS FOR CLAUDE
+
+To continue this work session:
+
+1. **Read this file first** - `CHECKPOINT.md` has all context
+2. **Check wallet balance** - Run `npx hardhat run scripts/check-balance.js --network baseSepolia`
+3. **If funded** - Deploy contracts with `npx hardhat run scripts/deploy.js --network baseSepolia`
+4. **Update this checkpoint** - Mark tasks complete, update status
+
+### Key Files to Review
+- `packages/contracts/scripts/deploy.js` - Deployment script
+- `apps/web/src/lib/contracts.ts` - Frontend contract addresses
+- `infra/k8s/*.yaml` - Kubernetes configuration
+
+### Quick Commands
+```bash
+# Check deployer balance
+cd packages/contracts
+npx hardhat run scripts/check-balance.js --network baseSepolia
+
+# Deploy contracts (after funding)
+npx hardhat run scripts/deploy.js --network baseSepolia
+
+# Check live site
+curl -s -o /dev/null -w "%{http_code}" https://grepcoin.io/
+
+# Check pod status
+kubectl get pods -n grepcoin
+```
+
+---
+
+*Last updated: December 26, 2024 - Session 8*
