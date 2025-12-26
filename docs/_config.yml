@@ -16,13 +16,17 @@ nav:
   - title: Lite Paper
     url: /litepaper
   - title: Whitepaper
-    url: /whitepaper
+    url: /WHITEPAPER
   - title: Tokenomics
     url: /tokenomics
   - title: Architecture
-    url: /architecture
+    url: /ARCHITECTURE
+  - title: API Reference
+    url: /API
+  - title: Database
+    url: /database
   - title: Roadmap
-    url: /roadmap
+    url: /ROADMAP
 
 # Defaults
 defaults:
