@@ -1,215 +1,171 @@
 # GrepCoin Development Checkpoint
 
-**Date:** December 20, 2024 (Wave 11 Complete)
-**Waves Completed:** 11 (57 PRs merged)
-**Status:** Full platform with marketplace, auctions, NFTs, and notifications
+**Date:** December 25, 2024
+**Status:** Production deployed, documentation complete
+**Latest Commit:** `1d89f3d6` - docs: comprehensive README update
+
+---
+
+## Current State
+
+### Deployment
+| Environment | URL | Status |
+|-------------|-----|--------|
+| **Production** | https://grepcoin.vercel.app | Live |
+| **GitHub** | https://github.com/grepcoin/grepcoin | Up to date |
+
+### Recent Changes (Today)
+1. Fixed Vercel deployment for monorepo structure
+2. Fixed LiveActivityTicker animation (inline-flex + width: max-content)
+3. Updated root README with ASCII logo and ecosystem diagram
+4. Added READMEs for all packages (discord-bot, anti-cheat, subgraph, game-evolution)
+5. Improved GitHub templates (PR template, issue chooser, FUNDING.yml)
 
 ---
 
 ## Platform Overview
 
-GrepCoin is a play-to-earn gaming platform with:
-- 8 browser games with score submission
-- GREP token staking and rewards
-- Achievement and badge systems
-- Social features (friends, guilds, chat)
-- Battle pass and seasonal content
-- Governance and token burning
-- **NEW: Marketplace** - Buy/sell items with 5% fee
-- **NEW: Auction house** - Bid on rare items
-- **NEW: NFT integration** - Mint items as ERC-1155 NFTs
-- **NEW: Push notifications** - Real-time browser alerts
-- **NEW: Email notifications** - Digests and alerts
-- **NEW: Leaderboard rewards** - Weekly/monthly distributions
+GrepCoin is an AI-built play-to-earn crypto arcade with:
+
+| Category | Details |
+|----------|---------|
+| **Games** | 9 browser games with score submission |
+| **Token** | GREP (ERC-20) on Base L2 |
+| **Staking** | 5 tiers (5-20% APY, up to 2x multipliers) |
+| **NFTs** | Achievements (soulbound) + Items (tradeable) |
+| **Social** | Guilds, tournaments, battle pass, friends |
+| **AI** | Claude-powered agents and Discord bot |
 
 ---
 
-## Infrastructure Status
-
-### ✅ Fully Working
-
-| Component | Status | Notes |
-|-----------|--------|-------|
-| **Prisma Schema** | Complete | 23 models, all relationships defined |
-| **API Routes** | Complete | 70 endpoints across all features |
-| **Authentication** | Working | SIWE wallet-based auth |
-| **Core Providers** | Working | Auth, Staking, Query, Wagmi, Notifications |
-| **Game Scoring** | Working | Submit scores, calculate rewards |
-| **Staking System** | Working | Tier-based multipliers |
-| **Smart Contracts** | Complete | Token, Staking, Vesting, Achievements, Burner, Governance |
-
-### ✅ Recently Fixed
-
-| Component | Fix Applied |
-|-----------|-------------|
-| **Navbar Balance** | Now uses `useStaking()` context for real balance |
-| **ThemeProvider** | Wired into Providers.tsx |
-| **LocaleProvider** | Wired into Providers.tsx |
-| **Leaderboard Page** | Created `/leaderboard` with period filters |
-| **Tournaments Page** | Created `/tournaments` with status filters |
-| **Guilds Page** | Created `/guilds` with search and perks |
-| **Quests Page** | Created `/quests` with daily/weekly tabs |
-
-### ⚠️ Remaining Integration
-
-| Component | Issue | Fix Required |
-|-----------|-------|--------------|
-| **Navbar Notifications** | Hardcoded (0) | Wire to notification count API |
-| **Games Data** | Hardcoded array | Fetch from /api/games |
-
-### ❌ Missing Pages
-
-| Page | API Exists | Priority |
-|------|------------|----------|
-| `/events` | ✅ Yes | LOW |
-| `/inventory` | ✅ Yes | LOW |
-
----
-
-## Feature Summary by Wave
-
-### Waves 1-2: Core Foundation
-- Claude API provider
-- Anti-cheat validators
-- GrepAchievements NFT contract
-- Friend system API
-- AI Chat with streaming
-- Events and Battle Pass systems
-
-### Waves 3-4: Infrastructure
-- Discord AI commands
-- Contract deployment scripts
-- Leaderboards and tournaments
-- Auto-fix GitHub agent
-- Multiplayer server (Socket.io)
-- OG image generation
-- The Graph subgraph
-
-### Waves 5-6: UX Polish
-- Anti-cheat integration
-- Achievement NFT minting
-- Battle Pass page
-- Notification system
-- Settings and Stats pages
-- Skeleton loaders
-- Error boundaries
-- Admin dashboard
-- Social sharing
-- Navbar upgrade
-- Daily rewards UI
-
-### Waves 7-8: Platform Features
-- PWA support
-- Game tutorials
-- Keyboard shortcuts
-- Sound manager
-- Search (Cmd+K)
-- Analytics events
-- i18n (5 languages)
-- Theme toggle
-- Game replays
-- Chat system
-- Token burn mechanics
-- Governance voting
-
-### Waves 9-10: Engagement Systems
-- Webhooks for integrations
-- User badges (17 badges)
-- Seasonal events
-- Data export
-- Referral tiers
-- Activity feed
-- Mini-games
-- User levels (XP system)
-- Inventory system
-- Guild/clan system
-- Daily/weekly quests
-- Tiered achievements
-
----
-
-## API Endpoints Summary
+## Repository Structure
 
 ```
-Authentication (4):     /api/auth/*
-Games (4):             /api/games/*
-Leaderboards (3):      /api/leaderboards/*
-Stats (3):             /api/stats/*
-Achievements (4):      /api/achievements/*
-Battle Pass (3):       /api/battle-pass/*
-Events (3):            /api/events/*
-Tournaments (4):       /api/tournaments/*
-Social (6):            /api/friends/*, /api/referrals/*
-Admin (1):             /api/admin/*
-Mini-games (1):        /api/mini-games/*
-Levels (2):            /api/levels/*
-Inventory (3):         /api/inventory/*
-Guilds (4):            /api/guilds/*
-Quests (2):            /api/quests/*
-Badges (2):            /api/badges/*
-Seasons (2):           /api/seasons/*
-Webhooks (4):          /api/webhooks/*
-Export (1):            /api/export
-Activity (1):          /api/activity
-Search (1):            /api/search
-Chat (1):              /api/chat/*
-Burn (1):              /api/burn/*
-Governance (1):        /api/governance/*
+grepcoin/
+├── apps/
+│   ├── web/                 # Next.js 15 (91 API routes, 112 components)
+│   └── discord-bot/         # AI Discord bot (14 slash commands)
+│
+├── packages/
+│   ├── contracts/           # 7 Solidity contracts (64 tests)
+│   ├── agents/              # AI agent system (4 agents)
+│   ├── anti-cheat/          # Score validation
+│   ├── subgraph/            # The Graph indexer
+│   └── game-evolution/      # AI content generator
+│
+└── docs/                    # Documentation & legal
 ```
 
 ---
 
 ## Smart Contracts
 
-| Contract | Purpose | Status |
-|----------|---------|--------|
-| GrepToken.sol | ERC20 token | Complete |
-| GrepStaking.sol | Stake for multipliers | Complete |
-| GrepVesting.sol | Token vesting | Complete |
-| GrepAchievements.sol | Achievement NFTs | Complete |
-| GrepBurner.sol | Token burning | Complete |
-| GrepGovernance.sol | On-chain voting | Complete |
+| Contract | Purpose | Tests |
+|----------|---------|-------|
+| GrepToken.sol | ERC-20 (1B supply) | Pass |
+| GrepStakingPool.sol | 5-tier staking | Pass |
+| GrepItems.sol | ERC-1155 game items | Pass |
+| GrepAchievements.sol | Soulbound badges | Pass |
+| GrepVesting.sol | Token vesting | Pass |
+| GrepGovernance.sol | DAO voting | Pass |
+| GrepBurner.sol | Deflationary burns | Pass |
+
+**Status:** Not yet deployed to mainnet (requires audit)
 
 ---
 
-## Database Models (23)
+## Documentation Status
 
-Core: User, Game, GameScore, Session
-Rewards: Stake, DailyReward, DailyStats, GlobalStats
-Content: Achievement, UserAchievement, DailyChallenge, ChallengeCompletion
-Social: Friendship, Referral, Activity
-Events: Event, EventParticipant, Tournament, TournamentParticipant
-Battle Pass: BattlePass, BattlePassProgress, BattlePassReward
-Fundraising: Backer, FundraiseStats, AirdropClaim
-
----
-
-## Priority Fixes Status
-
-### ✅ Completed Before Wave 11
-1. ✅ Created `/leaderboard` page with period filters (all/weekly/daily)
-2. ✅ Fixed Navbar to use `useStaking()` for balance
-3. ✅ Wired ThemeProvider into Providers.tsx
-4. ✅ Wired LocaleProvider into Providers.tsx
-5. ✅ Created `/tournaments` page with status filters
-6. ✅ Created `/guilds` page with search and perks display
-7. ✅ Created `/quests` page with daily/weekly tabs
-
-### P3 - Polish (Optional)
-8. Create `/inventory` page
-9. Create `/events` page
-10. Dynamic games loading from API
+| Document | Status |
+|----------|--------|
+| README.md (root) | Updated with ASCII logo, ecosystem diagram |
+| apps/web/README.md | Complete |
+| apps/discord-bot/README.md | NEW - Added |
+| packages/contracts/README.md | Complete |
+| packages/agents/README.md | Complete |
+| packages/anti-cheat/README.md | NEW - Added |
+| packages/subgraph/README.md | NEW - Added |
+| packages/game-evolution/README.md | NEW - Added |
+| .github/ templates | Updated |
+| WHITEPAPER.md | Complete |
+| TOKENOMICS.md | Complete |
 
 ---
 
-## Next Steps
+## API Summary (91 Endpoints)
 
-After fixing the above issues, Wave 11 candidates:
-- Marketplace (trade items)
-- Auction house
-- NFT integration for inventory
-- Real-time multiplayer games
-- Leaderboard rewards distribution
+```
+Authentication:    /api/auth/* (4)
+Games:             /api/games/* (4)
+Leaderboards:      /api/leaderboards/* (3)
+Stats:             /api/stats/* (3)
+Achievements:      /api/achievements/* (4)
+Battle Pass:       /api/battle-pass/* (3)
+Tournaments:       /api/tournaments/* (4)
+Social:            /api/friends/*, /api/guilds/* (10)
+Marketplace:       /api/marketplace/*, /api/auctions/* (6)
+Notifications:     /api/notifications/* (4)
+AI:                /api/ai/* (2)
+Admin:             /api/admin/* (3)
++ 41 more endpoints
+```
+
+---
+
+## Tech Stack
+
+| Layer | Technologies |
+|-------|--------------|
+| Frontend | Next.js 15, React 18, TypeScript, Tailwind CSS |
+| Blockchain | Base L2, Solidity 0.8.24, Hardhat, OpenZeppelin |
+| Web3 | wagmi v3, viem v2, SIWE, WalletConnect |
+| Database | PostgreSQL, Prisma ORM |
+| AI | Claude API, Ollama, OpenAI |
+| Indexing | The Graph Subgraph |
+| Hosting | Vercel |
+
+---
+
+## What's Working
+
+- Web app fully functional at grepcoin.vercel.app
+- All 9 games playable
+- Wallet authentication (SIWE)
+- Score submission and leaderboards
+- Activity feed and live ticker
+- Staking UI (mock data until contract deploy)
+- AI chat integration
 - Push notifications
-- Email notifications
-- Mobile app wrapper
+- Email system (Resend)
+
+---
+
+## What's Next
+
+### Before Token Launch
+1. **Smart Contract Audit** - Required before mainnet deployment
+2. **Deploy to Base Mainnet** - All 7 contracts
+3. **Liquidity Setup** - DEX pool for GREP trading
+4. **The Graph Deploy** - Index on-chain events
+
+### Growth
+1. Community building (Discord, Twitter)
+2. Game content updates via game-evolution
+3. Partnership integrations
+4. Mobile PWA improvements
+
+---
+
+## Commit History (Recent)
+
+```
+1d89f3d6 docs: comprehensive README update and ecosystem documentation
+f863235b fix: ensure LiveActivityTicker animation works correctly
+5959b5d5 fix: resolve Vercel deployment issues for monorepo
+232dd28f fix: configure Vercel to properly build monorepo with local packages
+a6aff16e fix: configure Vercel for monorepo root deployment
+```
+
+---
+
+*Last updated: December 25, 2024*
