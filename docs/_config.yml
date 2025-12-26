@@ -1,8 +1,8 @@
 # GrepCoin Documentation Site
 title: GrepCoin
 description: AI-Powered Play-to-Earn Crypto Arcade on Base
-baseurl: "/grepcoin"
-url: "https://grepcoin.github.io"
+baseurl: ""
+url: "https://docs.grepcoin.io"
 
 # Theme
 remote_theme: pages-themes/minimal@v0.2.0

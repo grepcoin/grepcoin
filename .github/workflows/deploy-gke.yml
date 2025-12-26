@@ -1,0 +1,88 @@
+name: Deploy to GKE
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/web/**'
+      - 'packages/**'
+      - 'infra/k8s/**'
+      - '.github/workflows/deploy-gke.yml'
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GKE_CLUSTER: grepcoin-cluster
+  GKE_ZONE: us-central1-a
+  IMAGE: grepcoin-web
+  REGISTRY: gcr.io
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker gcr.io --quiet
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --tag "$REGISTRY/$PROJECT_ID/$IMAGE:$GITHUB_SHA" \
+            --tag "$REGISTRY/$PROJECT_ID/$IMAGE:latest" \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --cache-from "$REGISTRY/$PROJECT_ID/$IMAGE:latest" \
+            -f apps/web/Dockerfile \
+            .
+
+      - name: Push Docker image
+        run: |
+          docker push "$REGISTRY/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
+          docker push "$REGISTRY/$PROJECT_ID/$IMAGE:latest"
+
+      - name: Deploy to GKE
+        run: |
+          # Update image tag in deployment
+          sed -i "s|gcr.io/PROJECT_ID/grepcoin-web:latest|$REGISTRY/$PROJECT_ID/$IMAGE:$GITHUB_SHA|g" infra/k8s/deployment.yaml
+
+          # Apply Kubernetes manifests
+          kubectl apply -f infra/k8s/namespace.yaml
+          kubectl apply -f infra/k8s/configmap.yaml
+          kubectl apply -f infra/k8s/deployment.yaml
+          kubectl apply -f infra/k8s/service.yaml
+          kubectl apply -f infra/k8s/ingress.yaml
+          kubectl apply -f infra/k8s/hpa.yaml
+
+          # Wait for rollout
+          kubectl rollout status deployment/grepcoin-web -n grepcoin --timeout=300s
+
+      - name: Verify deployment
+        run: |
+          kubectl get pods -n grepcoin
+          kubectl get services -n grepcoin
+          kubectl get ingress -n grepcoin

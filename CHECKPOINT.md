@@ -1,20 +1,74 @@
 # GrepCoin Development Checkpoint
 
 **Date:** December 25, 2024
-**Status:** Documentation Complete - Ready for GitHub Pages & Testnet
-**Latest Commit:** `ae00ff2e` - docs: update checkpoint with documentation site status
+**Status:** Infrastructure Ready - GKE + Domain Configuration
+**Latest Commit:** `86bc036f` - docs: add backend documentation
+
+---
+
+## GKE INFRASTRUCTURE (NEW)
+
+### Domain Setup: grepcoin.io
+| Domain | Target | Purpose |
+|--------|--------|---------|
+| grepcoin.io | GKE Load Balancer | Main web app |
+| www.grepcoin.io | GKE Load Balancer | Redirect to root |
+| docs.grepcoin.io | GitHub Pages | Documentation |
+
+### Squarespace DNS Configuration
+1. Log in to Squarespace → Settings → Domains → grepcoin.io
+2. Go to DNS Settings
+3. Add these records:
+
+| Type | Host | Value |
+|------|------|-------|
+| A | @ | `<GKE_STATIC_IP>` |
+| A | www | `<GKE_STATIC_IP>` |
+| CNAME | docs | grepcoin.github.io |
+
+### GKE Cluster Setup
+```bash
+# 1. Create cluster
+gcloud container clusters create-auto grepcoin-cluster --region us-central1
+
+# 2. Reserve static IP
+gcloud compute addresses create grepcoin-ip --global
+gcloud compute addresses describe grepcoin-ip --global --format="get(address)"
+
+# 3. Get credentials
+gcloud container clusters get-credentials grepcoin-cluster --region us-central1
+```
+
+### Infrastructure Files
+| File | Purpose |
+|------|---------|
+| `apps/web/Dockerfile` | Multi-stage Next.js build |
+| `infra/k8s/namespace.yaml` | Kubernetes namespace |
+| `infra/k8s/deployment.yaml` | Pod deployment (2-10 replicas) |
+| `infra/k8s/service.yaml` | ClusterIP service |
+| `infra/k8s/ingress.yaml` | Ingress + SSL certificate |
+| `infra/k8s/hpa.yaml` | Horizontal pod autoscaler |
+| `.github/workflows/deploy-gke.yml` | CI/CD pipeline |
+
+### GitHub Secrets Required
+| Secret | Description |
+|--------|-------------|
+| `GCP_PROJECT_ID` | Your GCP project ID |
+| `GCP_WORKLOAD_IDENTITY_PROVIDER` | Workload Identity provider path |
+| `GCP_SERVICE_ACCOUNT` | GitHub Actions service account |
 
 ---
 
 ## DOCUMENTATION SITE
 
-### GitHub Pages Setup
+### GitHub Pages: docs.grepcoin.io
 | File | Purpose |
 |------|---------|
-| `docs/_config.yml` | Jekyll configuration with navigation |
+| `docs/_config.yml` | Jekyll config for docs.grepcoin.io |
+| `docs/CNAME` | Custom domain file |
 | `docs/index.md` | Landing page |
-| `docs/litepaper.md` | Executive summary (3 pages) |
-| `docs/tokenomics.md` | Token economics details |
+| `docs/litepaper.md` | Executive summary |
+| `docs/tokenomics.md` | Token economics |
 | `docs/WHITEPAPER.md` | Full whitepaper v2.0 |
 | `docs/ARCHITECTURE.md` | Technical architecture |
 | `docs/API.md` | API reference (91 endpoints) |
@@ -28,7 +82,7 @@
 4. Folder: `/docs`
 5. Save
 
-**URL will be:** https://grepcoin.github.io/grepcoin/
+**URL:** https://docs.grepcoin.io
 
 ### Vision Alignment (Fixed)
 | Before | After |
@@ -362,11 +416,20 @@ npm run build
 
 ## Progress Log
 
-### 2025-12-25 Session 5 (Current)
+### 2025-12-25 Session 6 (Current)
+- Created GKE infrastructure for production deployment
+- Added Dockerfile for Next.js with multi-stage build
+- Created Kubernetes manifests: namespace, deployment, service, ingress, HPA
+- Added GitHub Actions workflow for automated GKE deployment
+- Configured domain structure: grepcoin.io (app), docs.grepcoin.io (docs)
+- Added docs/CNAME for GitHub Pages custom domain
+- Created comprehensive infra/README.md with setup instructions
+- Next steps: Create GKE cluster, configure DNS in Squarespace
+
+### 2025-12-25 Session 5
 - Added backend documentation: API.md (91 endpoints), database.md (39 models)
 - Updated Jekyll navigation with all doc pages
 - Documentation site ready for GitHub Pages publishing
-- Next action: Enable GitHub Pages in repo settings, fund wallet for testnet
 
 ### 2025-12-25 Session 4
 - Created GitHub Pages documentation site
@@ -410,4 +473,4 @@ npm run build
 
 ---
 
-*Last updated: December 25, 2024 - Session 5*
+*Last updated: December 25, 2024 - Session 6*

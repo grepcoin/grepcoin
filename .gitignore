@@ -16,6 +16,11 @@ cache/
 .env
 .env.local
 .env.*.local
+.env.production
+
+# Kubernetes secrets (keep template, ignore real secrets)
+infra/k8s/secret.local.yaml
+infra/k8s/*-secrets.yaml
 
 # IDE
 .idea/

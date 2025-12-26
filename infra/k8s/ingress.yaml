@@ -1,0 +1,42 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grepcoin-ingress
+  namespace: grepcoin
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "grepcoin-ip"
+    networking.gke.io/managed-certificates: "grepcoin-cert"
+    kubernetes.io/ingress.allow-http: "false"
+spec:
+  rules:
+    - host: grepcoin.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grepcoin-web
+                port:
+                  number: 80
+    - host: www.grepcoin.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grepcoin-web
+                port:
+                  number: 80
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: grepcoin-cert
+  namespace: grepcoin
+spec:
+  domains:
+    - grepcoin.io
+    - www.grepcoin.io
