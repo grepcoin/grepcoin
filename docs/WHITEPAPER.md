@@ -9,7 +9,9 @@
 
 ## Abstract
 
-GrepCoin is a decentralized blockchain gaming platform that combines classic arcade-style gameplay with cryptocurrency rewards. Built on Base L2, GrepCoin offers players the opportunity to earn GREP tokens by playing developer-themed games, staking for rewards, and participating in a vibrant gaming community. This whitepaper outlines GrepCoin's vision, tokenomics, technical architecture, and roadmap.
+GrepCoin is a **deflationary blockchain gaming platform** that combines arcade-style gameplay with AI-generated content evolution. Built on Base L2, GrepCoin introduces the **AI Evolution Economy** - a novel model where platform growth directly drives token scarcity. Every AI-generated game, level, and content piece burns GREP tokens, creating sustainable value appreciation.
+
+This whitepaper outlines GrepCoin's vision, the AI Evolution Economy, technical architecture, and roadmap.
 
 ---
 
@@ -118,23 +120,33 @@ GrepCoin addresses these issues through:
 
 ## 5. Tokenomics
 
-### 5.1 Token Details
+### 5.1 The AI Evolution Economy
+
+GrepCoin introduces a **deflationary utility model** where platform growth drives token scarcity:
+
+- Every AI-generated game burns GREP
+- Every evolution vote burns GREP
+- Every marketplace transaction burns GREP
+- **The more the platform grows, the scarcer GREP becomes**
+
+### 5.2 Token Details
 
 - **Name**: GrepCoin
 - **Symbol**: GREP
 - **Type**: ERC-20 on Base L2
-- **Total Supply**: 1,000,000,000 (1 billion)
+- **Total Supply**: 500,000,000 (500M) - Fixed, no minting
 - **Decimals**: 18
 - **Chain**: Base (Ethereum L2)
 
-### 5.2 Token Distribution
+### 5.3 Token Distribution
 
-| Allocation | Percentage | Amount | Vesting | Purpose |
-|------------|------------|--------|---------|---------|
-| Team & Liquidity | 40% | 400,000,000 | 1yr cliff, 2yr vest | Initial liquidity, team compensation |
-| Staking Rewards | 30% | 300,000,000 | 4yr emissions | Reward stakers with APY |
-| Gameplay Rewards | 20% | 200,000,000 | 4yr emissions | Reward players for performance |
-| Airdrops & Marketing | 10% | 100,000,000 | 2yr emissions | Community growth, campaigns |
+| Allocation | Percentage | Amount | Purpose |
+|------------|------------|--------|---------|
+| Ecosystem & Rewards | 40% | 200,000,000 | Gameplay, staking, grants |
+| Liquidity Pool | 20% | 100,000,000 | DEX liquidity |
+| Team & Founders | 15% | 75,000,000 | 4-year vest |
+| Treasury | 15% | 75,000,000 | Operations |
+| Early Supporters | 10% | 50,000,000 | Seed investors |
 
 ### 5.3 Token Utility
 
@@ -181,17 +193,24 @@ To create deflationary pressure:
 
 ## 6. Staking System
 
-### 6.1 Staking Tiers
+### 6.1 Real Yield Model
 
-GrepCoin offers 5 staking tiers with increasing rewards:
+Unlike traditional P2E staking that mints new tokens (causing inflation), GrepCoin staking rewards come from **platform revenue**:
 
-| Tier | Minimum | Lock Period | APY | Game Multiplier | Bonus Plays |
-|------|---------|-------------|-----|-----------------|-------------|
-| Flexible | 100 GREP | None | 5% | 1.1x | +2 daily |
-| Bronze | 1,000 GREP | 7 days | 8% | 1.25x | +5 daily |
-| Silver | 5,000 GREP | 14 days | 12% | 1.5x | +10 daily |
-| Gold | 10,000 GREP | 30 days | 15% | 1.75x | +15 daily |
-| Diamond | 50,000 GREP | 90 days | 20% | 2.0x | +25 daily |
+- 50% of marketplace fees → Staking pool
+- 50% of tournament fees → Staking pool
+- 30% of premium subscriptions → Staking pool
+
+### 6.2 Staking Tiers
+
+| Tier | Minimum | Lock Period | APY* | Perks |
+|------|---------|-------------|------|-------|
+| Basic | 100 GREP | None | 3% | Vote on evolutions |
+| Silver | 1,000 GREP | 7 days | 5% | Early access to content |
+| Gold | 5,000 GREP | 30 days | 6% | Propose evolutions |
+| Diamond | 25,000 GREP | 90 days | 8% | Revenue share + governance |
+
+*APY varies based on platform revenue and total staked
 
 ### 6.2 Benefits of Staking
 
