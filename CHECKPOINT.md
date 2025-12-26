@@ -1,8 +1,16 @@
 # GrepCoin Development Checkpoint
 
 **Date:** December 25, 2024
-**Status:** Infrastructure Ready - GKE + Domain Configuration
-**Latest Commit:** `86bc036f` - docs: add backend documentation
+**Status:** GKE DEPLOYED - Awaiting DNS Configuration
+**Latest Commit:** `882c5345` - feat: add GKE infrastructure
+
+### Live Deployment
+| Resource | Value |
+|----------|-------|
+| **Static IP** | 136.110.246.71 |
+| **Pods** | 3/3 Running |
+| **GKE Cluster** | autopilot-cluster-1 (us-west2) |
+| **Image** | gcr.io/greplabs/grepcoin-web:latest |
 
 ---
 
@@ -22,8 +30,8 @@
 
 | Type | Host | Value |
 |------|------|-------|
-| A | @ | `<GKE_STATIC_IP>` |
-| A | www | `<GKE_STATIC_IP>` |
+| A | @ | `136.110.246.71` |
+| A | www | `136.110.246.71` |
 | CNAME | docs | grepcoin.github.io |
 
 ### GKE Cluster Setup
@@ -417,14 +425,13 @@ npm run build
 ## Progress Log
 
 ### 2025-12-25 Session 6 (Current)
-- Created GKE infrastructure for production deployment
-- Added Dockerfile for Next.js with multi-stage build
-- Created Kubernetes manifests: namespace, deployment, service, ingress, HPA
-- Added GitHub Actions workflow for automated GKE deployment
-- Configured domain structure: grepcoin.io (app), docs.grepcoin.io (docs)
-- Added docs/CNAME for GitHub Pages custom domain
-- Created comprehensive infra/README.md with setup instructions
-- Next steps: Create GKE cluster, configure DNS in Squarespace
+- **DEPLOYED TO GKE** - 3 pods running on autopilot-cluster-1
+- Reserved static IP: 136.110.246.71
+- Built linux/amd64 Docker image and pushed to GCR
+- Created Kubernetes secrets from .env.local
+- SSL certificate provisioning (awaiting DNS)
+- Added your IP to cluster authorized networks
+- Next: Configure DNS in Squarespace, enable GitHub Pages
 
 ### 2025-12-25 Session 5
 - Added backend documentation: API.md (91 endpoints), database.md (39 models)
