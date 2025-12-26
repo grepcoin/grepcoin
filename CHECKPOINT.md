@@ -1,17 +1,25 @@
 # GrepCoin Development Checkpoint
 
-**Date:** December 25, 2024
-**Status:** GKE DEPLOYED - Awaiting DNS Configuration
-**Latest Commit:** `882c5345` - feat: add GKE infrastructure
+**Date:** December 26, 2024
+**Status:** ✅ PRODUCTION LIVE
+**Latest Commit:** `94c3a0dd` - feat: add Let's Encrypt SSL with cert-manager
 
-### Live Deployment
+### Live URLs
+| Site | URL | Platform |
+|------|-----|----------|
+| **Main App** | https://grepcoin.io | GKE + Let's Encrypt |
+| **Documentation** | https://docs.grepcoin.io | GitHub Pages |
+
+### Infrastructure
 | Resource | Value |
 |----------|-------|
 | **Nginx Ingress IP** | 34.94.204.248 |
-| **Pods** | 2-3 Running (autoscaled) |
+| **Pods** | 2 replicas (autoscaling 2-10) |
 | **GKE Cluster** | autopilot-cluster-1 (us-west2) |
 | **Image** | gcr.io/greplabs/grepcoin-web:latest |
-| **SSL** | Let's Encrypt via cert-manager |
+| **SSL (App)** | Let's Encrypt via cert-manager |
+| **SSL (Docs)** | GitHub Pages (expires 2026-03-25) |
+| **Database** | NeonDB (serverless Postgres) |
 
 ---
 
@@ -425,14 +433,21 @@ npm run build
 
 ## Progress Log
 
-### 2025-12-25 Session 6 (Current)
-- **DEPLOYED TO GKE** - pods running on autopilot-cluster-1
+### 2025-12-26 Session 7 (Current)
+- **PRODUCTION LIVE** - All systems operational
+- https://grepcoin.io - Main app on GKE with Let's Encrypt SSL
+- https://docs.grepcoin.io - Documentation on GitHub Pages
+- DNS configured in Squarespace pointing to 34.94.204.248
+- SSL certificates auto-provisioned and active
+- GitHub Pages enabled with custom domain
+
+### 2025-12-25 Session 6
+- Deployed to GKE autopilot-cluster-1
 - Installed cert-manager + nginx-ingress controller
 - Set up Let's Encrypt SSL with ClusterIssuer
-- Nginx Ingress IP: 34.94.204.248
+- Fixed RBAC for cert-manager on GKE Autopilot
 - Built linux/amd64 Docker image and pushed to GCR
 - Created Kubernetes secrets from .env.local
-- Next: Configure DNS in Squarespace → SSL will auto-provision
 
 ### 2025-12-25 Session 5
 - Added backend documentation: API.md (91 endpoints), database.md (39 models)
@@ -481,4 +496,4 @@ npm run build
 
 ---
 
-*Last updated: December 25, 2024 - Session 6*
+*Last updated: December 26, 2024 - Session 7*
