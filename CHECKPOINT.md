@@ -142,6 +142,12 @@ Admin:             /api/admin/* (3)
 
 ## What's Next
 
+### Immediate (Testnet Deployment)
+- [ ] Fund wallet `0xdaBbe447173cC0A40D08Aafcf3361A0EeDF62D28` with Base Sepolia ETH
+- [ ] Run `npm run deploy:sepolia` in packages/contracts
+- [ ] Update apps/web/src/lib/contracts.ts with deployed addresses
+- [ ] Test staking UI with live testnet contracts
+
 ### Before Token Launch
 1. **Smart Contract Audit** - Required before mainnet deployment
 2. **Deploy to Base Mainnet** - All 7 contracts
