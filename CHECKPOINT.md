@@ -1,8 +1,40 @@
 # GrepCoin Development Checkpoint
 
 **Date:** December 25, 2024
-**Status:** Testnet Deployment Ready - Awaiting Wallet Funding
-**Latest Commit:** `6634ea72` - docs: update checkpoint with PR status and tracking
+**Status:** Documentation Complete - Ready for GitHub Pages & Testnet
+**Latest Commit:** `8db63c61` - docs: add GitHub Pages documentation site
+
+---
+
+## DOCUMENTATION SITE (NEW)
+
+### GitHub Pages Setup
+| File | Purpose |
+|------|---------|
+| `docs/_config.yml` | Jekyll configuration |
+| `docs/index.md` | Landing page |
+| `docs/litepaper.md` | Executive summary (3 pages) |
+| `docs/tokenomics.md` | Token economics details |
+| `docs/WHITEPAPER.md` | Full whitepaper v2.0 |
+| `docs/ARCHITECTURE.md` | Technical architecture |
+| `docs/ROADMAP.md` | Development phases |
+
+### Enable GitHub Pages
+1. Go to: https://github.com/grepcoin/grepcoin/settings/pages
+2. Source: "Deploy from a branch"
+3. Branch: `main`
+4. Folder: `/docs`
+5. Save
+
+**URL will be:** https://grepcoin.github.io/grepcoin/
+
+### Vision Alignment (Fixed)
+| Before | After |
+|--------|-------|
+| 1B supply (inflationary) | 500M fixed supply |
+| Mint rewards | Real yield from revenue |
+| "Indie game ecosystem" | "Play-to-earn arcade" |
+| Vague roadmap | Hybrid: arcade now, ecosystem later |
 
 ---
 
@@ -328,13 +360,21 @@ npm run build
 
 ## Progress Log
 
-### 2025-12-25 Session 3 (Current)
+### 2025-12-25 Session 4 (Current)
+- Created GitHub Pages documentation site
+- Fixed vision alignment (hybrid approach)
+- Fixed tokenomics (500M fixed, real yield, burns)
+- New docs: litepaper.md, tokenomics.md, index.md
+- Updated: WHITEPAPER.md v2.0, ARCHITECTURE.md, ROADMAP.md
+- Added Jekyll config for GitHub Pages
+- Next action: Enable GitHub Pages in repo settings, fund wallet
+
+### 2025-12-25 Session 3
 - Attempted testnet deployment
 - Fixed deploy script: `addMinter` → `addBurner` (token is now fixed supply)
 - Contracts compile successfully with Hardhat
 - **BLOCKED**: Deployer wallet has 0 ETH
 - Added faucet links and clear deployment steps
-- Next action: Fund wallet, then re-run deployment
 
 ### 2025-12-25 Session 2
 - Updated checkpoint with PR status (52 PRs, all merged)
@@ -363,4 +403,4 @@ npm run build
 
 ---
 
-*Last updated: December 25, 2024 - Session 3*
+*Last updated: December 25, 2024 - Session 4*
