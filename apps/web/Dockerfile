@@ -6,14 +6,14 @@ FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
-# Copy all necessary files for npm install
+# Copy all necessary files for npm install (monorepo structure)
 COPY package.json package-lock.json ./
-COPY apps/web/package.json ./apps/web/
+COPY apps/web/package.json apps/web/package-lock.json ./apps/web/
 COPY apps/web/prisma ./apps/web/prisma/
 COPY packages/anti-cheat/package.json ./packages/anti-cheat/
 COPY packages/anti-cheat/src ./packages/anti-cheat/src/
 
-# Install all dependencies (including dev for build)
+# Install all workspace dependencies
 RUN npm ci
 
 # Generate Prisma client
@@ -25,13 +25,13 @@ FROM node:20-alpine AS builder
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
-# Copy node_modules from deps
+# Copy root node_modules from deps
 COPY --from=deps /app/node_modules ./node_modules
 
 # Copy source code
 COPY . .
 
-# Copy generated prisma client
+# Copy generated prisma client (generated to root node_modules)
 COPY --from=deps /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=deps /app/node_modules/@prisma ./node_modules/@prisma
 

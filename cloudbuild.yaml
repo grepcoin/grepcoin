@@ -1,0 +1,12 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/greplabs/grepcoin-web:latest'
+      - '-f'
+      - 'apps/web/Dockerfile'
+      - '.'
+images:
+  - 'gcr.io/greplabs/grepcoin-web:latest'
+timeout: '1200s'
