@@ -1,0 +1,16 @@
+# Ignore local lockfiles from workspace packages
+apps/*/package-lock.json
+packages/*/package-lock.json
+
+# Development files
+node_modules
+.next
+.git
+*.log
+.env*
+!.env.example
+
+# Build artifacts
+dist
+coverage
+.turbo
