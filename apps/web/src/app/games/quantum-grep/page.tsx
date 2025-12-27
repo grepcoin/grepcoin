@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Play, Pause, RotateCcw, Eye, Zap, Target, Sparkles } from 'lucide-react'
+import { ArrowLeft, Play, RotateCcw, Eye, Zap, Target, Sparkles } from 'lucide-react'
 import { playSound, createExplosion, createTextParticle, updateParticle, drawParticle, Particle, GREP_COLORS } from '@/lib/gameUtils'
 import { useStaking } from '@/context/StakingContext'
 import { MultiplierIndicator } from '@/components/StakingBadge'

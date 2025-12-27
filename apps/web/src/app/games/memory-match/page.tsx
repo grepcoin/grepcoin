@@ -56,7 +56,6 @@ interface GameState {
   level: number
 }
 
-const GRID_COLS = 4
 const INITIAL_TIME = 90
 
 export default function MemoryMatchGame() {

@@ -5,7 +5,7 @@ import { parseSessionToken } from '@/lib/auth'
 
 const ADMIN_WALLETS = [process.env.ADMIN_WALLET?.toLowerCase()]
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   const cookieStore = await cookies()
   const sessionToken = cookieStore.get('session')?.value
 

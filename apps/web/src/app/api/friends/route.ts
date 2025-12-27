@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 import prisma from '@/lib/db'
 import { parseSessionToken } from '@/lib/auth'
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const cookieStore = await cookies()
     const sessionToken = cookieStore.get('session')?.value
