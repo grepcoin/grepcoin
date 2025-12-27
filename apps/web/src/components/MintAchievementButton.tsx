@@ -9,7 +9,7 @@ interface Props {
   isUnlocked: boolean
 }
 
-export function MintAchievementButton({ achievementId, achievementName, isMinted, isUnlocked }: Props) {
+export function MintAchievementButton({ achievementId, achievementName: _achievementName, isMinted, isUnlocked }: Props) {
   const { mintAchievement, isPending, isSuccess, error } = useAchievementMint()
 
   if (!isUnlocked) {

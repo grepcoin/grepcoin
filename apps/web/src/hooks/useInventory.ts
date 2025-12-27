@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
-import { ITEMS, Item, InventoryItem } from '@/lib/inventory'
+import { ITEMS, InventoryItem } from '@/lib/inventory'
 
 export function useInventory() {
   const [inventory, setInventory] = useState<InventoryItem[]>([])

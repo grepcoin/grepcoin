@@ -22,7 +22,7 @@ export function SeasonRewards() {
         </div>
 
         <div className="flex justify-between relative">
-          {season.rewards.map((reward, i) => {
+          {season.rewards.map((reward, _i) => {
             const unlocked = points >= reward.requiredPoints
             const claimed = claimedRewards.includes(reward.id)
             const canClaim = unlocked && !claimed

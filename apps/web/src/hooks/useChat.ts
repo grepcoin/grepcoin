@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import type { ChatMessage, ChatRoom } from '@/lib/chat'
+import type { ChatMessage } from '@/lib/chat'
 import { MAX_MESSAGE_LENGTH, RATE_LIMIT_MESSAGES, RATE_LIMIT_WINDOW } from '@/lib/chat'
 
 export function useChat(roomId: string) {

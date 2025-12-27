@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { CURRENT_SEASON, SeasonChallenge, SeasonReward } from '@/lib/seasons'
+import { CURRENT_SEASON } from '@/lib/seasons'
 
 interface ChallengeProgress {
   challengeId: string

@@ -57,8 +57,9 @@ export default function QuantumGrepGame() {
   const [particles, setParticles] = useState<QuantumParticle[]>([])
   const [observedPattern, setObservedPattern] = useState<number[]>([])
   const [effects, setEffects] = useState<Particle[]>([])
-  const [observerMode, setObserverMode] = useState(false)
-  const [selectedParticle, setSelectedParticle] = useState<number | null>(null)
+  // Reserved for future observer mode feature
+  const [_observerMode, _setObserverMode] = useState(false)
+  const [selectedParticle, _setSelectedParticle] = useState<number | null>(null)
   const [observations, setObservations] = useState(3)
   const [combo, setCombo] = useState(0)
   const [hoveredParticle, setHoveredParticle] = useState<number | null>(null)

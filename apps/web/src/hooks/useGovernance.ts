@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAccount, useWriteContract, useReadContract } from 'wagmi'
-import { formatEther } from 'viem'
 
 const GOVERNANCE_ADDRESS = process.env.NEXT_PUBLIC_GOVERNANCE_ADDRESS as `0x${string}`
 
@@ -64,7 +63,7 @@ export interface Proposal {
 }
 
 export function useGovernance() {
-  const { address } = useAccount()
+  const { address: _address } = useAccount()
   const [proposals, setProposals] = useState<Proposal[]>([])
   const [isLoading, setIsLoading] = useState(true)
 

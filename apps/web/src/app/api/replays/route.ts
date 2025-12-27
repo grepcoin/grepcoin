@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const gameSlug = searchParams.get('game')
   const userId = searchParams.get('user')
-  const limit = parseInt(searchParams.get('limit') || '10')
+  // Note: limit would be used when fetching from database
+  const _limit = parseInt(searchParams.get('limit') || '10')
 
   const where: Record<string, unknown> = {}
   if (gameSlug) where.gameSlug = gameSlug

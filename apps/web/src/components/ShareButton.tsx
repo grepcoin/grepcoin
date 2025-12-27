@@ -9,7 +9,7 @@ interface Props {
   hashtags?: string[]
 }
 
-export function ShareButton({ title, text, url, hashtags = ['GrepCoin', 'Web3Gaming'] }: Props) {
+export function ShareButton({ title: _title, text, url, hashtags = ['GrepCoin', 'Web3Gaming'] }: Props) {
   const [copied, setCopied] = useState(false)
   const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '')
 

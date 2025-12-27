@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
-import { Achievement, ACHIEVEMENTS, AchievementTier } from '@/lib/achievements-v2'
+import { ACHIEVEMENTS, AchievementTier } from '@/lib/achievements-v2'
 
 interface UserProgress { achievementId: string; progress: number; claimedTiers: AchievementTier[] }
 

@@ -9,7 +9,7 @@ export function createGameSession(): GameSession {
   return { startTime: Date.now(), actions: [], mouseMovements: 0 }
 }
 
-export function recordAction(session: GameSession, action: number) {
+export function recordAction(session: GameSession, _action: number) {
   session.actions.push(Date.now() - session.startTime)
 }
 

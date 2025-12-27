@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const rarity = (searchParams.get('rarity') || 'common') as 'common' | 'rare' | 'epic' | 'legendary';
   const date = searchParams.get('date') || new Date().toLocaleDateString();
   const category = searchParams.get('category') || 'General';
-  const progress = searchParams.get('progress') || '100';
+  const _progress = searchParams.get('progress') || '100'; // Reserved for progress bar feature
 
   const rarityColor = getRarityColor(rarity);
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { ExportOptions, ExportFormat, convertToCSV, downloadFile, formatExportFilename } from '@/lib/export'
+import { ExportOptions, convertToCSV, downloadFile, formatExportFilename } from '@/lib/export'
 
 interface ExportProgress {
   status: 'idle' | 'preparing' | 'downloading' | 'complete' | 'error'

@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid'
 import { parseSessionToken } from '@/lib/auth'
 
 const REFERRAL_BONUS = 100 // GREP bonus for new user
-const REFERRER_PERCENTAGE = 10 // % of referee's earnings
+const _REFERRER_PERCENTAGE = 10 // % of referee's earnings (reserved for future use)
 const MAX_REFERRAL_REWARD = 5000 // Max GREP from single referral
 const REFERRAL_DURATION_DAYS = 30
 
@@ -15,7 +15,7 @@ function generateReferralCode(): string {
 }
 
 // GET - Get user's referral info
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const cookieStore = await cookies()
     const sessionToken = cookieStore.get('session')?.value
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + REFERRAL_DURATION_DAYS)
 
-    const referral = await prisma.referral.create({
+    const _referral = await prisma.referral.create({
       data: {
         referrerId: referrer.id,
         refereeId: user.id,

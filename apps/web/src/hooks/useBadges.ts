@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Badge, BADGES } from '@/lib/badges'
+import { BADGES } from '@/lib/badges'
 
 interface UserBadge {
   badgeId: string
