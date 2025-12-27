@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Copy all necessary files for npm install (monorepo structure)
 COPY package.json package-lock.json ./
-COPY apps/web/package.json apps/web/package-lock.json ./apps/web/
+COPY apps/web/package.json ./apps/web/
 COPY apps/web/prisma ./apps/web/prisma/
 COPY packages/anti-cheat/package.json ./packages/anti-cheat/
 COPY packages/anti-cheat/src ./packages/anti-cheat/src/
