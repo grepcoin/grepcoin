@@ -54,9 +54,9 @@ const PUZZLES: Puzzle[] = [
   },
   {
     size: 3,
-    rowPatterns: ['^(ab)+.$', '^.(cd)+$', '^..(ef)$'],
-    colPatterns: ['^a..$', '^b.e$', '^.df$'],
-    solution: [['a', 'b', 'a'], ['a', 'c', 'd'], ['c', 'd', 'f']],
+    rowPatterns: ['^ab.$', '^.cd$', '^..f$'],
+    colPatterns: ['^a..$', '^b.d$', '^.df$'],
+    solution: [['a', 'b', 'a'], ['a', 'c', 'd'], ['e', 'd', 'f']],
     difficulty: 'medium',
     points: 150,
   },
@@ -182,7 +182,9 @@ export default function RegExCrosswordGame() {
     // Check rows
     for (let r = 0; r < size; r++) {
       const rowStr = grid[r].join('')
-      if (rowStr.length === size && rowStr.indexOf('') === -1) {
+      // Check if all cells are filled (no empty strings)
+      const allFilled = !grid[r].includes('')
+      if (rowStr.length === size && allFilled) {
         try {
           const regex = new RegExp(currentPuzzle.rowPatterns[r])
           newValidRows.push(regex.test(rowStr))
@@ -196,8 +198,11 @@ export default function RegExCrosswordGame() {
 
     // Check columns
     for (let c = 0; c < size; c++) {
-      const colStr = grid.map(row => row[c]).join('')
-      if (colStr.length === size && colStr.indexOf('') === -1) {
+      const colValues = grid.map(row => row[c])
+      const colStr = colValues.join('')
+      // Check if all cells are filled (no empty strings)
+      const allFilled = !colValues.includes('')
+      if (colStr.length === size && allFilled) {
         try {
           const regex = new RegExp(currentPuzzle.colPatterns[c])
           newValidCols.push(regex.test(colStr))

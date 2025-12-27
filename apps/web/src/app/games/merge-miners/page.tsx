@@ -29,6 +29,7 @@ interface Tile {
   value: number
   conflictOptions?: string[]
   correctOption?: number
+  scenarioIndex?: number
 }
 
 interface Player {
@@ -147,7 +148,8 @@ export default function MergeMinersGame() {
           tile = { type: 'gem', mined: false, revealed: false, value: 100 + depth * 20 }
         } else if (rand < 0.78 + difficultyMod) {
           // Conflict (mini-puzzle)
-          const scenario = conflictScenarios[Math.floor(Math.random() * conflictScenarios.length)]
+          const scenarioIndex = Math.floor(Math.random() * conflictScenarios.length)
+          const scenario = conflictScenarios[scenarioIndex]
           tile = {
             type: 'conflict',
             mined: false,
@@ -155,6 +157,7 @@ export default function MergeMinersGame() {
             value: 200,
             conflictOptions: scenario.options,
             correctOption: scenario.correct,
+            scenarioIndex: scenarioIndex,
           }
         } else if (rand < 0.82) {
           // Commit point (checkpoint)
@@ -224,12 +227,16 @@ export default function MergeMinersGame() {
     // Check energy
     if (gameState.energy < ENERGY_PER_MINE && tile.type !== 'empty') {
       setFeedback('No energy!')
+      setTimeout(() => setFeedback(null), 1500)
       return
     }
 
     // Handle conflict tiles specially
     if (tile.type === 'conflict' && !tile.mined) {
-      const scenario = conflictScenarios.find(s => s.options === tile.conflictOptions)
+      // Use stored scenario index for reliable lookup
+      const scenario = tile.scenarioIndex !== undefined
+        ? conflictScenarios[tile.scenarioIndex]
+        : conflictScenarios.find(s => s.options === tile.conflictOptions)
       if (scenario) {
         setCurrentConflict(scenario)
         setConflictTilePos({ x, y }) // Track which tile is being resolved
