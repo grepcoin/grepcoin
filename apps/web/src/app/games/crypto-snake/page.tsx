@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Play, RotateCcw, Volume2, VolumeX, Trophy, Coins, Zap, ArrowUp, ArrowDown, ArrowLeftIcon, ArrowRight } from 'lucide-react'
+import { ArrowLeft, Play, Pause, RotateCcw, Volume2, VolumeX, Trophy, Coins, Zap, ArrowUp, ArrowDown, ArrowLeftIcon, ArrowRight } from 'lucide-react'
 import { useGameScore } from '@/hooks/useGameScore'
 import { useAuth } from '@/context/AuthContext'
 import {
@@ -143,6 +143,26 @@ export default function CryptoSnakeGame() {
       }
     }
   }, [])
+
+  // Toggle pause
+  const togglePause = useCallback(() => {
+    if (gameStatus === 'playing') {
+      setGameStatus('paused')
+    } else if (gameStatus === 'paused') {
+      setGameStatus('playing')
+    }
+  }, [gameStatus])
+
+  // Escape key to pause
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && (gameStatus === 'playing' || gameStatus === 'paused')) {
+        togglePause()
+      }
+    }
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [gameStatus, togglePause])
 
   // Start game
   const startGame = useCallback(() => {
@@ -640,12 +660,23 @@ export default function CryptoSnakeGame() {
             Back to Arcade
           </Link>
 
-          <button
-            onClick={() => setMuted(!muted)}
-            className="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors"
-          >
-            {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-          </button>
+          <div className="flex items-center gap-2">
+            {(gameStatus === 'playing' || gameStatus === 'paused') && (
+              <button
+                onClick={togglePause}
+                className="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors"
+                title={gameStatus === 'paused' ? 'Resume (Esc)' : 'Pause (Esc)'}
+              >
+                {gameStatus === 'paused' ? <Play className="w-5 h-5 text-green-400" /> : <Pause className="w-5 h-5" />}
+              </button>
+            )}
+            <button
+              onClick={() => setMuted(!muted)}
+              className="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors"
+            >
+              {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         {/* Game Title */}
@@ -725,6 +756,46 @@ export default function CryptoSnakeGame() {
                 <Play className="w-6 h-6" />
                 Start Game
               </button>
+            </div>
+          )}
+
+          {/* Pause Screen */}
+          {gameStatus === 'paused' && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-dark-900/90 backdrop-blur-sm">
+              <div className="text-6xl mb-6">⏸️</div>
+              <h2 className="text-3xl font-display font-bold mb-4">
+                <span className="text-gradient">Paused</span>
+              </h2>
+
+              <div className="grid grid-cols-2 gap-3 mb-6 text-center text-sm">
+                <div className="p-3 rounded-xl bg-dark-800 border border-purple-500/30">
+                  <div className="text-xl font-bold text-purple-400">{gameState.score}</div>
+                  <div className="text-xs text-gray-400">Score</div>
+                </div>
+                <div className="p-3 rounded-xl bg-dark-800 border border-yellow-500/30">
+                  <div className="text-xl font-bold text-yellow-400">{gameState.coinsCollected}</div>
+                  <div className="text-xs text-gray-400">Coins</div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={togglePause}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 font-bold hover:scale-105 transition-transform"
+                >
+                  <Play className="w-4 h-4" />
+                  Resume
+                </button>
+                <Link
+                  href="/games"
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-dark-700 border border-dark-600 font-bold hover:bg-dark-600 transition-colors"
+                >
+                  <Trophy className="w-4 h-4" />
+                  Quit
+                </Link>
+              </div>
+
+              <p className="text-gray-500 text-sm mt-4">Press Esc to resume</p>
             </div>
           )}
 

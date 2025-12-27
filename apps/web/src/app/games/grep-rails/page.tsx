@@ -539,11 +539,12 @@ export default function GrepRailsGame() {
 
           // Check collection
           if (Math.abs(game.train.x - track.x) < 40) {
+            // Save power-up type before clearing
+            const powerUpType = track.hasPowerUp
             track.hasPowerUp = undefined
 
             if (!muted) playSound('powerup')
 
-            const powerUpType = track.hasPowerUp
             if (powerUpType === 'extraLife') {
               setGameState(prev => ({ ...prev, lives: Math.min(5, prev.lives + 1) }))
             } else {

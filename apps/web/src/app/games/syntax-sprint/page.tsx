@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Play, RotateCcw, Volume2, VolumeX, Trophy, Code, Zap, ArrowDown, ArrowLeftIcon, ArrowRight, RotateCw } from 'lucide-react'
+import { ArrowLeft, Play, Pause, RotateCcw, Volume2, VolumeX, Trophy, Code, Zap, ArrowDown, ArrowLeftIcon, ArrowRight, RotateCw } from 'lucide-react'
 import { useGameScore } from '@/hooks/useGameScore'
 import { useAuth } from '@/context/AuthContext'
 import {
@@ -184,28 +184,62 @@ export default function SyntaxSprintGame() {
       let isValid = false
 
       for (const pattern of VALID_PATTERNS) {
-        // Check if row starts with or matches pattern
+        // Check for exact pattern match only
         const patternStr = pattern.join(' ')
-        if (rowStr === patternStr || rowStr.includes(patternStr)) {
+        if (rowStr === patternStr) {
           isValid = true
           break
         }
       }
 
-      // Also check for simple valid sequences
-      if (tokens.length >= 4) {
-        // Check for variable declaration pattern
+      // Check for valid syntax patterns with proper structure
+      if (!isValid && tokens.length >= 3) {
+        // Variable declaration: (const|let|var) identifier = value ;
         if (
           ['const', 'let', 'var'].includes(tokens[0]) &&
-          ['x', 'y', 'n', 'sum'].includes(tokens[1]) &&
+          /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(tokens[1]) && // valid identifier
           tokens[2] === '=' &&
-          tokens[tokens.length - 1] === ';'
+          tokens[tokens.length - 1] === ';' &&
+          tokens.length >= 5 // minimum: const x = 1 ;
         ) {
-          isValid = true
+          // Verify there's at least one value between = and ;
+          const valueTokens = tokens.slice(3, -1)
+          if (valueTokens.length > 0 && valueTokens.every(t =>
+            /^[a-zA-Z0-9_]+$/.test(t) || ['+', '-', '*', '/', '(', ')'].includes(t)
+          )) {
+            isValid = true
+          }
         }
-        // Check for return statement
-        if (tokens[0] === 'return' && tokens[tokens.length - 1] === ';') {
-          isValid = true
+
+        // Return statement: return value ;
+        if (
+          tokens[0] === 'return' &&
+          tokens[tokens.length - 1] === ';' &&
+          tokens.length >= 3 // minimum: return x ;
+        ) {
+          // Verify there's a valid expression between return and ;
+          const exprTokens = tokens.slice(1, -1)
+          if (exprTokens.length > 0 && exprTokens.every(t =>
+            /^[a-zA-Z0-9_]+$/.test(t) || ['+', '-', '*', '/', '(', ')'].includes(t)
+          )) {
+            isValid = true
+          }
+        }
+
+        // If statement: if ( condition ) { }
+        if (
+          tokens[0] === 'if' &&
+          tokens[1] === '(' &&
+          tokens.includes(')') &&
+          tokens.includes('{') &&
+          tokens[tokens.length - 1] === '}'
+        ) {
+          const closeParenIdx = tokens.indexOf(')')
+          const openBraceIdx = tokens.indexOf('{')
+          // Must have content between ( and ), and { must come after )
+          if (closeParenIdx > 2 && openBraceIdx === closeParenIdx + 1) {
+            isValid = true
+          }
         }
       }
 
@@ -342,6 +376,26 @@ export default function SyntaxSprintGame() {
     game.currentBlock.y = landY
     placeBlock()
   }, [placeBlock])
+
+  // Toggle pause
+  const togglePause = useCallback(() => {
+    if (gameStatus === 'playing') {
+      setGameStatus('paused')
+    } else if (gameStatus === 'paused') {
+      setGameStatus('playing')
+    }
+  }, [gameStatus])
+
+  // Escape key to pause
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && (gameStatus === 'playing' || gameStatus === 'paused')) {
+        togglePause()
+      }
+    }
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [gameStatus, togglePause])
 
   // Start game
   const startGame = useCallback(() => {
@@ -572,12 +626,23 @@ export default function SyntaxSprintGame() {
             Back to Arcade
           </Link>
 
-          <button
-            onClick={() => setMuted(!muted)}
-            className="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors"
-          >
-            {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-          </button>
+          <div className="flex items-center gap-2">
+            {(gameStatus === 'playing' || gameStatus === 'paused') && (
+              <button
+                onClick={togglePause}
+                className="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors"
+                title={gameStatus === 'paused' ? 'Resume (Esc)' : 'Pause (Esc)'}
+              >
+                {gameStatus === 'paused' ? <Play className="w-5 h-5 text-green-400" /> : <Pause className="w-5 h-5" />}
+              </button>
+            )}
+            <button
+              onClick={() => setMuted(!muted)}
+              className="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors"
+            >
+              {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         {/* Game Title */}
@@ -633,6 +698,46 @@ export default function SyntaxSprintGame() {
                   <Play className="w-6 h-6" />
                   Start Coding
                 </button>
+              </div>
+            )}
+
+            {/* Pause Screen */}
+            {gameStatus === 'paused' && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-dark-900/90 backdrop-blur-sm">
+                <div className="text-6xl mb-6">⏸️</div>
+                <h2 className="text-3xl font-display font-bold mb-4">
+                  <span className="text-gradient">Paused</span>
+                </h2>
+
+                <div className="grid grid-cols-2 gap-3 mb-6 text-center text-sm">
+                  <div className="p-3 rounded-xl bg-dark-800 border border-purple-500/30">
+                    <div className="text-xl font-bold text-purple-400">{gameState.score}</div>
+                    <div className="text-xs text-gray-400">Score</div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-dark-800 border border-green-500/30">
+                    <div className="text-xl font-bold text-green-400">{gameState.linesCleared}</div>
+                    <div className="text-xs text-gray-400">Lines</div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={togglePause}
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 font-bold hover:scale-105 transition-transform"
+                  >
+                    <Play className="w-4 h-4" />
+                    Resume
+                  </button>
+                  <Link
+                    href="/games"
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-dark-700 border border-dark-600 font-bold hover:bg-dark-600 transition-colors"
+                  >
+                    <Trophy className="w-4 h-4" />
+                    Quit
+                  </Link>
+                </div>
+
+                <p className="text-gray-500 text-sm mt-4">Press Esc to resume</p>
               </div>
             )}
 
@@ -749,6 +854,46 @@ export default function SyntaxSprintGame() {
             </div>
           )}
         </div>
+
+        {/* Mobile Touch Controls */}
+        {gameStatus === 'playing' && (
+          <div className="mt-4 md:hidden">
+            <div className="flex justify-center items-center gap-6">
+              {/* Left/Right movement */}
+              <div className="flex gap-2">
+                <button
+                  onTouchStart={() => moveBlock(-1)}
+                  className="w-14 h-14 rounded-xl bg-dark-700 border border-purple-500/30 flex items-center justify-center active:bg-purple-500/30 active:border-purple-500 transition-colors"
+                >
+                  <ArrowLeftIcon className="w-6 h-6 text-purple-400" />
+                </button>
+                <button
+                  onTouchStart={() => moveBlock(1)}
+                  className="w-14 h-14 rounded-xl bg-dark-700 border border-purple-500/30 flex items-center justify-center active:bg-purple-500/30 active:border-purple-500 transition-colors"
+                >
+                  <ArrowRight className="w-6 h-6 text-purple-400" />
+                </button>
+              </div>
+
+              {/* Drop button */}
+              <button
+                onTouchStart={() => hardDrop()}
+                className="w-16 h-14 rounded-xl bg-dark-700 border border-cyan-500/30 flex items-center justify-center active:bg-cyan-500/30 active:border-cyan-500 transition-colors gap-1"
+              >
+                <ArrowDown className="w-5 h-5 text-cyan-400" />
+                <ArrowDown className="w-5 h-5 text-cyan-400 -ml-3" />
+              </button>
+
+              {/* Place button */}
+              <button
+                onTouchStart={() => placeBlock()}
+                className="w-20 h-14 rounded-xl bg-gradient-to-r from-purple-500/30 to-pink-500/30 border border-pink-500/50 flex items-center justify-center active:from-purple-500/50 active:to-pink-500/50 transition-colors"
+              >
+                <span className="text-pink-400 font-bold text-sm">PLACE</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Instructions */}
         <div className="mt-6 p-4 rounded-xl bg-dark-800/50 border border-dark-700 max-w-2xl mx-auto">

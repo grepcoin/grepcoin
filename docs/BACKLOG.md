@@ -1,8 +1,9 @@
 # GrepCoin Development Backlog
 
-**Last Updated:** December 27, 2024 (Session 2)
+**Last Updated:** December 27, 2024 (Session 3)
 **Status:** Active Development
 **Total Items:** 30 (15 technical + 15 features)
+**Games:** 10 (added Memory Match + Pipe Dream)
 
 ---
 
@@ -433,7 +434,42 @@ Types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`
 
 ## Completed Items
 
-### December 27, 2024
+### December 27, 2024 (Session 3)
+
+- [x] **Fix Grep Rails power-up bug** - Fixed critical bug where power-up type was read after being set to undefined
+  - File: grep-rails/page.tsx line 542-546
+
+- [x] **Fix Syntax Sprint pattern matching** - Made pattern validation more strict with proper syntax checking
+  - File: syntax-sprint/page.tsx
+
+- [x] **Fix Merge Miners conflict resolution** - Added proper conflict tile position tracking
+  - File: merge-miners/page.tsx (added conflictTilePos state)
+
+- [x] **Improve Merge Miners visuals** - Major visual polish update
+  - Added player trail effect, mining helmet, pulsing glow
+  - Enhanced tiles with gradients, glow effects, bounce animations
+  - Improved HUD with styled energy bar, stat boxes
+  - Added ambient cave particles
+
+- [x] **Add mobile touch controls** - Added touch controls to games
+  - Merge Miners: D-pad for movement
+  - Syntax Sprint: Left/right/drop/place buttons
+
+- [x] **Add pause functionality** - Added pause button and overlay
+  - Merge Miners, Syntax Sprint, Crypto Snake
+  - Escape key shortcut, pause button in header
+
+- [x] **Create Memory Match game** - New card-matching game with code symbols
+  - 6 levels with increasing difficulty
+  - Combo system for bonus points
+  - Time-based gameplay
+
+- [x] **Create Pipe Dream game** - New puzzle game
+  - Connect pipes to guide data flow
+  - 10 levels with obstacles
+  - Timer-based flow mechanic
+
+### December 27, 2024 (Session 2)
 
 - [x] **Migrate to Vercel** - Moved from GKE to Vercel free tier
   - Commit: `58075192`
