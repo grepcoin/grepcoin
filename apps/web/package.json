@@ -29,7 +29,7 @@
     "@prisma/adapter-neon": "^7.2.0",
     "@prisma/client": "^5.22.0",
     "@tanstack/react-query": "^5.90.12",
-    "framer-motion": "^11.0.0",
+    "framer-motion": "^11.18.2",
     "lucide-react": "^0.344.0",
     "prisma": "^5.22.0",
     "react": "^18.2.0",
@@ -39,7 +39,7 @@
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "viem": "^2.42.0",
-    "wagmi": "^3.1.0",
+    "wagmi": "^3.1.3",
     "web-push": "^3.6.7",
     "ws": "^8.17.1"
   },
