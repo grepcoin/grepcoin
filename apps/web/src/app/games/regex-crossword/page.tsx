@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { ArrowLeft, Play, RotateCcw, Volume2, VolumeX, Trophy, Lightbulb, Check, X, Clock, Grid3X3 } from 'lucide-react'
 import { useGameScore } from '@/hooks/useGameScore'
 import { useAuth } from '@/context/AuthContext'
-import { playSound, GREP_COLORS } from '@/lib/gameUtils'
+import { playSound } from '@/lib/gameUtils'
 
 interface Puzzle {
   size: number

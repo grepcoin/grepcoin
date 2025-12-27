@@ -22,7 +22,6 @@ import {
   drawNeonText,
   drawGlowingRect,
   hexToRgba,
-  easing,
 } from '@/lib/gameUtils'
 
 // Enhanced pattern challenges with difficulty tiers

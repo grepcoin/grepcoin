@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Play, RotateCcw, Volume2, VolumeX, Trophy, AlertTriangle, Keyboard, Zap } from 'lucide-react'
+import { ArrowLeft, Play, RotateCcw, Volume2, VolumeX, Trophy, AlertTriangle, Keyboard } from 'lucide-react'
 import { useGameScore } from '@/hooks/useGameScore'
 import { useAuth } from '@/context/AuthContext'
 import {
