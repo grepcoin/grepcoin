@@ -1,17 +1,40 @@
 # GrepCoin Project Status Report
 
-**Last Updated:** December 21, 2024
-**Version:** 1.0.0
+**Last Updated:** December 27, 2024
+**Version:** 1.1.0
 **Git Branch:** main
-**Last Commit:** 686cf70 - Fix GrepItems.sol variable shadowing function name
+**Last Commit:** 58075192 - chore: migrate to Vercel hosting
 
 ---
 
 ## Executive Summary
 
-GrepCoin is a decentralized arcade gaming platform built on Base L2, featuring 8 developer-themed games, play-to-earn mechanics, and comprehensive Web3 integration. The project is in **ALPHA/PRE-PRODUCTION** state with significant functionality implemented but requiring environment configuration, dependency fixes, and security audits before production deployment.
+GrepCoin is a decentralized arcade gaming platform built on Base L2, featuring 8 developer-themed games, play-to-earn mechanics, and comprehensive Web3 integration. The project is now **LIVE IN PRODUCTION** on Vercel with a NeonDB PostgreSQL backend.
 
-**Overall Status:** 65% Production Ready
+**Overall Status:** 75% Production Ready
+
+### Recent Updates (December 27, 2024)
+
+#### Hosting Migration (GKE to Vercel)
+- **Migrated from GKE Autopilot to Vercel** - Reduced hosting costs from ~$20-50/month to $0 (free tier)
+- **Custom domain configured**: https://grepcoin.io now points to Vercel
+- **All GCP resources cleaned up**: Cluster, disks, IPs, Container Registry, Cloud Build storage deleted
+- **Environment variables configured** in Vercel: DATABASE_URL, DIRECT_URL, VAPID keys
+
+#### Bug Fixes
+- **Fixed client-side crash**: `TypeError: can't access property "slice", e.wallet is undefined`
+  - Added null checks in `LiveActivityTicker.tsx` and `ReferralList.tsx`
+  - Updated `/api/activity` to fetch real game scores from database
+- **Fixed web-push initialization**: Made VAPID key initialization lazy to prevent build-time errors
+
+#### Infrastructure
+| Resource | Previous | Current |
+|----------|----------|---------|
+| Hosting | GKE Autopilot ($20-50/mo) | Vercel (FREE) |
+| Database | NeonDB PostgreSQL | NeonDB PostgreSQL (unchanged) |
+| Domain | grepcoin.io (via GKE LB) | grepcoin.io (via Vercel) |
+| SSL | Let's Encrypt (cert-manager) | Vercel automatic SSL |
+| CDN | None | Vercel Edge Network |
 
 ### Quick Status Overview
 
@@ -406,13 +429,13 @@ TWITTER_API_KEY=<twitter_key>
 - [ ] Privacy Policy finalized
 
 ### Infrastructure
-- [ ] Production database provisioned
-- [ ] RPC endpoints configured
-- [ ] CDN setup for static assets
-- [ ] SSL certificates installed
-- [ ] Domain DNS configured
+- [x] Production database provisioned (NeonDB PostgreSQL)
+- [x] RPC endpoints configured
+- [x] CDN setup for static assets (Vercel Edge Network)
+- [x] SSL certificates installed (Vercel automatic)
+- [x] Domain DNS configured (grepcoin.io -> Vercel)
 - [ ] Email service configured
-- [ ] Push notification service configured
+- [x] Push notification service configured (VAPID keys set)
 - [ ] Backup systems tested
 
 ### Security
@@ -676,35 +699,42 @@ No production monitoring, logging, or alerting. No load testing. CI/CD exists bu
 
 | Version | Date | Status | Notes |
 |---------|------|--------|-------|
+| 1.1.0 | Dec 27, 2024 | Production | Migrated to Vercel, GKE cleanup, bug fixes |
 | 1.0.0 | Dec 21, 2024 | Alpha | Initial status report |
 
 ---
 
 ## Conclusion
 
-GrepCoin is an ambitious and well-architected project with solid foundations. The smart contracts are excellently tested, the web application is feature-rich and functional, and the documentation is comprehensive. However, several critical items must be addressed before production:
+GrepCoin is now **LIVE IN PRODUCTION** at https://grepcoin.io, hosted on Vercel's free tier with NeonDB PostgreSQL backend. The migration from GKE has resulted in significant cost savings (~$20-50/month saved).
 
-**Critical Path to Production:**
+**Current Production Status:**
+- Web app: Live and functional
+- Database: NeonDB PostgreSQL (production)
+- Hosting: Vercel (free tier)
+- Domain: grepcoin.io with automatic SSL
+- Push notifications: Configured with VAPID keys
+
+**Remaining Items for Full Production:**
 1. Smart contract professional audit ($15-30k, 2-4 weeks)
-2. Fix TypeScript compilation errors (2-3 days)
-3. Implement comprehensive test coverage (2 weeks)
-4. Security review and fixes (1 week)
-5. DevOps and monitoring setup (1 week)
-6. Staging deployment and testing (1 week)
+2. Email service configuration (Resend)
+3. Implement comprehensive test coverage
+4. Fix TypeScript errors in agents/discord-bot packages
+5. Security review and monitoring setup
 
-**Estimated Cost to Production:**
-- Audit: $15,000-$30,000
-- Development time: 6-8 weeks
-- Infrastructure: $500-$1000/month
+**Monthly Infrastructure Cost:**
+- Previous (GKE): ~$20-50/month
+- Current (Vercel): $0 (free tier)
+- Database (NeonDB): Free tier
 
-**Current State:** Pre-production alpha
-**Production Ready:** 65% overall
-**Recommended Next Step:** Fix TypeScript errors and implement test coverage while scheduling smart contract audit
+**Current State:** Production (MVP)
+**Production Ready:** 75% overall
+**Live URL:** https://grepcoin.io
 
-The project demonstrates excellent architectural decisions and comprehensive feature implementation. With focused effort on the identified gaps, particularly testing and security review, GrepCoin can be production-ready in 6-8 weeks.
+The project is now live and accessible. Focus should shift to smart contract auditing, adding test coverage, and fixing the agents/discord-bot packages for full ecosystem deployment.
 
 ---
 
-*Report Generated: December 21, 2024*
-*Project: GrepCoin v1.0.0*
+*Report Generated: December 27, 2024*
+*Project: GrepCoin v1.1.0*
 *Contact: hello@greplabs.io*
