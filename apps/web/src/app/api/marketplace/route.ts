@@ -20,8 +20,9 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '20')
 
-    // Build where clause
-    const where: any = {
+    // Build where clause dynamically for Prisma
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: Record<string, any> = {
       status: 'ACTIVE',
       expiresAt: { gt: new Date() },
     }
@@ -41,7 +42,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Build orderBy clause
-    let orderBy: any = {}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let orderBy: Record<string, any> = {}
     switch (sortBy) {
       case 'price_asc':
         orderBy = { price: 'asc' }

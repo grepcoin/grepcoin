@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Trophy, Flame, Target, Coins, Crown, ArrowRight, Sparkles, Gamepad2 } from 'lucide-react'
 import { useLeaderboard } from '@/hooks/useLeaderboard'
@@ -48,12 +48,16 @@ export default function PlayerSpotlight() {
 
   const selectedPlayer = players[selectedIndex] || null
 
+  // Use ref to track current animated value without causing effect re-runs
+  const animatedEarningsRef = useRef(animatedEarnings)
+  animatedEarningsRef.current = animatedEarnings
+
   useEffect(() => {
     if (!selectedPlayer) return
 
     const duration = 1500
     const startTime = Date.now()
-    const startValue = animatedEarnings
+    const startValue = animatedEarningsRef.current
     const endValue = selectedPlayer.totalEarned
 
     const animate = () => {

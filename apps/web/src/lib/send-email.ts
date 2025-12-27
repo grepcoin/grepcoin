@@ -62,14 +62,14 @@ export async function sendEmail<T extends EmailType>(
         emailType,
         subject,
         htmlContent: finalHTML,
-        data: data as any,
+        data: data as object,
         status: 'PENDING',
       },
     })
 
     // Send via Resend
     try {
-      const result = await resend.emails.send({
+      await resend.emails.send({
         from: EMAIL_CONFIG.FROM_EMAIL,
         to,
         subject,
@@ -86,7 +86,7 @@ export async function sendEmail<T extends EmailType>(
       })
 
       return { success: true, emailId: emailQueue.id }
-    } catch (sendError: any) {
+    } catch (sendError: unknown) {
       console.error('Failed to send email:', sendError)
 
       // Update queue with error
@@ -95,15 +95,15 @@ export async function sendEmail<T extends EmailType>(
         data: {
           status: 'FAILED',
           attempts: { increment: 1 },
-          lastError: sendError.message || 'Unknown error',
+          lastError: sendError instanceof Error ? sendError.message : 'Unknown error',
         },
       })
 
-      return { success: false, error: sendError.message }
+      return { success: false, error: sendError instanceof Error ? sendError.message : 'Failed to send' }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in sendEmail:', error)
-    return { success: false, error: error.message || 'Unknown error' }
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
   }
 }
 

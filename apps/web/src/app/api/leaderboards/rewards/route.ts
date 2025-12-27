@@ -84,7 +84,10 @@ export async function GET(request: NextRequest) {
     })
 
     // Calculate user's projected rewards if authenticated and requested
-    let projectedRewards: any = null
+    let projectedRewards: {
+      weekly: { rank: number; grepAmount: number; badgeId?: string; multiplierBonus?: number } | null
+      monthly: { rank: number; grepAmount: number; badgeId?: string; multiplierBonus?: number } | null
+    } | null = null
     if (includeProjected && userId) {
       // Get user's current rank for weekly
       const weeklyStart = getCurrentPeriodStart('weekly')

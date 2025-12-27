@@ -213,11 +213,7 @@ export function useNotificationPreferences(userId?: string) {
   })
   const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    loadPreferences()
-  }, [userId])
-
-  const loadPreferences = async () => {
+  const loadPreferences = useCallback(async () => {
     if (!userId) return
 
     try {
@@ -231,7 +227,11 @@ export function useNotificationPreferences(userId?: string) {
     } catch (error) {
       console.error('Error loading notification preferences:', error)
     }
-  }
+  }, [userId])
+
+  useEffect(() => {
+    loadPreferences()
+  }, [loadPreferences])
 
   const updatePreferences = async (newPreferences: Partial<NotificationPreferences>) => {
     if (!userId) return

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface Shortcut {
@@ -15,7 +15,7 @@ interface Shortcut {
 export function useKeyboardShortcuts(customShortcuts: Shortcut[] = []) {
   const router = useRouter()
 
-  const defaultShortcuts: Shortcut[] = [
+  const defaultShortcuts: Shortcut[] = useMemo(() => [
     { key: 'g', description: 'Go to Games', action: () => router.push('/games') },
     { key: 'l', description: 'Go to Leaderboard', action: () => router.push('/leaderboard') },
     { key: 'p', description: 'Go to Profile', action: () => router.push('/profile') },
@@ -24,9 +24,9 @@ export function useKeyboardShortcuts(customShortcuts: Shortcut[] = []) {
     { key: '?', shift: true, description: 'Show shortcuts', action: () => {
       window.dispatchEvent(new CustomEvent('toggle-shortcuts-modal'))
     }},
-  ]
+  ], [router])
 
-  const shortcuts = [...defaultShortcuts, ...customShortcuts]
+  const shortcuts = useMemo(() => [...defaultShortcuts, ...customShortcuts], [defaultShortcuts, customShortcuts])
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     // Ignore if typing in input

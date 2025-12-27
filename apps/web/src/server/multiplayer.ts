@@ -85,7 +85,6 @@ export class MultiplayerServer {
     const room = this.rooms.get(roomId);
     if (!room) return;
 
-    const player = room.players.get(socket.id);
     room.players.delete(socket.id);
     this.playerRooms.delete(socket.id);
 

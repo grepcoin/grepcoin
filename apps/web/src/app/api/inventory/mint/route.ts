@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { ITEMS } from '@/lib/inventory'
 import { generateItemMetadata, uploadToIPFS, ITEM_TO_TOKEN_ID } from '@/lib/nft-items'
-import { getContractAddress, GREP_ITEMS_ABI } from '@/lib/contracts'
+import { getContractAddress } from '@/lib/contracts'
 
 const prisma = new PrismaClient()
 
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     const metadata = generateItemMetadata(item)
 
     // Upload metadata to IPFS (in production, this would be a real upload)
-    const { cid, url } = await uploadToIPFS(metadata)
+    const { url } = await uploadToIPFS(metadata)
 
     // Get token ID for this item type
     const tokenId = ITEM_TO_TOKEN_ID[itemId]
