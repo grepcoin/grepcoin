@@ -2,9 +2,22 @@
 
 <!-- Brief description of changes -->
 
-## Related Issue
+## Related Issue / Backlog Item
 
+<!-- Reference issue or backlog item from docs/BACKLOG.md -->
 Fixes #(issue)
+Backlog: #(number) - (title)
+
+## Branch Type
+
+<!-- Confirm branch follows naming convention -->
+- [ ] `feature/` - New feature
+- [ ] `fix/` - Bug fix
+- [ ] `chore/` - Maintenance
+- [ ] `docs/` - Documentation
+- [ ] `refactor/` - Code refactoring
+- [ ] `test/` - Testing
+- [ ] `perf/` - Performance
 
 ## Type of Change
 
