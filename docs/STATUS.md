@@ -1,7 +1,7 @@
 # GrepCoin Project Status Report
 
-**Last Updated:** December 27, 2024 (Session 2)
-**Version:** 1.2.0
+**Last Updated:** December 27, 2024 (Session 3)
+**Version:** 1.3.0
 **Git Branch:** main
 **Last Commit:** See git log for latest
 
@@ -9,13 +9,33 @@
 
 ## Executive Summary
 
-GrepCoin is a decentralized arcade gaming platform built on Base L2, featuring 8 developer-themed games, play-to-earn mechanics, and comprehensive Web3 integration. The project is now **LIVE IN PRODUCTION** on Vercel with a NeonDB PostgreSQL backend.
+GrepCoin is a decentralized arcade gaming platform built on Base L2, featuring 10 developer-themed games, play-to-earn mechanics, and comprehensive Web3 integration. The project is now **LIVE IN PRODUCTION** on Vercel with a NeonDB PostgreSQL backend.
 
 **Overall Status:** 75% Production Ready
 
 ### Recent Updates (December 27, 2024)
 
-#### Hosting Migration (GKE to Vercel)
+#### Session 3: Games Ecosystem Enhancements
+- **Added 2 new games** (total now 10):
+  - **Memory Match** - Card matching game with code symbols, 6 levels, combo system
+  - **Pipe Dream** - Connect pipes puzzle to guide data flow, 10 levels with obstacles
+- **Critical bug fixes**:
+  - Fixed Grep Rails power-up bug (power-up type read after being set to undefined)
+  - Fixed Syntax Sprint pattern matching (made validation stricter)
+  - Fixed Merge Miners conflict resolution (added proper tile position tracking)
+- **Visual improvements** for Merge Miners:
+  - Added player trail effect, mining helmet, pulsing glow
+  - Enhanced tiles with gradients, glow effects, bounce animations
+  - Improved HUD with styled energy bar and stat boxes
+  - Added ambient cave particles
+- **Mobile touch controls** added to:
+  - Merge Miners (D-pad for movement)
+  - Syntax Sprint (left/right/drop/place buttons)
+- **Pause functionality** added to:
+  - Merge Miners, Syntax Sprint, Crypto Snake
+  - Escape key shortcut + pause button in header
+
+#### Session 2: Hosting Migration (GKE to Vercel)
 - **Migrated from GKE Autopilot to Vercel** - Reduced hosting costs from ~$20-50/month to $0 (free tier)
 - **Custom domain configured**: https://grepcoin.io now points to Vercel
 - **All GCP resources cleaned up**: Cluster, disks, IPs, Container Registry, Cloud Build storage deleted
@@ -51,7 +71,7 @@ See `docs/BACKLOG.md` for full details. Summary:
 | **P2** | Daily Spin Wheel | 2-3 days |
 | **P2** | Tutorial System | 3-4 days |
 | **P3** | Spectator Mode | 1 week |
-| **P3** | New Games (4 more) | 2-3 weeks |
+| **P3** | New Games (2 more) | 1-2 weeks |
 | **P3** | Cosmetic System | 1 week |
 | **P3** | Social Sharing | 2-3 days |
 | **P3** | Achievement Categories | 1-2 days |
@@ -99,7 +119,7 @@ See `docs/BACKLOG.md` for full details. Summary:
 - Socket.io 4.8.1
 
 **Features Implemented:**
-- 8 playable arcade games
+- 10 playable arcade games
 - Sign-In with Ethereum (SIWE)
 - Leaderboards & achievements
 - Staking integration
@@ -332,7 +352,7 @@ cd packages/agents && npm run build
 1. **Code Comments** - Many files lack detailed comments
 2. **Bundle Size** - Could be optimized further
 3. **Accessibility** - A11y improvements needed
-4. **Mobile Optimization** - Games need better mobile support
+4. **Mobile Optimization** - Some games now have touch controls (Merge Miners, Syntax Sprint), others need work
 5. **Internationalization** - i18n setup incomplete
 
 ---
@@ -494,7 +514,7 @@ TWITTER_API_KEY=<twitter_key>
 #### 2. Web Application Core (70%)
 **Why Ready:**
 - Builds successfully
-- 8 functional games
+- 10 functional games
 - Authentication working
 - Database integration solid
 - Clean architecture
@@ -597,7 +617,7 @@ apps/web/
   - Pages: 30+
   - API Routes: 50+
   - Hooks: 25+
-  - Games: 8
+  - Games: 10
 
 packages/contracts/
   - Contracts: 7
@@ -722,6 +742,7 @@ No production monitoring, logging, or alerting. No load testing. CI/CD exists bu
 
 | Version | Date | Status | Notes |
 |---------|------|--------|-------|
+| 1.3.0 | Dec 27, 2024 | Production | 2 new games, bug fixes, visual enhancements, mobile controls, pause functionality |
 | 1.2.0 | Dec 27, 2024 | Production | Added feature roadmap, 15 new feature plans |
 | 1.1.0 | Dec 27, 2024 | Production | Migrated to Vercel, GKE cleanup, bug fixes |
 | 1.0.0 | Dec 21, 2024 | Alpha | Initial status report |
@@ -760,5 +781,5 @@ The project is now live and accessible. Focus should shift to smart contract aud
 ---
 
 *Report Generated: December 27, 2024*
-*Project: GrepCoin v1.1.0*
+*Project: GrepCoin v1.3.0*
 *Contact: hello@greplabs.io*
