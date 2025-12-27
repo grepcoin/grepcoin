@@ -100,7 +100,7 @@ export async function POST(
     }
 
     // Update participant score
-    const updatedParticipation = await prisma.tournamentParticipant.update({
+    const _updatedParticipation = await prisma.tournamentParticipant.update({
       where: { id: participation.id },
       data: { score },
     })

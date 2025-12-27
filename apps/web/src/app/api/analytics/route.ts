@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
 
     // Store events in database
     await prisma.analyticsEvent.createMany({
-      data: events.map((event: any) => ({
+      data: events.map((event: { name: string; properties: Record<string, unknown>; timestamp: string }) => ({
         name: event.name,
         properties: event.properties,
         userId: event.properties.userId || null,

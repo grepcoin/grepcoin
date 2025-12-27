@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAccount } from 'wagmi'
 
 interface RewardTier {
@@ -127,7 +127,7 @@ export function useMyRewards() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchRewards = async () => {
+  const fetchRewards = useCallback(async () => {
     if (!isConnected) {
       setRewards([])
       setTotalClaimable(0)
@@ -151,11 +151,11 @@ export function useMyRewards() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [isConnected])
 
   useEffect(() => {
     fetchRewards()
-  }, [isConnected])
+  }, [fetchRewards])
 
   return { rewards, totalClaimable, count, isLoading, error, refetch: fetchRewards }
 }
@@ -206,7 +206,6 @@ export function useLeaderboardRewards(type?: 'weekly' | 'monthly') {
     // Refetch rewards after successful claim
     if (result.success) {
       myRewards.refetch()
-      schedule
     }
     return result
   }

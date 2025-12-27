@@ -221,8 +221,9 @@ export async function GET(request: NextRequest) {
         headers: { 'Content-Type': 'text/html' },
       }
     )
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in /api/email/verify:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return new NextResponse(
       `
       <!DOCTYPE html>
@@ -231,7 +232,7 @@ export async function GET(request: NextRequest) {
       <body style="font-family: sans-serif; text-align: center; padding: 50px;">
         <h1 style="color: #ef4444;">Verification Error</h1>
         <p>An error occurred while verifying your email.</p>
-        <p style="color: #64748b; font-size: 14px;">${error.message}</p>
+        <p style="color: #64748b; font-size: 14px;">${errorMessage}</p>
       </body>
       </html>
       `,

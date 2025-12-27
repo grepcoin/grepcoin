@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useMultiplayer } from '@/hooks/useMultiplayer';
 
 interface RoomInfo {
@@ -42,7 +42,7 @@ export function MultiplayerLobby({
   } = useMultiplayer(gameSlug, { walletAddress, username });
 
   // Fetch available rooms
-  const fetchRooms = async () => {
+  const fetchRooms = useCallback(async () => {
     setIsLoadingRooms(true);
     try {
       const response = await fetch(`/api/multiplayer/rooms?gameSlug=${gameSlug}`);
@@ -53,13 +53,13 @@ export function MultiplayerLobby({
     } finally {
       setIsLoadingRooms(false);
     }
-  };
+  }, [gameSlug]);
 
   useEffect(() => {
     fetchRooms();
     const interval = setInterval(fetchRooms, 5000); // Refresh every 5 seconds
     return () => clearInterval(interval);
-  }, [gameSlug]);
+  }, [fetchRooms]);
 
   useEffect(() => {
     if (gameState.status === 'playing' && onGameStart) {

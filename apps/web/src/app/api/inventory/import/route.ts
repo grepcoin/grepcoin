@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { ITEMS } from '@/lib/inventory'
-import { TOKEN_ID_TO_ITEM, fetchTokenMetadata } from '@/lib/nft-items'
+import { TOKEN_ID_TO_ITEM } from '@/lib/nft-items'
 import { getContractAddress } from '@/lib/contracts'
 
 const prisma = new PrismaClient()
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
       // Create new inventory item
       // Fetch metadata if available
       const chainId = 8453 // Base mainnet
-      const contractAddress = getContractAddress(chainId, 'GREP_ITEMS')
+      const _contractAddress = getContractAddress(chainId, 'GREP_ITEMS')
       let metadataURI: string | undefined
 
       // In production, fetch actual token URI from contract

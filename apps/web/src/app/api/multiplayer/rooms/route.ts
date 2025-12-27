@@ -1,8 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Multiplayer server interface
+interface MultiplayerRoom {
+  id: string
+  gameSlug: string
+  players: unknown[]
+  state: { status: string }
+  createdAt: Date
+}
+
+interface MultiplayerServer {
+  getRooms: () => MultiplayerRoom[]
+  getRoom: (id: string) => MultiplayerRoom | undefined
+  createRoom: (gameSlug: string) => string
+}
+
 // This will be replaced with actual server instance in the server setup
 // In production, use a proper server-side store or environment variable
-const multiplayerServer: any = null;
+const multiplayerServer: MultiplayerServer | null = null;
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,11 +35,11 @@ export async function GET(request: NextRequest) {
 
     // Filter by game slug if provided
     if (gameSlug) {
-      rooms = rooms.filter((room: any) => room.gameSlug === gameSlug);
+      rooms = rooms.filter((room) => room.gameSlug === gameSlug);
     }
 
     // Add player counts and format response
-    const roomsWithCounts = rooms.map((room: any) => ({
+    const roomsWithCounts = rooms.map((room) => ({
       id: room.id,
       gameSlug: room.gameSlug,
       playerCount: room.players.length,

@@ -58,10 +58,10 @@ export async function GET(request: NextRequest) {
         unsubscribedAll: user.emailSettings.unsubscribedAll,
       },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in GET /api/email/preferences:', error)
     return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }
@@ -108,7 +108,15 @@ export async function PUT(request: NextRequest) {
     }
 
     // Build update object with only valid fields
-    const updateData: any = {}
+    const updateData: Partial<{
+      welcomeEnabled: boolean
+      weeklyDigestEnabled: boolean
+      achievementEnabled: boolean
+      rewardClaimEnabled: boolean
+      tournamentStartEnabled: boolean
+      friendRequestEnabled: boolean
+      unsubscribedAll: boolean
+    }> = {}
 
     if (typeof preferences.welcomeEnabled === 'boolean') {
       updateData.welcomeEnabled = preferences.welcomeEnabled
@@ -151,10 +159,10 @@ export async function PUT(request: NextRequest) {
         unsubscribedAll: updatedSettings.unsubscribedAll,
       },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in PUT /api/email/preferences:', error)
     return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }
@@ -202,10 +210,10 @@ export async function DELETE(request: NextRequest) {
       success: true,
       message: 'Email removed successfully',
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in DELETE /api/email/preferences:', error)
     return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }
