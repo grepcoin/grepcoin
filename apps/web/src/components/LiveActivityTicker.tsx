@@ -24,7 +24,7 @@ export default function LiveActivityTicker() {
       setDisplayActivities(
         apiActivities.map((a) => ({
           id: a.id,
-          player: a.username || `${a.wallet.slice(0, 6)}...${a.wallet.slice(-4)}`,
+          player: a.username || (a.wallet ? `${a.wallet.slice(0, 6)}...${a.wallet.slice(-4)}` : 'Anonymous'),
           message: a.message,
           icon: a.icon,
         }))

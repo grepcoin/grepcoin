@@ -33,7 +33,7 @@ export function ReferralList({ referrals }: Props) {
           <div key={ref.id} className="px-6 py-4 flex items-center justify-between">
             <div>
               <p className="font-mono text-sm">
-                {ref.wallet.slice(0, 6)}...{ref.wallet.slice(-4)}
+                {ref.wallet ? `${ref.wallet.slice(0, 6)}...${ref.wallet.slice(-4)}` : 'Unknown'}
               </p>
               <p className="text-sm text-gray-400">
                 Joined {new Date(ref.joinedAt).toLocaleDateString()} • {ref.gamesPlayed} games
