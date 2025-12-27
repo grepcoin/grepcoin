@@ -5,10 +5,8 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { parseEther, formatEther } from 'viem'
 import { getStakingMultiplier } from '@/lib/gameUtils'
 import {
-  CONTRACTS,
   GREP_TOKEN_ABI,
   STAKING_POOL_ABI,
-  TIER_NAMES,
   areContractsDeployed,
   getContractAddress
 } from '@/lib/contracts'
@@ -101,7 +99,7 @@ export function StakingProvider({ children }: { children: ReactNode }) {
     query: { enabled: !!address && contractsDeployed },
   })
 
-  const { data: allowance } = useReadContract({
+  const { data: _allowance } = useReadContract({
     address: tokenAddress,
     abi: GREP_TOKEN_ABI,
     functionName: 'allowance',
@@ -211,7 +209,7 @@ export function StakingProvider({ children }: { children: ReactNode }) {
             tierInfo: TIER_INFO[tier] || TIER_INFO.none,
             multiplier: getStakingMultiplier(parsed.stakedAmount, tier),
           }))
-        } catch (e) {
+        } catch (_e) {
           // Invalid saved state
         }
       }

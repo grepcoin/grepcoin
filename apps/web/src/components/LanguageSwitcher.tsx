@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useLocale } from '@/hooks/useLocale'
-import { locales, localeNames, Locale } from '@/lib/i18n'
+import { locales, localeNames } from '@/lib/i18n'
 
 export function LanguageSwitcher() {
   const { locale, setLocale } = useLocale()

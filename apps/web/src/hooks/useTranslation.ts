@@ -2,16 +2,6 @@
 
 import { useCallback } from 'react'
 import { useLocale } from './useLocale'
-import type { Translations } from '@/lib/i18n'
-
-type NestedKeyOf<T> = T extends object
-  ? { [K in keyof T]: K extends string
-      ? T[K] extends object
-        ? `${K}.${NestedKeyOf<T[K]>}`
-        : K
-      : never
-    }[keyof T]
-  : never
 
 export function useTranslation() {
   const { locale, translations } = useLocale()

@@ -21,7 +21,7 @@ export function useDailyRewards() {
         const json = await res.json()
         setData(json)
       }
-    } catch (e) {
+    } catch (_e) {
       setError('Failed to load rewards')
     } finally {
       setIsLoading(false)

@@ -133,7 +133,7 @@ export function playSound(type: 'success' | 'error' | 'powerup' | 'coin' | 'expl
         oscillator.stop(now + 0.15)
         break
     }
-  } catch (e) {
+  } catch (_e) {
     // Audio not supported or blocked
   }
 }

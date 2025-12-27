@@ -7,7 +7,6 @@ import { useGameScore } from '@/hooks/useGameScore'
 import { useAuth } from '@/context/AuthContext'
 import {
   playSound,
-  createShake,
   getShakeOffset,
   ShakeState,
   Particle,
@@ -16,7 +15,6 @@ import {
   updateParticle,
   drawParticle,
   GREP_COLORS,
-  hexToRgba,
 } from '@/lib/gameUtils'
 
 interface Position {

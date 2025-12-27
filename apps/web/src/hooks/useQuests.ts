@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
-import { Quest, UserQuest, DAILY_QUESTS, WEEKLY_QUESTS } from '@/lib/quests'
+import { UserQuest, DAILY_QUESTS, WEEKLY_QUESTS } from '@/lib/quests'
 
 export function useQuests() {
   const [userQuests, setUserQuests] = useState<UserQuest[]>([])

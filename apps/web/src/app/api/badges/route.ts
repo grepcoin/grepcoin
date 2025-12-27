@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
-  const userId = searchParams.get('userId')
+  const _userId = searchParams.get('userId')
 
-  // Would fetch from database in production
+  // Would fetch from database in production using _userId
   const badges = [
     { badgeId: 'first_game', earnedAt: new Date('2024-01-01'), displayed: true },
     { badgeId: 'gamer_10', earnedAt: new Date('2024-01-15'), displayed: true },

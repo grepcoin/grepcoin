@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { getLevel, getNextLevel, getXPProgress, Level } from '@/lib/levels'
+import { getLevel, getNextLevel, getXPProgress } from '@/lib/levels'
 
 export function useLevel(userId?: string) {
   const [xp, setXP] = useState(0)

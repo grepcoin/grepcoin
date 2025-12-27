@@ -9,13 +9,13 @@ interface PushNotificationPromptProps {
   onClose?: () => void
 }
 
-export default function PushNotificationPrompt({ userId, onClose }: PushNotificationPromptProps) {
+export default function PushNotificationPrompt({ userId, onClose: _onClose }: PushNotificationPromptProps) {
   const {
     isSubscribed,
     isLoading,
     error,
     isSupported,
-    isGranted,
+    isGranted: _isGranted,
     subscribeToPush,
     unsubscribeFromPush,
   } = usePushNotifications(userId)

@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import type { Proposal } from '@/hooks/useGovernance'
 
 interface Props {

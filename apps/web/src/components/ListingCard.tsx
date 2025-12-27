@@ -9,7 +9,6 @@ import {
   getRarityColor,
   getRarityTextColor,
   calculateFee,
-  calculateSellerProceeds,
 } from '@/lib/marketplace'
 import { buyItem, cancelListing } from '@/hooks/useMarketplace'
 

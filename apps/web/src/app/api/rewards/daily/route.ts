@@ -8,7 +8,7 @@ const DAILY_REWARDS = [10, 15, 25, 40, 60, 85, 150]
 const DAY_7_BONUS = 50
 
 // GET - Get user's daily reward status
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const cookieStore = await cookies()
     const sessionToken = cookieStore.get('session')?.value
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
 }
 
 // POST - Claim daily reward
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const cookieStore = await cookies()
     const sessionToken = cookieStore.get('session')?.value
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
     const reward = DAILY_REWARDS[nextDay - 1] + (nextDay === 7 ? DAY_7_BONUS : 0)
 
     // Create daily reward claim
-    const dailyReward = await prisma.dailyReward.create({
+    const _dailyReward = await prisma.dailyReward.create({
       data: {
         userId: user.id,
         day: nextDay,
