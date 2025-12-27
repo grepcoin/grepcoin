@@ -87,6 +87,26 @@ const games = [
     rewards: '10-80 GREP',
     status: 'live',
   },
+  {
+    id: 'memory-match',
+    name: 'Memory Match',
+    description: 'Match pairs of code symbols! Build combos and clear 6 levels before time runs out.',
+    difficulty: 'Easy',
+    color: 'from-purple-500 to-cyan-500',
+    icon: '🧠',
+    rewards: '5-50 GREP',
+    status: 'live',
+  },
+  {
+    id: 'pipe-dream',
+    name: 'Pipe Dream',
+    description: 'Connect pipes to guide data flow! Place pipes before the flow starts and reach the exit.',
+    difficulty: 'Medium',
+    color: 'from-cyan-500 to-blue-500',
+    icon: '🔧',
+    rewards: '10-60 GREP',
+    status: 'live',
+  },
 ]
 
 const miniGames = [

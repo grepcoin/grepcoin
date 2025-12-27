@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Play, RotateCcw, Volume2, VolumeX, Trophy, GitBranch, GitMerge, GitCommit } from 'lucide-react'
+import { ArrowLeft, ArrowUp, ArrowDown, ArrowRight as ArrowRightIcon, Play, Pause, RotateCcw, Volume2, VolumeX, Trophy, GitBranch, GitMerge, GitCommit } from 'lucide-react'
 import { useGameScore } from '@/hooks/useGameScore'
 import { useAuth } from '@/context/AuthContext'
 import {
@@ -39,6 +39,7 @@ interface Player {
   facing: 'left' | 'right' | 'up' | 'down'
   mining: boolean
   miningProgress: number
+  trail: { x: number; y: number; alpha: number }[]
 }
 
 interface GameState {
@@ -88,19 +89,23 @@ export default function MergeMinersGame() {
   })
   const [muted, setMuted] = useState(false)
   const [currentConflict, setCurrentConflict] = useState<typeof conflictScenarios[0] | null>(null)
+  const [conflictTilePos, setConflictTilePos] = useState<{ x: number; y: number } | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
 
   const gameRef = useRef({
     animationId: 0,
     grid: [] as Tile[][],
-    player: { x: 5, y: 0, targetX: 5, targetY: 0, facing: 'down', mining: false, miningProgress: 0 } as Player,
+    player: { x: 5, y: 0, targetX: 5, targetY: 0, facing: 'down', mining: false, miningProgress: 0, trail: [] } as Player,
     particles: [] as Particle[],
+    ambientParticles: [] as { x: number; y: number; vx: number; vy: number; size: number; alpha: number; color: string }[],
     shake: null as ShakeState | null,
     frameCount: 0,
     cameraY: 0,
     targetCameraY: 0,
     keysPressed: new Set<string>(),
     lastMoveTime: 0,
+    lastPlayerX: 5,
+    lastPlayerY: 0,
   })
 
   // Generate a level of the mine
@@ -188,11 +193,15 @@ export default function MergeMinersGame() {
       facing: 'down',
       mining: false,
       miningProgress: 0,
+      trail: [],
     }
     gameRef.current.particles = []
+    gameRef.current.ambientParticles = []
     gameRef.current.shake = null
     gameRef.current.cameraY = 0
     gameRef.current.targetCameraY = 0
+    gameRef.current.lastPlayerX = Math.floor(GRID_SIZE / 2)
+    gameRef.current.lastPlayerY = 0
 
     // Reveal starting area
     for (let dy = -1; dy <= 1; dy++) {
@@ -223,6 +232,7 @@ export default function MergeMinersGame() {
       const scenario = conflictScenarios.find(s => s.options === tile.conflictOptions)
       if (scenario) {
         setCurrentConflict(scenario)
+        setConflictTilePos({ x, y }) // Track which tile is being resolved
         setGameStatus('conflict')
         return
       }
@@ -327,46 +337,47 @@ export default function MergeMinersGame() {
   // Handle conflict resolution
   const resolveConflict = useCallback((optionIndex: number) => {
     const game = gameRef.current
-    const { x, y } = game.player
 
-    // Find the conflict tile near player
-    for (let dy = -1; dy <= 1; dy++) {
-      for (let dx = -1; dx <= 1; dx++) {
-        const nx = x + dx
-        const ny = y + dy
-        const tile = game.grid[ny]?.[nx]
-        if (tile?.type === 'conflict' && !tile.mined) {
-          const isCorrect = optionIndex === tile.correctOption
+    // Use tracked conflict tile position
+    if (!conflictTilePos) {
+      setCurrentConflict(null)
+      setGameStatus('playing')
+      return
+    }
 
-          tile.mined = true
+    const { x: nx, y: ny } = conflictTilePos
+    const tile = game.grid[ny]?.[nx]
 
-          if (isCorrect) {
-            if (!muted) playSound('success')
-            setGameState(prev => ({
-              ...prev,
-              score: prev.score + tile.value,
-              conflicts: prev.conflicts + 1,
-            }))
-            game.particles.push(createTextParticle(nx * TILE_SIZE + TILE_SIZE / 2, (ny - game.cameraY) * TILE_SIZE, `RESOLVED! +${tile.value}`, GREP_COLORS.green))
-            game.particles.push(...createExplosion(nx * TILE_SIZE + TILE_SIZE / 2, (ny - game.cameraY) * TILE_SIZE + TILE_SIZE / 2, 15, [GREP_COLORS.green, GREP_COLORS.cyan]))
-          } else {
-            if (!muted) playSound('error')
-            setGameState(prev => ({
-              ...prev,
-              energy: Math.max(0, prev.energy - 15),
-            }))
-            game.particles.push(createTextParticle(nx * TILE_SIZE + TILE_SIZE / 2, (ny - game.cameraY) * TILE_SIZE, 'WRONG! -15 Energy', GREP_COLORS.red))
-            game.shake = createShake(8, 200)
-          }
+    if (tile?.type === 'conflict' && !tile.mined) {
+      const isCorrect = optionIndex === tile.correctOption
 
-          break
-        }
+      tile.mined = true
+      tile.revealed = true
+
+      if (isCorrect) {
+        if (!muted) playSound('success')
+        setGameState(prev => ({
+          ...prev,
+          score: prev.score + tile.value,
+          conflicts: prev.conflicts + 1,
+        }))
+        game.particles.push(createTextParticle(nx * TILE_SIZE + TILE_SIZE / 2, (ny - game.cameraY) * TILE_SIZE, `RESOLVED! +${tile.value}`, GREP_COLORS.green))
+        game.particles.push(...createExplosion(nx * TILE_SIZE + TILE_SIZE / 2, (ny - game.cameraY) * TILE_SIZE + TILE_SIZE / 2, 15, [GREP_COLORS.green, GREP_COLORS.cyan]))
+      } else {
+        if (!muted) playSound('error')
+        setGameState(prev => ({
+          ...prev,
+          energy: Math.max(0, prev.energy - 15),
+        }))
+        game.particles.push(createTextParticle(nx * TILE_SIZE + TILE_SIZE / 2, (ny - game.cameraY) * TILE_SIZE, 'WRONG! -15 Energy', GREP_COLORS.red))
+        game.shake = createShake(8, 200)
       }
     }
 
+    setConflictTilePos(null)
     setCurrentConflict(null)
     setGameStatus('playing')
-  }, [muted])
+  }, [muted, conflictTilePos])
 
   // Submit score when game ends
   useEffect(() => {
@@ -413,9 +424,57 @@ export default function MergeMinersGame() {
       ctx.save()
       ctx.translate(shakeOffset.x, shakeOffset.y)
 
-      // Background
-      ctx.fillStyle = '#0a0a12'
+      // Background with depth gradient
+      const depthGradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
+      depthGradient.addColorStop(0, '#0a0a12')
+      depthGradient.addColorStop(1, '#050508')
+      ctx.fillStyle = depthGradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+      // Draw subtle grid lines for cave effect
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)'
+      ctx.lineWidth = 1
+      for (let i = 0; i < canvas.width; i += TILE_SIZE) {
+        ctx.beginPath()
+        ctx.moveTo(i, 0)
+        ctx.lineTo(i, canvas.height)
+        ctx.stroke()
+      }
+      for (let i = 0; i < canvas.height; i += TILE_SIZE) {
+        ctx.beginPath()
+        ctx.moveTo(0, i)
+        ctx.lineTo(canvas.width, i)
+        ctx.stroke()
+      }
+
+      // Spawn ambient cave particles
+      if (game.frameCount % 15 === 0 && game.ambientParticles.length < 30) {
+        game.ambientParticles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: -0.2 - Math.random() * 0.3,
+          size: 1 + Math.random() * 2,
+          alpha: 0.1 + Math.random() * 0.2,
+          color: Math.random() > 0.7 ? GREP_COLORS.cyan : '#ffffff',
+        })
+      }
+
+      // Update ambient particles
+      game.ambientParticles = game.ambientParticles.filter(p => {
+        p.x += p.vx
+        p.y += p.vy
+        p.alpha -= 0.002
+        return p.alpha > 0 && p.y > -10
+      })
+
+      // Draw ambient particles
+      game.ambientParticles.forEach(p => {
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fillStyle = `${p.color}${Math.floor(p.alpha * 255).toString(16).padStart(2, '0')}`
+        ctx.fill()
+      })
 
       // Handle movement
       const now = Date.now()
@@ -438,6 +497,13 @@ export default function MergeMinersGame() {
             if (targetTile.mined || targetTile.type === 'empty') {
               // Move to empty space
               if (gameState.energy >= ENERGY_PER_MOVE) {
+                // Add trail point before moving
+                if (game.player.x !== game.lastPlayerX || game.player.y !== game.lastPlayerY) {
+                  game.player.trail.push({ x: game.player.x, y: game.player.y, alpha: 0.6 })
+                  if (game.player.trail.length > 8) game.player.trail.shift()
+                }
+                game.lastPlayerX = game.player.x
+                game.lastPlayerY = game.player.y
                 game.player.x = newX
                 game.player.y = newY
                 setGameState(prev => ({ ...prev, energy: prev.energy - ENERGY_PER_MOVE }))
@@ -450,6 +516,9 @@ export default function MergeMinersGame() {
           }
         }
       }
+
+      // Fade trail
+      game.player.trail = game.player.trail.map(t => ({ ...t, alpha: t.alpha * 0.92 })).filter(t => t.alpha > 0.05)
 
       // Camera follow
       game.targetCameraY = Math.max(0, game.player.y - 4)
@@ -476,9 +545,11 @@ export default function MergeMinersGame() {
             continue
           }
 
-          // Draw based on tile type
+          // Draw based on tile type with enhanced visuals
           let color = '#1a1a2e'
           let icon = ''
+          let glowColor: string | null = null
+          let glowIntensity = 0
 
           switch (tile.type) {
             case 'wall':
@@ -494,75 +565,165 @@ export default function MergeMinersGame() {
             case 'ore':
               color = tile.mined ? '#12121f' : '#4a3a20'
               icon = tile.mined ? '' : '⛏️'
+              glowColor = tile.mined ? null : GREP_COLORS.orange
+              glowIntensity = 8
               break
             case 'gem':
               color = tile.mined ? '#12121f' : '#2a3a4a'
               icon = tile.mined ? '' : '💎'
+              glowColor = tile.mined ? null : GREP_COLORS.cyan
+              glowIntensity = 15
               break
             case 'conflict':
               color = tile.mined ? '#12121f' : '#4a2a2a'
               icon = tile.mined ? '✓' : '⚠️'
+              glowColor = tile.mined ? null : '#ff6b6b'
+              glowIntensity = 10
               break
             case 'commit':
               color = tile.mined ? '#1a3a1a' : '#2a4a2a'
               icon = tile.mined ? '✓' : '📌'
+              glowColor = tile.mined ? null : GREP_COLORS.green
+              glowIntensity = 10
               break
             case 'branch':
               color = tile.mined ? '#12121f' : '#3a2a4a'
               icon = tile.mined ? '' : '🌿'
+              glowColor = tile.mined ? null : GREP_COLORS.purple
+              glowIntensity = 8
               break
             case 'merge':
               color = tile.mined ? '#12121f' : '#2a4a3a'
               icon = tile.mined ? '' : '🔀'
+              glowColor = tile.mined ? null : GREP_COLORS.green
+              glowIntensity = 12
               break
             case 'bug':
               color = tile.mined ? '#12121f' : '#4a1a1a'
               icon = tile.mined ? '💀' : '🐛'
+              glowColor = tile.mined ? null : '#ff4444'
+              glowIntensity = 8
               break
           }
 
-          ctx.fillStyle = color
+          // Apply glow effect for special tiles
+          if (glowColor && !tile.mined) {
+            ctx.shadowColor = glowColor
+            ctx.shadowBlur = glowIntensity + Math.sin(game.frameCount * 0.1) * 3
+          }
+
+          // Draw tile with gradient
+          if (!tile.mined && tile.type !== 'wall' && tile.type !== 'empty') {
+            const tileGradient = ctx.createLinearGradient(screenX, screenY, screenX, screenY + TILE_SIZE)
+            tileGradient.addColorStop(0, color)
+            tileGradient.addColorStop(1, '#0a0a12')
+            ctx.fillStyle = tileGradient
+          } else {
+            ctx.fillStyle = color
+          }
+
           ctx.beginPath()
           ctx.roundRect(screenX + 1, screenY + 1, TILE_SIZE - 3, TILE_SIZE - 3, 4)
           ctx.fill()
 
+          // Add highlight edge for unmined tiles
+          if (!tile.mined && tile.type !== 'wall' && tile.type !== 'empty') {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+            ctx.lineWidth = 1
+            ctx.stroke()
+          }
+
+          ctx.shadowBlur = 0
+
           if (icon) {
+            // Add subtle bounce animation for valuable tiles
+            const bounce = (tile.type === 'gem' || tile.type === 'merge') && !tile.mined
+              ? Math.sin(game.frameCount * 0.08 + x + y) * 2
+              : 0
             ctx.font = '20px sans-serif'
             ctx.textAlign = 'center'
-            ctx.fillText(icon, screenX + TILE_SIZE / 2, screenY + TILE_SIZE / 2 + 6)
+            ctx.fillText(icon, screenX + TILE_SIZE / 2, screenY + TILE_SIZE / 2 + 6 + bounce)
           }
         }
       }
 
+      // Draw player trail
+      game.player.trail.forEach((t, i) => {
+        const trailScreenX = t.x * TILE_SIZE + TILE_SIZE / 2
+        const trailScreenY = (t.y - game.cameraY) * TILE_SIZE + TILE_SIZE / 2
+        const size = 8 + i * 0.5
+        ctx.beginPath()
+        ctx.arc(trailScreenX, trailScreenY, size, 0, Math.PI * 2)
+        ctx.fillStyle = hexToRgba(GREP_COLORS.green, t.alpha * 0.5)
+        ctx.fill()
+      })
+
       // Draw player
       const playerScreenX = game.player.x * TILE_SIZE
       const playerScreenY = (game.player.y - game.cameraY) * TILE_SIZE
+      const playerCenterX = playerScreenX + TILE_SIZE / 2
+      const playerCenterY = playerScreenY + TILE_SIZE / 2
 
-      // Player glow
+      // Pulsing player glow
+      const pulseIntensity = 15 + Math.sin(game.frameCount * 0.1) * 5
       ctx.shadowColor = GREP_COLORS.green
-      ctx.shadowBlur = 15
+      ctx.shadowBlur = pulseIntensity
 
-      // Player body
-      ctx.fillStyle = GREP_COLORS.green
+      // Player body with gradient
+      const playerGradient = ctx.createRadialGradient(
+        playerCenterX - 3, playerCenterY - 3, 0,
+        playerCenterX, playerCenterY, 16
+      )
+      playerGradient.addColorStop(0, '#6bff6b')
+      playerGradient.addColorStop(0.5, GREP_COLORS.green)
+      playerGradient.addColorStop(1, '#1a8a1a')
+
+      ctx.fillStyle = playerGradient
       ctx.beginPath()
-      ctx.arc(playerScreenX + TILE_SIZE / 2, playerScreenY + TILE_SIZE / 2, 14, 0, Math.PI * 2)
+      ctx.arc(playerCenterX, playerCenterY, 14, 0, Math.PI * 2)
       ctx.fill()
+
+      // Highlight ring
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.arc(playerCenterX, playerCenterY, 12, -Math.PI * 0.8, -Math.PI * 0.2)
+      ctx.stroke()
 
       ctx.shadowBlur = 0
 
-      // Player face direction indicator
+      // Mining helmet/visor
+      ctx.fillStyle = '#ffd700'
+      ctx.beginPath()
+      ctx.ellipse(playerCenterX, playerCenterY - 8, 8, 4, 0, Math.PI, 0)
+      ctx.fill()
+
+      // Headlamp
+      ctx.fillStyle = '#ffff88'
+      ctx.beginPath()
+      ctx.arc(playerCenterX, playerCenterY - 10, 3, 0, Math.PI * 2)
+      ctx.fill()
+
+      // Player face direction indicator (eyes)
       ctx.fillStyle = '#0a0a12'
-      let eyeX = playerScreenX + TILE_SIZE / 2
-      let eyeY = playerScreenY + TILE_SIZE / 2
+      let eyeOffsetX = 0
+      let eyeOffsetY = 0
       switch (game.player.facing) {
-        case 'left': eyeX -= 5; break
-        case 'right': eyeX += 5; break
-        case 'up': eyeY -= 5; break
-        case 'down': eyeY += 5; break
+        case 'left': eyeOffsetX = -4; break
+        case 'right': eyeOffsetX = 4; break
+        case 'up': eyeOffsetY = -4; break
+        case 'down': eyeOffsetY = 4; break
       }
       ctx.beginPath()
-      ctx.arc(eyeX - 3, eyeY, 3, 0, Math.PI * 2)
-      ctx.arc(eyeX + 3, eyeY, 3, 0, Math.PI * 2)
+      ctx.arc(playerCenterX - 4 + eyeOffsetX, playerCenterY + eyeOffsetY, 3, 0, Math.PI * 2)
+      ctx.arc(playerCenterX + 4 + eyeOffsetX, playerCenterY + eyeOffsetY, 3, 0, Math.PI * 2)
+      ctx.fill()
+
+      // Eye shine
+      ctx.fillStyle = '#ffffff'
+      ctx.beginPath()
+      ctx.arc(playerCenterX - 3 + eyeOffsetX, playerCenterY - 1 + eyeOffsetY, 1, 0, Math.PI * 2)
+      ctx.arc(playerCenterX + 5 + eyeOffsetX, playerCenterY - 1 + eyeOffsetY, 1, 0, Math.PI * 2)
       ctx.fill()
 
       // Draw particles
@@ -574,44 +735,132 @@ export default function MergeMinersGame() {
         return false
       })
 
-      // HUD
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
-      ctx.fillRect(0, 0, canvas.width, 50)
+      // HUD Background with gradient
+      const hudGradient = ctx.createLinearGradient(0, 0, 0, 55)
+      hudGradient.addColorStop(0, 'rgba(0, 0, 0, 0.9)')
+      hudGradient.addColorStop(1, 'rgba(0, 0, 0, 0.7)')
+      ctx.fillStyle = hudGradient
+      ctx.fillRect(0, 0, canvas.width, 55)
 
-      ctx.fillStyle = '#fff'
-      ctx.font = 'bold 14px monospace'
-      ctx.textAlign = 'left'
-      ctx.fillText(`Score: ${gameState.score}`, 10, 20)
-      ctx.fillText(`Depth: ${gameState.depth}`, 10, 38)
+      // HUD bottom border glow
+      ctx.strokeStyle = hexToRgba(GREP_COLORS.green, 0.3)
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.moveTo(0, 55)
+      ctx.lineTo(canvas.width, 55)
+      ctx.stroke()
 
-      // Energy bar
-      ctx.fillStyle = '#333'
-      ctx.fillRect(130, 12, 100, 12)
-      ctx.fillRect(130, 28, 100, 12)
-
+      // Score with icon
       ctx.fillStyle = GREP_COLORS.green
-      ctx.fillRect(130, 12, (gameState.energy / gameState.maxEnergy) * 100, 12)
-
+      ctx.font = 'bold 16px monospace'
+      ctx.textAlign = 'left'
+      ctx.fillText('⚡', 8, 22)
       ctx.fillStyle = '#fff'
-      ctx.font = '10px monospace'
-      ctx.fillText('ENERGY', 135, 22)
-      ctx.fillText(`${gameState.energy}/${gameState.maxEnergy}`, 135, 38)
+      ctx.fillText(gameState.score.toLocaleString(), 28, 22)
 
-      // Stats
-      ctx.textAlign = 'right'
+      // Depth indicator
+      ctx.fillStyle = GREP_COLORS.cyan
       ctx.font = '12px monospace'
-      ctx.fillText(`💎 ${gameState.gems}`, canvas.width - 10, 20)
-      ctx.fillText(`⛏️ ${gameState.ore}`, canvas.width - 10, 38)
-      ctx.fillText(`📌 ${gameState.commits}`, canvas.width - 60, 20)
-      ctx.fillText(`⚠️ ${gameState.conflicts}`, canvas.width - 60, 38)
+      ctx.fillText('⬇', 10, 42)
+      ctx.fillStyle = '#aaa'
+      ctx.fillText(`Depth ${gameState.depth}`, 26, 42)
 
-      // Controls hint
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'
-      ctx.fillRect(0, canvas.height - 30, canvas.width, 30)
+      // Energy bar (styled)
+      const energyBarX = 115
+      const energyBarY = 10
+      const energyBarWidth = 120
+      const energyBarHeight = 16
+
+      // Bar background
+      ctx.fillStyle = '#1a1a2e'
+      ctx.beginPath()
+      ctx.roundRect(energyBarX, energyBarY, energyBarWidth, energyBarHeight, 4)
+      ctx.fill()
+
+      // Bar border
+      ctx.strokeStyle = '#333'
+      ctx.lineWidth = 1
+      ctx.stroke()
+
+      // Energy fill with gradient
+      const energyPercent = gameState.energy / gameState.maxEnergy
+      const energyFillWidth = Math.max(0, (energyPercent * (energyBarWidth - 4)))
+      if (energyFillWidth > 0) {
+        const energyGradient = ctx.createLinearGradient(energyBarX, 0, energyBarX + energyBarWidth, 0)
+        if (energyPercent > 0.5) {
+          energyGradient.addColorStop(0, GREP_COLORS.green)
+          energyGradient.addColorStop(1, '#6bff6b')
+        } else if (energyPercent > 0.25) {
+          energyGradient.addColorStop(0, GREP_COLORS.yellow)
+          energyGradient.addColorStop(1, GREP_COLORS.orange)
+        } else {
+          energyGradient.addColorStop(0, GREP_COLORS.red)
+          energyGradient.addColorStop(1, '#ff6b6b')
+        }
+        ctx.fillStyle = energyGradient
+        ctx.beginPath()
+        ctx.roundRect(energyBarX + 2, energyBarY + 2, energyFillWidth, energyBarHeight - 4, 3)
+        ctx.fill()
+      }
+
+      // Energy text
+      ctx.fillStyle = '#fff'
+      ctx.font = 'bold 10px monospace'
+      ctx.textAlign = 'center'
+      ctx.fillText(`${gameState.energy}/${gameState.maxEnergy}`, energyBarX + energyBarWidth / 2, energyBarY + 12)
+
+      // Energy label below
       ctx.fillStyle = '#666'
+      ctx.font = '9px monospace'
+      ctx.fillText('ENERGY', energyBarX + energyBarWidth / 2, energyBarY + 28)
+
+      // Stats on right side with styled boxes
+      const statsData = [
+        { icon: '💎', value: gameState.gems, color: GREP_COLORS.cyan },
+        { icon: '⛏️', value: gameState.ore, color: GREP_COLORS.orange },
+        { icon: '📌', value: gameState.commits, color: GREP_COLORS.green },
+        { icon: '⚠️', value: gameState.conflicts, color: GREP_COLORS.yellow },
+      ]
+
+      statsData.forEach((stat, i) => {
+        const statX = canvas.width - 50 - (i * 55)
+        const statY = 8
+
+        // Stat background
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'
+        ctx.beginPath()
+        ctx.roundRect(statX, statY, 45, 35, 4)
+        ctx.fill()
+
+        // Icon
+        ctx.font = '14px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.fillText(stat.icon, statX + 22, statY + 16)
+
+        // Value
+        ctx.fillStyle = stat.color
+        ctx.font = 'bold 11px monospace'
+        ctx.fillText(stat.value.toString(), statX + 22, statY + 30)
+      })
+
+      // Controls hint with better styling
+      const controlsBgGradient = ctx.createLinearGradient(0, canvas.height - 28, 0, canvas.height)
+      controlsBgGradient.addColorStop(0, 'rgba(0, 0, 0, 0.6)')
+      controlsBgGradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)')
+      ctx.fillStyle = controlsBgGradient
+      ctx.fillRect(0, canvas.height - 28, canvas.width, 28)
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(0, canvas.height - 28)
+      ctx.lineTo(canvas.width, canvas.height - 28)
+      ctx.stroke()
+
+      ctx.fillStyle = '#888'
       ctx.font = '11px monospace'
       ctx.textAlign = 'center'
-      ctx.fillText('WASD / Arrow Keys to move and mine', canvas.width / 2, canvas.height - 12)
+      ctx.fillText('⌨️ WASD / Arrow Keys to move and mine', canvas.width / 2, canvas.height - 10)
 
       ctx.restore()
 
@@ -630,6 +879,61 @@ export default function MergeMinersGame() {
       cancelAnimationFrame(gameRef.current.animationId)
     }
   }, [gameStatus, gameState, interactWithTile])
+
+  // Toggle pause
+  const togglePause = useCallback(() => {
+    if (gameStatus === 'playing') {
+      setGameStatus('paused')
+    } else if (gameStatus === 'paused') {
+      setGameStatus('playing')
+    }
+  }, [gameStatus])
+
+  // Escape key to pause
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && (gameStatus === 'playing' || gameStatus === 'paused')) {
+        togglePause()
+      }
+    }
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [gameStatus, togglePause])
+
+  // Mobile touch direction handler
+  const handleTouchDirection = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
+    if (gameStatus !== 'playing') return
+    const game = gameRef.current
+
+    let dx = 0
+    let dy = 0
+
+    switch (direction) {
+      case 'up': dy = -1; game.player.facing = 'up'; break
+      case 'down': dy = 1; game.player.facing = 'down'; break
+      case 'left': dx = -1; game.player.facing = 'left'; break
+      case 'right': dx = 1; game.player.facing = 'right'; break
+    }
+
+    const newX = game.player.x + dx
+    const newY = game.player.y + dy
+
+    const targetTile = game.grid[newY]?.[newX]
+    if (targetTile && targetTile.type !== 'wall') {
+      if (targetTile.mined || targetTile.type === 'empty') {
+        if (gameState.energy >= ENERGY_PER_MOVE) {
+          // Add trail
+          game.player.trail.push({ x: game.player.x, y: game.player.y, alpha: 0.6 })
+          if (game.player.trail.length > 8) game.player.trail.shift()
+          game.player.x = newX
+          game.player.y = newY
+          setGameState(prev => ({ ...prev, energy: prev.energy - ENERGY_PER_MOVE }))
+        }
+      } else {
+        interactWithTile(newX, newY)
+      }
+    }
+  }, [gameStatus, gameState.energy, interactWithTile])
 
   // Start game
   const startGame = () => {
@@ -660,7 +964,7 @@ export default function MergeMinersGame() {
               Back to Arcade
             </Link>
             <div className="flex items-center gap-4">
-              {gameStatus === 'playing' && (
+              {(gameStatus === 'playing' || gameStatus === 'paused') && (
                 <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-1">
                     <GitBranch className="w-4 h-4 text-purple-400" />
@@ -675,6 +979,15 @@ export default function MergeMinersGame() {
                     <span>{gameState.conflicts}</span>
                   </div>
                 </div>
+              )}
+              {(gameStatus === 'playing' || gameStatus === 'paused') && (
+                <button
+                  onClick={togglePause}
+                  className="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors"
+                  title={gameStatus === 'paused' ? 'Resume (Esc)' : 'Pause (Esc)'}
+                >
+                  {gameStatus === 'paused' ? <Play className="w-5 h-5 text-green-400" /> : <Pause className="w-5 h-5" />}
+                </button>
               )}
               <button
                 onClick={() => setMuted(!muted)}
@@ -734,6 +1047,46 @@ export default function MergeMinersGame() {
                   <div className="text-gray-400 mt-1">Bugs = Danger!</div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Pause Screen */}
+          {gameStatus === 'paused' && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-dark-900/90 rounded-2xl backdrop-blur-sm">
+              <div className="text-6xl mb-6">⏸️</div>
+              <h2 className="text-3xl font-display font-bold mb-4">
+                <span className="text-gradient">Paused</span>
+              </h2>
+
+              <div className="grid grid-cols-2 gap-3 mb-6 text-center text-sm">
+                <div className="p-3 rounded-xl bg-dark-800 border border-green-500/30">
+                  <div className="text-xl font-bold text-green-400">{gameState.score}</div>
+                  <div className="text-xs text-gray-400">Score</div>
+                </div>
+                <div className="p-3 rounded-xl bg-dark-800 border border-cyan-500/30">
+                  <div className="text-xl font-bold text-cyan-400">{gameState.depth}</div>
+                  <div className="text-xs text-gray-400">Depth</div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={togglePause}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-cyan-500 font-bold text-dark-900 hover:scale-105 transition-transform"
+                >
+                  <Play className="w-4 h-4" />
+                  Resume
+                </button>
+                <Link
+                  href="/games"
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-dark-700 border border-dark-600 font-bold hover:bg-dark-600 transition-colors"
+                >
+                  <Trophy className="w-4 h-4" />
+                  Quit
+                </Link>
+              </div>
+
+              <p className="text-gray-500 text-sm mt-4">Press Esc to resume</p>
             </div>
           )}
 
@@ -838,6 +1191,47 @@ export default function MergeMinersGame() {
             </div>
           )}
         </div>
+
+        {/* Mobile Touch Controls */}
+        {gameStatus === 'playing' && (
+          <div className="mt-6 md:hidden">
+            <div className="flex justify-center">
+              <div className="grid grid-cols-3 gap-2 w-44">
+                <div />
+                <button
+                  onTouchStart={() => handleTouchDirection('up')}
+                  className="w-14 h-14 rounded-xl bg-dark-700 border border-green-500/30 flex items-center justify-center active:bg-green-500/30 active:border-green-500 transition-colors"
+                >
+                  <ArrowUp className="w-6 h-6 text-green-400" />
+                </button>
+                <div />
+                <button
+                  onTouchStart={() => handleTouchDirection('left')}
+                  className="w-14 h-14 rounded-xl bg-dark-700 border border-green-500/30 flex items-center justify-center active:bg-green-500/30 active:border-green-500 transition-colors"
+                >
+                  <ArrowLeft className="w-6 h-6 text-green-400" />
+                </button>
+                <div className="w-14 h-14 rounded-xl bg-dark-800 border border-dark-700 flex items-center justify-center">
+                  <span className="text-lg">⛏️</span>
+                </div>
+                <button
+                  onTouchStart={() => handleTouchDirection('right')}
+                  className="w-14 h-14 rounded-xl bg-dark-700 border border-green-500/30 flex items-center justify-center active:bg-green-500/30 active:border-green-500 transition-colors"
+                >
+                  <ArrowRightIcon className="w-6 h-6 text-green-400" />
+                </button>
+                <div />
+                <button
+                  onTouchStart={() => handleTouchDirection('down')}
+                  className="w-14 h-14 rounded-xl bg-dark-700 border border-green-500/30 flex items-center justify-center active:bg-green-500/30 active:border-green-500 transition-colors"
+                >
+                  <ArrowDown className="w-6 h-6 text-green-400" />
+                </button>
+                <div />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   )
