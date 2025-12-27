@@ -1,7 +1,8 @@
 # GrepCoin Development Backlog
 
-**Last Updated:** December 27, 2024
+**Last Updated:** December 27, 2024 (Session 2)
 **Status:** Active Development
+**Total Items:** 30 (15 technical + 15 features)
 
 ---
 
@@ -174,7 +175,207 @@ Types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`
 
 ---
 
-### P3 - Low Priority / Future
+## New Features
+
+### P1 - High Priority Features
+
+#### [ ] 16. Leaderboard Rewards System
+**Branch:** `feature/leaderboard-rewards`
+**Effort:** 2-3 days
+**Description:** Automatic GREP rewards for top leaderboard players
+**Tasks:**
+- [ ] Create weekly/monthly reward distribution logic
+- [ ] Add reward tiers (Top 10, Top 50, Top 100)
+- [ ] Create reward claim UI in leaderboard page
+- [ ] Add notification for reward eligibility
+- [ ] Create admin tool for manual distribution
+**Rewards Structure:**
+- Weekly: Top 10 = 1000 GREP, Top 50 = 500 GREP, Top 100 = 250 GREP
+- Monthly: Top 10 = 5000 GREP, Top 50 = 2000 GREP, Top 100 = 1000 GREP
+
+#### [ ] 17. Friend Challenges
+**Branch:** `feature/friend-challenges`
+**Effort:** 3-4 days
+**Description:** Challenge friends to beat your high score
+**Tasks:**
+- [ ] Create challenge API endpoints
+- [ ] Add "Challenge Friend" button on game over screen
+- [ ] Create challenge notification system
+- [ ] Build challenges inbox/dashboard
+- [ ] Add challenge leaderboard between friends
+- [ ] Implement GREP wagering on challenges (optional)
+
+#### [ ] 18. Sound & Music System
+**Branch:** `feature/game-audio`
+**Effort:** 2-3 days
+**Description:** Add sound effects and background music to games
+**Tasks:**
+- [ ] Create audio manager utility
+- [ ] Add sound effects for all 8 games (score, game over, powerup)
+- [ ] Add background music tracks
+- [ ] Create volume controls in settings
+- [ ] Add mute toggle in game UI
+- [ ] Ensure mobile compatibility
+
+---
+
+### P2 - Medium Priority Features
+
+#### [ ] 19. Game Replays
+**Branch:** `feature/game-replays`
+**Effort:** 1 week
+**Description:** Record, save, and share game replays
+**Tasks:**
+- [ ] Create replay recording system (capture game state)
+- [ ] Build replay storage (database or cloud)
+- [ ] Create replay viewer component
+- [ ] Add "Watch Replay" on leaderboard entries
+- [ ] Enable replay sharing via URL
+- [ ] Add replay to profile showcase
+
+#### [ ] 20. Seasonal Events
+**Branch:** `feature/seasonal-events`
+**Effort:** 1 week
+**Description:** Time-limited seasonal events with special rewards
+**Tasks:**
+- [ ] Create event system architecture
+- [ ] Build event banner/announcement UI
+- [ ] Add seasonal game modes/modifiers
+- [ ] Create event-exclusive rewards
+- [ ] Add event leaderboard
+- [ ] Build event countdown timer
+**Example Events:** Winter Holiday, Lunar New Year, Halloween, Anniversary
+
+#### [ ] 21. Guild Wars
+**Branch:** `feature/guild-wars`
+**Effort:** 1-2 weeks
+**Description:** Weekly guild vs guild competition
+**Tasks:**
+- [ ] Create guild war matchmaking system
+- [ ] Build war dashboard showing progress
+- [ ] Add guild war leaderboard
+- [ ] Create war rewards distribution
+- [ ] Add guild war chat/coordination
+- [ ] Build war history/stats page
+
+#### [ ] 22. Public Profile Pages
+**Branch:** `feature/public-profiles`
+**Effort:** 2-3 days
+**Description:** Shareable public profile pages
+**Tasks:**
+- [ ] Create /player/[username] route
+- [ ] Display achievements, stats, badges
+- [ ] Add social sharing meta tags (OG image)
+- [ ] Show recent activity feed
+- [ ] Add "Add Friend" button for visitors
+- [ ] Create profile customization options
+
+#### [ ] 23. Daily Spin Wheel
+**Branch:** `feature/spin-wheel`
+**Effort:** 2-3 days
+**Description:** Daily bonus wheel for random rewards
+**Tasks:**
+- [ ] Create spin wheel component with animation
+- [ ] Define reward tiers (GREP, XP, items, rare drops)
+- [ ] Add daily spin limit (1 free, more with staking)
+- [ ] Create spin history tracking
+- [ ] Add special jackpot prizes
+- [ ] Integrate with staking multipliers
+
+#### [ ] 24. Tutorial System
+**Branch:** `feature/tutorials`
+**Effort:** 3-4 days
+**Description:** Interactive tutorials for each game
+**Tasks:**
+- [ ] Create tutorial overlay component
+- [ ] Add step-by-step instructions per game
+- [ ] Implement practice mode (no score submission)
+- [ ] Create "First Time" detection
+- [ ] Add skip tutorial option
+- [ ] Track tutorial completion in profile
+
+---
+
+### P3 - Low Priority Features
+
+#### [ ] 25. Spectator Mode
+**Branch:** `feature/spectator-mode`
+**Effort:** 1 week
+**Description:** Watch live multiplayer games
+**Tasks:**
+- [ ] Create spectator WebSocket channel
+- [ ] Build spectator UI overlay
+- [ ] Add "Watch Live" button on multiplayer lobby
+- [ ] Show spectator count to players
+- [ ] Add spectator chat
+- [ ] Create featured matches section
+
+#### [ ] 26. New Games (Batch 2)
+**Branch:** `feature/new-games-batch2`
+**Effort:** 2-3 weeks
+**Description:** Add 4 new arcade games
+**Planned Games:**
+- [ ] **Pipe Dream** - Connect pipes before water flows (Puzzle)
+- [ ] **Memory Match** - Card matching with code symbols (Memory)
+- [ ] **Tower Defense** - Defend against bug invasions (Strategy)
+- [ ] **Endless Runner** - Infinite runner with coding obstacles (Action)
+**Tasks per game:**
+- [ ] Game design document
+- [ ] Core game mechanics
+- [ ] Scoring and GREP rewards
+- [ ] Anti-cheat integration
+- [ ] Mobile optimization
+
+#### [ ] 27. Cosmetic System
+**Branch:** `feature/cosmetics`
+**Effort:** 1 week
+**Description:** Visual customization for games
+**Tasks:**
+- [ ] Create theme/skin system architecture
+- [ ] Add game board themes (neon, retro, minimal)
+- [ ] Create player avatars/icons
+- [ ] Add cursor/pointer customization
+- [ ] Create cosmetic shop
+- [ ] Integrate with NFT minting
+
+#### [ ] 28. Social Sharing
+**Branch:** `feature/social-sharing`
+**Effort:** 2-3 days
+**Description:** Share achievements and scores on social media
+**Tasks:**
+- [ ] Create shareable score cards (image generation)
+- [ ] Add Twitter/X share integration
+- [ ] Add Discord share integration
+- [ ] Create achievement share templates
+- [ ] Add referral tracking to shares
+- [ ] Build share analytics
+
+#### [ ] 29. Achievement Categories
+**Branch:** `feature/achievement-categories`
+**Effort:** 1-2 days
+**Description:** Organize achievements by category
+**Tasks:**
+- [ ] Define categories (Games, Social, Economy, Collector, etc.)
+- [ ] Update achievement showcase UI with tabs
+- [ ] Add category completion percentage
+- [ ] Create category-specific rewards
+- [ ] Add achievement search/filter
+
+#### [ ] 30. Streak Bonuses
+**Branch:** `feature/streak-bonuses`
+**Effort:** 2 days
+**Description:** Escalating rewards for daily login streaks
+**Tasks:**
+- [ ] Create streak tracking system
+- [ ] Define streak milestones (7, 14, 30, 60, 90 days)
+- [ ] Add streak UI to daily rewards
+- [ ] Create streak protection (miss 1 day grace)
+- [ ] Add streak leaderboard
+- [ ] Create exclusive streak rewards
+
+---
+
+### P3 - Low Priority / Technical
 
 #### [ ] 11. E2E Testing with Playwright
 **Branch:** `test/e2e-playwright`

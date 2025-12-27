@@ -1,9 +1,9 @@
 # GrepCoin Project Status Report
 
-**Last Updated:** December 27, 2024
-**Version:** 1.1.0
+**Last Updated:** December 27, 2024 (Session 2)
+**Version:** 1.2.0
 **Git Branch:** main
-**Last Commit:** 58075192 - chore: migrate to Vercel hosting
+**Last Commit:** See git log for latest
 
 ---
 
@@ -35,6 +35,29 @@ GrepCoin is a decentralized arcade gaming platform built on Base L2, featuring 8
 | Domain | grepcoin.io (via GKE LB) | grepcoin.io (via Vercel) |
 | SSL | Let's Encrypt (cert-manager) | Vercel automatic SSL |
 | CDN | None | Vercel Edge Network |
+
+#### Feature Roadmap (New)
+See `docs/BACKLOG.md` for full details. Summary:
+
+| Priority | Feature | Effort |
+|----------|---------|--------|
+| **P1** | Leaderboard Rewards | 2-3 days |
+| **P1** | Friend Challenges | 3-4 days |
+| **P1** | Sound & Music | 2-3 days |
+| **P2** | Game Replays | 1 week |
+| **P2** | Seasonal Events | 1 week |
+| **P2** | Guild Wars | 1-2 weeks |
+| **P2** | Public Profiles | 2-3 days |
+| **P2** | Daily Spin Wheel | 2-3 days |
+| **P2** | Tutorial System | 3-4 days |
+| **P3** | Spectator Mode | 1 week |
+| **P3** | New Games (4 more) | 2-3 weeks |
+| **P3** | Cosmetic System | 1 week |
+| **P3** | Social Sharing | 2-3 days |
+| **P3** | Achievement Categories | 1-2 days |
+| **P3** | Streak Bonuses | 2 days |
+
+**Total Backlog:** 30 items (15 technical + 15 features)
 
 ### Quick Status Overview
 
@@ -699,6 +722,7 @@ No production monitoring, logging, or alerting. No load testing. CI/CD exists bu
 
 | Version | Date | Status | Notes |
 |---------|------|--------|-------|
+| 1.2.0 | Dec 27, 2024 | Production | Added feature roadmap, 15 new feature plans |
 | 1.1.0 | Dec 27, 2024 | Production | Migrated to Vercel, GKE cleanup, bug fixes |
 | 1.0.0 | Dec 21, 2024 | Alpha | Initial status report |
 
