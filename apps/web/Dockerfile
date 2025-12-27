@@ -12,9 +12,11 @@ COPY apps/web/package.json apps/web/package-lock.json ./apps/web/
 COPY apps/web/prisma ./apps/web/prisma/
 COPY packages/anti-cheat/package.json ./packages/anti-cheat/
 COPY packages/anti-cheat/src ./packages/anti-cheat/src/
+COPY packages/anti-cheat/tsconfig.json ./packages/anti-cheat/
 
-# Install all workspace dependencies
+# Install all workspace dependencies and build anti-cheat package
 RUN npm ci
+RUN cd packages/anti-cheat && npm run build
 
 # Generate Prisma client
 WORKDIR /app/apps/web
