@@ -33,10 +33,11 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy source code
 COPY . .
 
-# Copy generated prisma client and built anti-cheat package
+# Copy generated prisma client, built anti-cheat, and workspace-specific node_modules
 COPY --from=deps /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=deps /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=deps /app/packages/anti-cheat/dist ./packages/anti-cheat/dist
+COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
