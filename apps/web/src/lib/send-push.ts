@@ -5,8 +5,13 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-// Initialize web-push with VAPID keys
-function initializeWebPush() {
+// Lazy initialization flag
+let isInitialized = false
+
+// Initialize web-push with VAPID keys (lazy - only at runtime)
+function ensureInitialized(): boolean {
+  if (isInitialized) return true
+
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
   const privateKey = process.env.VAPID_PRIVATE_KEY
   const email = process.env.VAPID_EMAIL || 'hello@greplabs.io'
@@ -16,12 +21,15 @@ function initializeWebPush() {
     return false
   }
 
-  webpush.setVapidDetails(`mailto:${email}`, publicKey, privateKey)
-  return true
+  try {
+    webpush.setVapidDetails(`mailto:${email}`, publicKey, privateKey)
+    isInitialized = true
+    return true
+  } catch (error) {
+    console.error('Failed to initialize web-push:', error)
+    return false
+  }
 }
-
-// Initialize on module load
-const isInitialized = initializeWebPush()
 
 // Web-push subscription format
 interface WebPushSubscription {
@@ -37,7 +45,7 @@ export async function sendPushNotification(
   subscription: WebPushSubscription | { endpoint: string; p256dh: string; auth: string },
   notification: NotificationPayload
 ): Promise<void> {
-  if (!isInitialized) {
+  if (!ensureInitialized()) {
     throw new Error('Web push is not initialized. Check VAPID keys.')
   }
 
@@ -81,7 +89,7 @@ export async function sendToUser(
   userId: string,
   notification: NotificationPayload
 ): Promise<{ sent: number; failed: number }> {
-  if (!isInitialized) {
+  if (!ensureInitialized()) {
     throw new Error('Web push is not initialized. Check VAPID keys.')
   }
 
@@ -143,7 +151,7 @@ export async function sendToAll(
     delayBetweenBatches?: number
   }
 ): Promise<{ sent: number; failed: number }> {
-  if (!isInitialized) {
+  if (!ensureInitialized()) {
     throw new Error('Web push is not initialized. Check VAPID keys.')
   }
 
@@ -214,7 +222,7 @@ export async function sendToUsers(
   userIds: string[],
   notification: NotificationPayload
 ): Promise<{ sent: number; failed: number }> {
-  if (!isInitialized) {
+  if (!ensureInitialized()) {
     throw new Error('Web push is not initialized. Check VAPID keys.')
   }
 
