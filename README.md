@@ -37,7 +37,7 @@ GrepCoin is an **open-source, decentralized arcade gaming platform** where playe
 │                                                                  │
 │   🎮 ARCADE         💰 ECONOMY          🤝 COMMUNITY            │
 │   ─────────         ────────           ─────────                │
-│   9 Games           GREP Token         Guilds                   │
+│   10 Games          GREP Token         Guilds                   │
 │   Daily Challenges  5-Tier Staking     Tournaments              │
 │   Leaderboards      NFT Items          Battle Pass              │
 │   Achievements      Marketplace        Quests                   │
@@ -54,13 +54,13 @@ What would traditionally require a team and months to build was accomplished in 
 
 | Built | Count |
 |-------|-------|
-| Arcade Games | 9 |
+| Arcade Games | 10 |
 | API Endpoints | 91 |
 | React Components | 112 |
 | Custom Hooks | 47 |
 | Smart Contracts | 7 |
 | Contract Tests | 64 |
-| PRs Merged | 51 |
+| PRs Merged | 58+ |
 
 ---
 
@@ -78,7 +78,8 @@ Developer-themed arcade games with real token rewards:
 | **Crypto Snake** | Blockchain | Classic snake with a twist |
 | **Syntax Sprint** | Code building | Catch falling tokens |
 | **RegEx Crossword** | Regex puzzles | Solve pattern clues |
-| **Mini-Games** | Quick plays | Coin flip, dice, etc. |
+| **Memory Match** | Code symbols | Match pairs of programming icons |
+| **Pipe Dream** | Data flow | Connect pipes to guide data |
 
 ---
 
