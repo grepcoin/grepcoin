@@ -67,9 +67,12 @@ function generateWrongAnswers(correctPattern: typeof patternChallenges[0], count
     }
   }
 
-  const fallbacks = ['!!!', '@#$', 'WRONG', '---', 'xyz123ABC', '  ', '']
-  while (wrongs.length < count) {
-    const f = fallbacks[wrongs.length % fallbacks.length]
+  const fallbacks = ['!!!', '@#$', 'WRONG', '---', 'xyz123ABC', '  ', '000', 'null', 'undefined']
+  let iterations = 0
+  const maxIterations = 50
+  while (wrongs.length < count && iterations < maxIterations) {
+    iterations++
+    const f = fallbacks[iterations % fallbacks.length]
     if (!wrongs.includes(f) && !correctPattern.pattern.test(f)) wrongs.push(f)
   }
 

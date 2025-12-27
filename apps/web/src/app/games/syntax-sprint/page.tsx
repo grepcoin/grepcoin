@@ -313,10 +313,21 @@ export default function SyntaxSprintGame() {
 
     const { token, x, y } = game.currentBlock
 
-    // Check if position is valid
-    if (y >= GRID_HEIGHT || game.grid[Math.floor(y)][x] !== null) {
-      // Game over if can't place at top
-      if (y <= 1) {
+    // Check if we need to place above current position due to collision
+    const gridY = Math.min(Math.floor(y), GRID_HEIGHT - 1)
+    const needsAlternatePosition = game.grid[gridY][x] !== null
+
+    // Game over if column is full to the top
+    if (needsAlternatePosition) {
+      // Check if there's any space above in this column
+      let hasSpace = false
+      for (let yy = gridY - 1; yy >= 0; yy--) {
+        if (game.grid[yy][x] === null) {
+          hasSpace = true
+          break
+        }
+      }
+      if (!hasSpace) {
         if (!muted) playSound('explosion')
         setGameStatus('gameover')
         return
@@ -324,7 +335,6 @@ export default function SyntaxSprintGame() {
     }
 
     // Place in grid
-    const gridY = Math.min(Math.floor(y), GRID_HEIGHT - 1)
     if (game.grid[gridY][x] === null) {
       game.grid[gridY][x] = token
     } else {

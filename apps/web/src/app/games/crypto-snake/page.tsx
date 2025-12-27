@@ -319,8 +319,10 @@ export default function CryptoSnakeGame() {
         if (newHead.y < 0) newHead.y = GRID_SIZE - 1
         if (newHead.y >= GRID_SIZE) newHead.y = 0
 
-        // Check self collision
-        if (game.snake.some(seg => seg.x === newHead.x && seg.y === newHead.y)) {
+        // Check self collision (exclude tail since it will be removed unless eating)
+        // We check all but the last segment - the tail moves away on this frame
+        const bodyToCheck = game.snake.slice(0, -1)
+        if (bodyToCheck.some(seg => seg.x === newHead.x && seg.y === newHead.y)) {
           if (game.hasShield) {
             // Shield protects from one hit
             game.hasShield = false
