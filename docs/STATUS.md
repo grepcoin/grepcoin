@@ -15,16 +15,31 @@ GrepCoin is a decentralized arcade gaming platform built on Base L2, featuring 1
 
 ### Recent Updates
 
-#### Session 6: Launch Mode & Email Signup (December 28, 2024)
+#### Session 6: Launch Mode & Admin Tools (December 28, 2024)
 - **Launch page is now the default** - grepcoin.io shows countdown to Jan 31, 2026
 - **Middleware added** - Redirects all app pages to launch page until go-live
 - **Email signup system** - Database storage for waitlist with position tracking
-- **Vercel environment configured** - DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL set
+- **Vercel environment configured** - DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL, ADMIN_API_KEY
 - **Prisma schema updated** - Added LaunchSignup model for email collection
 - **Discord link updated** - Points to discord.gg/3eMCaa4p
-- **Admin API added** - /api/admin/signups for extracting waitlist emails
+- **Admin API created & tested** - `/api/admin/signups` for extracting waitlist
+  - JSON, CSV, and emails-only export formats
+  - Bearer token authentication
+  - Pagination support
+  - GDPR delete endpoint
+- **Local admin docs created** - `.env.admin` and `docs/ADMIN.md` (gitignored)
+- **README updated** - Launch date badge, status table, pre-launch messaging
 
-**Current Signups:** Tracking waitlist for launch notifications
+**Infrastructure:**
+| Component | Status |
+|-----------|--------|
+| Web App | ✅ Live at grepcoin.io |
+| Database | ✅ NeonDB PostgreSQL |
+| Vercel Env Vars | ✅ All configured |
+| Admin API | ✅ Tested & working |
+| Email Signups | ✅ Collecting waitlist |
+
+**Current Signups:** 2 users on waitlist
 
 #### Session 5: Production Cleanup & Launch Prep (December 28, 2024)
 - **Disabled GKE workflow** - Migrated to Vercel, removed stale CI
