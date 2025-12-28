@@ -1,53 +1,22 @@
-import Navbar from '@/components/Navbar'
-import Hero from '@/components/Hero'
-import LiveActivityTicker from '@/components/LiveActivityTicker'
-import Partners from '@/components/Partners'
-import HowItWorks from '@/components/HowItWorks'
-import Story from '@/components/Story'
-import GamesShowcase from '@/components/GamesShowcase'
-import DailyChallenge from '@/components/DailyChallenge'
-import PlayerSpotlight from '@/components/PlayerSpotlight'
-import AchievementShowcase from '@/components/AchievementShowcase'
-import Features from '@/components/Features'
-import Comparison from '@/components/Comparison'
-import Tokenomics from '@/components/Tokenomics'
-import StakingCalculator from '@/components/StakingCalculator'
-import Roadmap from '@/components/Roadmap'
-import Team from '@/components/Team'
-import FAQ from '@/components/FAQ'
-import Community from '@/components/Community'
-import Footer from '@/components/Footer'
-import CoinRain from '@/components/CoinRain'
+import LaunchCountdown from '@/components/LaunchCountdown'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'GrepCoin - Play Games. Earn Crypto. Have Fun.',
+  description: 'The AI-Built Crypto Arcade. Play games, earn GREP, own your rewards. 10 developer-themed games built on Base L2. Launching January 31, 2026.',
+  openGraph: {
+    title: 'GrepCoin - Play Games. Earn Crypto. Have Fun.',
+    description: 'The AI-Built Crypto Arcade. Play games, earn GREP, own your rewards.',
+    type: 'website',
+    url: 'https://grepcoin.io',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'GrepCoin - Play Games. Earn Crypto. Have Fun.',
+    description: 'The AI-Built Crypto Arcade. Play games, earn GREP, own your rewards.',
+  },
+}
 
 export default function Home() {
-  return (
-    <main className="min-h-screen relative">
-      {/* Subtle coin rain effect */}
-      <CoinRain />
-
-      <Navbar />
-      <Hero />
-      <LiveActivityTicker />
-      <Partners />
-      <div id="how-it-works">
-        <HowItWorks />
-      </div>
-      <div id="story">
-        <Story />
-      </div>
-      <GamesShowcase />
-      <DailyChallenge />
-      <PlayerSpotlight />
-      <AchievementShowcase />
-      <Features />
-      <Comparison />
-      <Tokenomics />
-      <StakingCalculator />
-      <Roadmap />
-      <Team />
-      <FAQ />
-      <Community />
-      <Footer />
-    </main>
-  )
+  return <LaunchCountdown />
 }
