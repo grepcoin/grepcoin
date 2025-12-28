@@ -1,7 +1,7 @@
 # GrepCoin Project Status Report
 
-**Last Updated:** December 28, 2024 (Session 5)
-**Version:** 1.4.0
+**Last Updated:** December 28, 2024 (Session 6)
+**Version:** 1.5.0
 **Git Branch:** main
 **Last Commit:** See git log for latest
 
@@ -9,11 +9,22 @@
 
 ## Executive Summary
 
-GrepCoin is a decentralized arcade gaming platform built on Base L2, featuring 10 developer-themed games, play-to-earn mechanics, and comprehensive Web3 integration. The project is now **LIVE IN PRODUCTION** on Vercel with a NeonDB PostgreSQL backend.
+GrepCoin is a decentralized arcade gaming platform built on Base L2, featuring 10 developer-themed games, play-to-earn mechanics, and comprehensive Web3 integration. The project is now in **LAUNCH MODE** on Vercel with a NeonDB PostgreSQL backend, showing the launch countdown page at grepcoin.io.
 
-**Overall Status:** 78% Production Ready
+**Overall Status:** 80% Production Ready | **Launch Date:** January 31, 2026
 
 ### Recent Updates
+
+#### Session 6: Launch Mode & Email Signup (December 28, 2024)
+- **Launch page is now the default** - grepcoin.io shows countdown to Jan 31, 2026
+- **Middleware added** - Redirects all app pages to launch page until go-live
+- **Email signup system** - Database storage for waitlist with position tracking
+- **Vercel environment configured** - DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL set
+- **Prisma schema updated** - Added LaunchSignup model for email collection
+- **Discord link updated** - Points to discord.gg/3eMCaa4p
+- **Admin API added** - /api/admin/signups for extracting waitlist emails
+
+**Current Signups:** Tracking waitlist for launch notifications
 
 #### Session 5: Production Cleanup & Launch Prep (December 28, 2024)
 - **Disabled GKE workflow** - Migrated to Vercel, removed stale CI
@@ -753,6 +764,7 @@ No production monitoring, logging, or alerting. No load testing. CI/CD exists bu
 
 | Version | Date | Status | Notes |
 |---------|------|--------|-------|
+| 1.5.0 | Dec 28, 2024 | Launch Mode | Launch page default, email signups, admin API, middleware redirect |
 | 1.4.0 | Dec 28, 2024 | Production | Launch prep: disabled GKE, added launch page, production audit |
 | 1.3.1 | Dec 27, 2024 | Production | P1 cleanup: ESLint 203→129, 5 game bugs fixed, stale closures resolved |
 | 1.3.0 | Dec 27, 2024 | Production | 2 new games, bug fixes, visual enhancements, mobile controls, pause functionality |

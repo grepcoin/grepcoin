@@ -20,7 +20,7 @@
 [![AI Powered](https://img.shields.io/badge/AI-Claude-ff6b35.svg)](https://anthropic.com)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[Website](https://grepcoin.io) • [Play Games](https://grepcoin.io/games) • [Documentation](https://docs.grepcoin.io) • [Discord](https://discord.gg/grepcoin) • [Twitter](https://twitter.com/grepcoin)
+[Website](https://grepcoin.io) • [Documentation](https://docs.grepcoin.io) • [Discord](https://discord.gg/3eMCaa4p) • [Twitter](https://twitter.com/grepcoin)
 
 </div>
 
@@ -278,7 +278,7 @@ Found a vulnerability? Please see [SECURITY.md](SECURITY.md) for responsible dis
 - **Games:** [grepcoin.io/games](https://grepcoin.io/games)
 - **GitHub:** [github.com/grepcoin](https://github.com/grepcoin/grepcoin)
 - **Twitter:** [@grepcoin](https://twitter.com/grepcoin)
-- **Discord:** [discord.gg/grepcoin](https://discord.gg/grepcoin)
+- **Discord:** [discord.gg/3eMCaa4p](https://discord.gg/3eMCaa4p)
 - **Docs:** [docs.grepcoin.io](https://docs.grepcoin.io)
 
 ---
