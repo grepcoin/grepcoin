@@ -287,7 +287,7 @@ export default function LaunchCountdown() {
               </svg>
             </a>
             <a
-              href="https://discord.gg/grepcoin"
+              href="https://discord.gg/3eMCaa4p"
               target="_blank"
               rel="noopener noreferrer"
               className="w-12 h-12 rounded-xl bg-dark-700/50 border border-dark-600 flex items-center justify-center text-gray-400 hover:text-white hover:border-grep-purple/50 transition-all"
