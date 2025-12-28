@@ -1,9 +1,55 @@
 # GrepCoin Project Status Report
 
-**Last Updated:** December 28, 2024 (Session 6)
+**Last Updated:** December 28, 2024 (Session 6 - Final)
 **Version:** 1.5.0
 **Git Branch:** main
 **Last Commit:** See git log for latest
+
+---
+
+## 🚀 Launch Checklist (January 31, 2026)
+
+### Critical Path (Must Complete)
+
+| # | Task | Branch | Status | Notes |
+|---|------|--------|--------|-------|
+| 1 | Deploy contracts to testnet | `feature/contract-deploy` | ⏳ | Need testnet ETH |
+| 2 | Test contract integration | `feature/contract-deploy` | ⏳ | After testnet deploy |
+| 3 | Deploy contracts to mainnet | `feature/contract-deploy` | ⏳ | Need mainnet ETH |
+| 4 | Update frontend contract addresses | `feature/contract-deploy` | ⏳ | Replace 0x0 placeholders |
+| 5 | Disable launch mode middleware | `main` | ⏳ | Go-live day |
+
+### Important (Before Launch)
+
+| # | Task | Branch | Status | Notes |
+|---|------|--------|--------|-------|
+| 6 | Configure Resend email | `feature/email-service` | ⏳ | Set RESEND_API_KEY |
+| 7 | Send launch announcement | `feature/email-service` | ⏳ | Email waitlist users |
+| 8 | Security review | - | ⏳ | Smart contract audit |
+
+### Feature Tracks (Post-Launch)
+
+| Track | Branch | Features | Priority |
+|-------|--------|----------|----------|
+| **Audio** | `feature/game-audio` | Sound effects, background music | P1 |
+| **Social** | `feature/social` | Friend challenges, sharing | P1 |
+| **Rewards** | `feature/rewards` | Leaderboard prizes, daily spin | P2 |
+| **Polish** | `feature/polish` | Tutorials, spectator mode | P3 |
+
+### Quick Resume Commands
+
+```bash
+# Check current status
+curl -H "Authorization: Bearer $ADMIN_API_KEY" https://grepcoin.io/api/admin/signups
+
+# Deploy contracts (when funded)
+cd packages/contracts
+npx hardhat run scripts/deploy.ts --network baseSepolia
+
+# Go live (remove middleware)
+# Edit apps/web/src/middleware.ts - comment out redirects
+vercel --prod
+```
 
 ---
 
