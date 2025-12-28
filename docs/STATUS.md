@@ -62,30 +62,75 @@ GrepCoin is a decentralized arcade gaming platform built on Base L2, featuring 1
 ### Recent Updates
 
 #### Session 6: Launch Mode & Admin Tools (December 28, 2024)
-- **Launch page is now the default** - grepcoin.io shows countdown to Jan 31, 2026
-- **Middleware added** - Redirects all app pages to launch page until go-live
-- **Email signup system** - Database storage for waitlist with position tracking
-- **Vercel environment configured** - DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL, ADMIN_API_KEY
-- **Prisma schema updated** - Added LaunchSignup model for email collection
-- **Discord link updated** - Points to discord.gg/3eMCaa4p
-- **Admin API created & tested** - `/api/admin/signups` for extracting waitlist
-  - JSON, CSV, and emails-only export formats
-  - Bearer token authentication
-  - Pagination support
-  - GDPR delete endpoint
-- **Local admin docs created** - `.env.admin` and `docs/ADMIN.md` (gitignored)
-- **README updated** - Launch date badge, status table, pre-launch messaging
 
-**Infrastructure:**
+**Summary:** Transitioned site to pre-launch mode with countdown, built admin tools for waitlist management, created feature branches for future work.
+
+**Changes Made:**
+1. **Launch Page as Default**
+   - `apps/web/src/app/page.tsx` - Now renders LaunchCountdown
+   - `apps/web/src/middleware.ts` - Redirects all routes to launch page
+   - Launch date: January 31, 2026
+
+2. **Email Signup System**
+   - `apps/web/prisma/schema.prisma` - Added LaunchSignup model
+   - `apps/web/src/app/api/launch/signup/route.ts` - POST/GET endpoints
+   - Tracks: email, source, referrer, IP, user agent, waitlist position
+
+3. **Admin API** (`/api/admin/signups`)
+   - `apps/web/src/app/api/admin/signups/route.ts`
+   - Formats: JSON (default), CSV, emails-only
+   - Auth: Bearer token (ADMIN_API_KEY)
+   - Methods: GET (list), DELETE (GDPR removal)
+
+4. **Vercel Environment Variables**
+   - DATABASE_URL ✅
+   - NEXTAUTH_SECRET ✅
+   - NEXTAUTH_URL ✅
+   - NEXT_PUBLIC_APP_URL ✅
+   - ADMIN_API_KEY ✅
+
+5. **Local Files (gitignored)**
+   - `.env.admin` - Admin API key and commands
+   - `docs/ADMIN.md` - Full admin documentation
+
+6. **Documentation Updates**
+   - README.md - Launch badge, status table
+   - Discord link → discord.gg/3eMCaa4p
+
+7. **Feature Branches Created**
+   - `feature/contract-deploy` - Smart contract deployment
+   - `feature/email-service` - Resend integration
+   - `feature/game-audio` - Sound effects, music
+   - `feature/social` - Friend challenges
+   - `feature/rewards` - Leaderboard prizes
+   - `feature/polish` - Tutorials, spectator mode
+
+**Commits This Session:**
+- `a8415567` - fix: update Discord invite link
+- `70795575` - feat: make launch page default, hide main app
+- `3c4b82d7` - docs: update for v1.5.0 launch mode + admin API
+- `8522f457` - fix: allow admin API through middleware
+- `f0e25816` - fix: read ADMIN_API_KEY at request time
+- `96129b53` - docs: update README with launch status
+- `a38e12e4` - docs: update checkpoint for Session 6
+- `b7051c74` - docs: add launch checklist and feature tracks
+
+**Current State:**
 | Component | Status |
 |-----------|--------|
 | Web App | ✅ Live at grepcoin.io |
+| Launch Page | ✅ Countdown to Jan 31, 2026 |
 | Database | ✅ NeonDB PostgreSQL |
 | Vercel Env Vars | ✅ All configured |
 | Admin API | ✅ Tested & working |
-| Email Signups | ✅ Collecting waitlist |
+| Email Signups | ✅ 2 users on waitlist |
+| Feature Branches | ✅ 6 branches ready |
 
-**Current Signups:** 2 users on waitlist
+**Admin API Quick Test:**
+```bash
+curl -H "Authorization: Bearer gc_admin_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6" \
+  https://grepcoin.io/api/admin/signups
+```
 
 #### Session 5: Production Cleanup & Launch Prep (December 28, 2024)
 - **Disabled GKE workflow** - Migrated to Vercel, removed stale CI
