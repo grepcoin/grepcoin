@@ -13,14 +13,30 @@
 
 **Play games. Earn GREP. Own your rewards.**
 
+[![Launch: Jan 31, 2026](https://img.shields.io/badge/Launch-Jan%2031%2C%202026-ff6b35.svg)](https://grepcoin.io)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 [![Built on Base](https://img.shields.io/badge/Built%20on-Base-0052FF.svg)](https://base.org)
 [![Next.js 15](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636.svg)](https://soliditylang.org)
 [![AI Powered](https://img.shields.io/badge/AI-Claude-ff6b35.svg)](https://anthropic.com)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[Website](https://grepcoin.io) • [Documentation](https://docs.grepcoin.io) • [Discord](https://discord.gg/3eMCaa4p) • [Twitter](https://twitter.com/grepcoin)
+[Website](https://grepcoin.io) • [Discord](https://discord.gg/3eMCaa4p) • [Twitter](https://twitter.com/grepcoin)
+
+---
+
+### Current Status: Pre-Launch
+
+GrepCoin is in **launch countdown mode**. Visit [grepcoin.io](https://grepcoin.io) to join the waitlist.
+
+| Milestone | Status |
+|-----------|--------|
+| Web App | ✅ Complete |
+| 10 Games | ✅ Complete |
+| Smart Contracts | ✅ Tests passing |
+| Database | ✅ Production ready |
+| Hosting (Vercel) | ✅ Live |
+| Contract Deployment | ⏳ Pending |
+| Token Launch | 📅 Jan 31, 2026 |
 
 </div>
 
@@ -275,11 +291,9 @@ Found a vulnerability? Please see [SECURITY.md](SECURITY.md) for responsible dis
 ## Links
 
 - **Website:** [grepcoin.io](https://grepcoin.io)
-- **Games:** [grepcoin.io/games](https://grepcoin.io/games)
 - **GitHub:** [github.com/grepcoin](https://github.com/grepcoin/grepcoin)
 - **Twitter:** [@grepcoin](https://twitter.com/grepcoin)
 - **Discord:** [discord.gg/3eMCaa4p](https://discord.gg/3eMCaa4p)
-- **Docs:** [docs.grepcoin.io](https://docs.grepcoin.io)
 
 ---
 
