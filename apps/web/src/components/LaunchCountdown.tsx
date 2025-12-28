@@ -61,7 +61,13 @@ export default function LaunchCountdown() {
       <div className="relative z-10 text-center max-w-4xl mx-auto">
         {/* Logo */}
         <div className="mb-8">
-          <h1 className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent animate-gradient">
+          <h1
+            className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent"
+            style={{
+              backgroundSize: '200% 200%',
+              animation: 'gradient 3s ease infinite',
+            }}
+          >
             GrepCoin
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mt-4">
@@ -176,16 +182,15 @@ export default function LaunchCountdown() {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes gradient {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        .animate-gradient {
-          background-size: 200% 200%;
-          animation: gradient 3s ease infinite;
-        }
-      `}</style>
+      {/* Global keyframes for gradient animation */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes gradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+          }
+        `
+      }} />
     </div>
   )
 }
