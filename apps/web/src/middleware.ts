@@ -7,6 +7,7 @@ const ALLOWED_PATHS = [
   '/launch',
   '/api/launch/signup',
   '/api/health',
+  '/api/admin/signups',
   '/cookies',
   '/disclaimer',
   '/privacy',
