@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
-// Simple admin key check - set ADMIN_API_KEY in Vercel env vars
-const ADMIN_API_KEY = process.env.ADMIN_API_KEY
-
-export async function GET(request: NextRequest) {
-  // Check for admin API key
+function checkAuth(request: NextRequest): boolean {
+  const adminKey = process.env.ADMIN_API_KEY
   const authHeader = request.headers.get('authorization')
   const apiKey = authHeader?.replace('Bearer ', '')
+  return !!(adminKey && apiKey === adminKey)
+}
 
-  if (!ADMIN_API_KEY || apiKey !== ADMIN_API_KEY) {
+export async function GET(request: NextRequest) {
+  if (!checkAuth(request)) {
     return NextResponse.json(
       { error: 'Unauthorized' },
       { status: 401 }
@@ -93,10 +93,7 @@ export async function GET(request: NextRequest) {
 
 // Delete a signup (for GDPR/unsubscribe requests)
 export async function DELETE(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  const apiKey = authHeader?.replace('Bearer ', '')
-
-  if (!ADMIN_API_KEY || apiKey !== ADMIN_API_KEY) {
+  if (!checkAuth(request)) {
     return NextResponse.json(
       { error: 'Unauthorized' },
       { status: 401 }
