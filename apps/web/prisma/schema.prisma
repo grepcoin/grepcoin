@@ -779,3 +779,20 @@ model AnalyticsEvent {
   @@index([userId])
   @@index([createdAt])
 }
+
+// Launch page email signups
+model LaunchSignup {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  source    String   @default("launch_page") // launch_page, twitter, discord, etc.
+  referrer  String?  // UTM or referral source
+  ipAddress String?  // For duplicate prevention
+  userAgent String?  // Browser/device info
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([source])
+  @@index([createdAt])
+}
